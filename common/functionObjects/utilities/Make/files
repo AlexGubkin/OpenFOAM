@@ -1,0 +1,5 @@
+saturation/saturation.C
+massFlowRate/massFlowRate.C
+volumetricFlowRate/volumetricFlowRate.C
+
+LIB = $(FOAM_USER_LIBBIN)/libuserUtilityFunctionObjects
