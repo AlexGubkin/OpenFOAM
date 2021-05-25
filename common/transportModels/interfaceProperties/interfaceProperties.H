@@ -71,7 +71,7 @@ class interfaceProperties
 
         const volScalarField& alpha1_;
         const volVectorField& U_;
-        surfaceVectorField nHatfv_;
+//         surfaceVectorField nHatfv_;
         surfaceScalarField nHatf_;
         volScalarField K_;
 
@@ -123,10 +123,10 @@ public:
             return deltaN_;
         }
 
-        const surfaceVectorField& nHatfv() const
-        {
-            return nHatfv_;
-        }
+//         const surfaceVectorField& nHatfv() const
+//         {
+//             return nHatfv_;
+//         }
 
         const surfaceScalarField& nHatf() const
         {
