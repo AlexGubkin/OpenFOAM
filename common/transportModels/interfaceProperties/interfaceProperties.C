@@ -178,7 +178,6 @@ Foam::interfaceProperties::interfaceProperties
     ),
 
     alpha1_(alpha1),
-//     T_(T),
     U_(U),
 
     nHatfv_
@@ -233,8 +232,16 @@ Foam::interfaceProperties::sigmaK() const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::interfaceProperties::surfaceTensionForce() const
 {
-    const surfaceVectorField& tau = nHatfv_;
-    return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + (fvc::snGrad(sigmaPtr_->sigma()));
+    const fvMesh& mesh = alpha1_.mesh();
+    const surfaceVectorField& Sf = mesh.Sf();
+
+//     surfaceVectorField snGradSigmaf =
+//         fvc::snGrad(sigmaPtr_->sigma());
+
+    surfaceVectorField gradSigma(fvc::interpolate(fvc::grad(sigmaPtr_->sigma())));
+
+//     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + (gradSigma - (gradSigma & nHatfv_)/(nHatfv_ & nHatfv_)*nHatfv_) & Sf;
+    return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + gradSigma & Sf;
 }
 
 

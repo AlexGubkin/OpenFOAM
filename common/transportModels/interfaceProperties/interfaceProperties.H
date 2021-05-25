@@ -57,9 +57,6 @@ class interfaceProperties
 {
     // Private Data
 
-        //- Name of temperature field, default = "T"
-        word TName_;
-
         //- Keep a reference to the transportProperties dictionary
         const dictionary& transportPropertiesDict_;
 
@@ -73,7 +70,6 @@ class interfaceProperties
         const dimensionedScalar deltaN_;
 
         const volScalarField& alpha1_;
-//         const volScalarField& T_;
         const volVectorField& U_;
         surfaceVectorField nHatfv_;
         surfaceScalarField nHatf_;
