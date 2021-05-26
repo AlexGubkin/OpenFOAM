@@ -235,7 +235,31 @@ Foam::interfaceProperties::surfaceTensionForce() const
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
 //     const scalarField& V = mesh.V();
+    const vectorField& CC = mesh.C();
 
+    const scalar epsilon(0.9);
+    const scalar alpha10(0.5);
+
+    volScalarField delta
+    (
+        IOobject
+        (
+            "delta",
+            alpha1_.time().timeName(),
+            mesh
+        ),
+        mesh,
+        dimensionedScalar(dimless, 0)
+    );
+
+    forAll(CC, CVCi)
+    {
+        delta[CVCi] =
+            (Foam::mag(alpha1_[CVCi] - alpha10) <= 0.5*epsilon)
+            ? 1.0/epsilon*(1.0 + Foam::cos(Foam::constant::mathematical::twoPi*(alpha1_[CVCi] - alpha10)/epsilon))
+            : 0.0;
+    }
+    
     volScalarField V
     (
         IOobject
@@ -245,7 +269,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
             mesh
         ),
         mesh,
-        dimensionedScalar("small", dimVolume, SMALL)
+        dimensionedScalar(dimVolume, SMALL)
     );
 
     V.ref() = mesh.V();
@@ -264,7 +288,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
     const volVectorField gradSigmaByV(fvc::grad(sigmaPtr_->sigma())/V);
 
     // Interpolated face-gradient of sigma
-    surfaceVectorField gradSigmaByVf(fvc::interpolate(gradSigmaByV));
+    surfaceVectorField gradSigmaByVf(fvc::interpolate(delta)*fvc::interpolate(gradSigmaByV));
 
     surfaceScalarField tangentForce((gradSigmaByVf - (gradSigmaByVf & nHatfv)*nHatfv) & Sf);
 
