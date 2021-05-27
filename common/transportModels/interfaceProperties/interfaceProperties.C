@@ -233,7 +233,7 @@ Foam::tmp<Foam::surfaceScalarField>
 Foam::interfaceProperties::surfaceTensionForce() const
 {
     const fvMesh& mesh = alpha1_.mesh();
-    const surfaceVectorField& Sf = mesh.Sf();
+//     const surfaceVectorField& Sf = mesh.Sf();
 //     const scalarField& V = mesh.V();
     const vectorField& CC = mesh.C();
 
@@ -249,7 +249,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
             mesh
         ),
         mesh,
-        dimensionedScalar(dimless, 0)
+        dimensionedScalar(dimless/dimLength, 0)
     );
 
     forAll(CC, CVCi)
@@ -257,22 +257,22 @@ Foam::interfaceProperties::surfaceTensionForce() const
         delta[CVCi] =
             (Foam::mag(alpha1_[CVCi] - alpha10) <= 0.5*epsilon)
             ? 1.0/epsilon*(1.0 + Foam::cos(Foam::constant::mathematical::twoPi*(alpha1_[CVCi] - alpha10)/epsilon))
-            : 0.0;
+            : 0;
     }
-    
-    volScalarField V
-    (
-        IOobject
-        (
-            "V",
-            alpha1_.time().timeName(),
-            mesh
-        ),
-        mesh,
-        dimensionedScalar(dimVolume, SMALL)
-    );
 
-    V.ref() = mesh.V();
+//     volScalarField V
+//     (
+//         IOobject
+//         (
+//             "V",
+//             alpha1_.time().timeName(),
+//             mesh
+//         ),
+//         mesh,
+//         dimensionedScalar(dimVolume, SMALL)
+//     );
+// 
+//     V.ref() = mesh.V();
     
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
@@ -285,12 +285,12 @@ Foam::interfaceProperties::surfaceTensionForce() const
 
     // Cell gradient of sigma
 //     const volVectorField gradSigma(fvc::grad(sigmaPtr_->sigma(), "sigma"));
-    const volVectorField gradSigmaByV(fvc::grad(sigmaPtr_->sigma())/V);
+    const volVectorField gradSigma(fvc::grad(sigmaPtr_->sigma()));
 
     // Interpolated face-gradient of sigma
-    surfaceVectorField gradSigmaByVf(fvc::interpolate(delta)*fvc::interpolate(gradSigmaByV));
+    surfaceVectorField gradSigmaf(fvc::interpolate(delta)*fvc::interpolate(gradSigma));
 
-    surfaceScalarField tangentForce((gradSigmaByVf - (gradSigmaByVf & nHatfv)*nHatfv) & Sf);
+    surfaceScalarField tangentForce((gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf());
 
     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentForce;
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_);
