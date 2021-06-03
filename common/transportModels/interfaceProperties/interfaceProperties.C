@@ -273,16 +273,16 @@ Foam::interfaceProperties::surfaceTensionForce() const
 //     );
 // 
 //     V.ref() = mesh.V();
-// 
-//     // Cell gradient of alpha
-//     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
-// 
-//     // Interpolated face-gradient of alpha
-//     const surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
-// 
-//     // Face unit interface normal
-//     const surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
-// 
+
+    // Cell gradient of alpha
+    const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
+
+    // Interpolated face-gradient of alpha
+    const surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
+
+    // Face unit interface normal
+    const surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
+
 //     // Cell gradient of sigma
 // //     const volVectorField gradSigma(fvc::grad(sigmaPtr_->sigma(), "sigma"));
 //     const volVectorField gradSigmaByV(fvc::grad(sigmaPtr_->sigma())/V);
