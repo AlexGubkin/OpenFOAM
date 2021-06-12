@@ -23,7 +23,9 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/CourantNo.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/setInitialDeltaT.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createUfIfPresent.H \
 $(WM_PROJECT_DIR)/src/dynamicFvMesh/lnInclude/readDyMControls.H \
-$(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/setDeltaT.H \
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/setRDeltaT.H \
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/alphaCourantNo.H \
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/setDeltaT.H \
 correctPhi.H \
 $(WM_PROJECT_DIR)/src/dynamicFvMesh/lnInclude/meshCourantNo.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/alphaControls.H \
@@ -89,10 +91,12 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPhi.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/readGravitationalAcceleration.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/readhRef.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/gh.H \
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/createAlphaFluxes.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createMRF.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createFvOptions.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/readTimeControls.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/continuityErrs.H \
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/alphaEqn.H \
 rhofs.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Pstream.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOstreams.H \
@@ -208,7 +212,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Function1.C \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Constant.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/psiThermo.H \
-/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H \
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/CompressibleTurbulenceModel.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/ThermalDiffusivity.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/EddyDiffusivity.H \
@@ -238,6 +242,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addDictOption.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPisoControl.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPimpleControl.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createSimpleControl.H \
+alphaSuSp.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/UPstream.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/DynamicList.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/gatherScatter.C \
@@ -388,7 +393,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Field.C \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/ConstantI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Constant.C \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Function1New.C \
-$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/turbulenceModels/lnInclude/TurbulenceModel.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/compressibleTurbulenceModel.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/CompressibleTurbulenceModel.C \
@@ -900,7 +905,9 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/CourantNo.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/setInitialDeltaT.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createUfIfPresent.H :
 $(WM_PROJECT_DIR)/src/dynamicFvMesh/lnInclude/readDyMControls.H :
-$(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/setDeltaT.H :
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/setRDeltaT.H :
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/alphaCourantNo.H :
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/setDeltaT.H :
 correctPhi.H :
 $(WM_PROJECT_DIR)/src/dynamicFvMesh/lnInclude/meshCourantNo.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/alphaControls.H :
@@ -966,10 +973,12 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPhi.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/readGravitationalAcceleration.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/readhRef.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/gh.H :
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/createAlphaFluxes.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createMRF.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createFvOptions.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/readTimeControls.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/continuityErrs.H :
+$(WM_PROJECT_DIR)/applications/solvers/multiphase/VoF/alphaEqn.H :
 rhofs.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Pstream.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOstreams.H :
@@ -1085,7 +1094,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Function1.C :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Constant.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/psiThermo.H :
-/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H :
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/CompressibleTurbulenceModel.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/ThermalDiffusivity.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/EddyDiffusivity.H :
@@ -1115,6 +1124,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addDictOption.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPisoControl.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createPimpleControl.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/createSimpleControl.H :
+alphaSuSp.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/UPstream.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/DynamicList.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/gatherScatter.C :
@@ -1265,7 +1275,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Field.C :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/ConstantI.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Constant.C :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/Function1New.C :
-$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/turbulenceModels/lnInclude/TurbulenceModel.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/compressibleTurbulenceModel.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/CompressibleTurbulenceModel.C :

@@ -1,6 +1,5 @@
 EXE_INC = \
     -I$(OWN_LIB_SRC)/transportModels/interfaceProperties/lnInclude \
-    -I$(LIB_SRC)/transportModels/interfaceProperties/lnInclude \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
@@ -9,6 +8,7 @@ EXE_INC = \
 
 LIB_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
+    -linterfacePropertiesTangentialForceAddition \
     -lcompressibleTransportModels \
     -lfluidThermophysicalModels \
     -lspecie \

@@ -8,7 +8,7 @@ VoFphaseCompressibleTurbulenceModel.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/psiThermo.H \
-/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H \
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/CompressibleTurbulenceModel.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/ThermalDiffusivity.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/EddyDiffusivity.H \
@@ -28,7 +28,7 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/calculatedFvPatchFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFieldsI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/runTimeSelectionTables.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H \
-$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/turbulenceModels/lnInclude/TurbulenceModel.H \
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/compressibleTurbulenceModel.H \
@@ -729,7 +729,7 @@ VoFphaseCompressibleTurbulenceModel.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/psiThermo.H :
-/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H :
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/CompressibleTurbulenceModel.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/ThermalDiffusivity.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/EddyDiffusivity.H :
@@ -749,7 +749,7 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/calculatedFvPatchFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFieldsI.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/runTimeSelectionTables.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H :
-$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
+/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/turbulenceModels/lnInclude/TurbulenceModel.H :
 $(WM_PROJECT_DIR)/src/TurbulenceModels/compressible/lnInclude/compressibleTurbulenceModel.H :

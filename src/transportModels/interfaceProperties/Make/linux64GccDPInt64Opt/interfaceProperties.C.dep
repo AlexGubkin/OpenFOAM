@@ -1,14 +1,14 @@
 $(OBJECTS_DIR)/interfaceProperties.C.dep: \
 interfaceProperties.C \
 interfaceProperties.H \
-$(WM_PROJECT_DIR)/src/transportModels/twoPhaseProperties/lnInclude/alphaContactAngleFvPatchScalarField.H \
+$(WM_PROJECT_DIR)/src/transportModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle/alphaContactAngleFvPatchScalarField.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/mathematicalConstants.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceInterpolate.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcDiv.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcGrad.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcSnGrad.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H \
-$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
+lnInclude/surfaceTensionModel.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchFields.H \
@@ -564,14 +564,14 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/SpatialVectorI.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/SpatialTensorI.H \
 
 interfaceProperties.H :
-$(WM_PROJECT_DIR)/src/transportModels/twoPhaseProperties/lnInclude/alphaContactAngleFvPatchScalarField.H :
+$(WM_PROJECT_DIR)/src/transportModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle/alphaContactAngleFvPatchScalarField.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/mathematicalConstants.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceInterpolate.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcDiv.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcGrad.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcSnGrad.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H :
-$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
+lnInclude/surfaceTensionModel.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchFields.H :
