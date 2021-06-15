@@ -7,7 +7,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/collatedFileOperation.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/psiThermo.H \
 $(WM_PROJECT_DIR)/src/transportModels/twoPhaseMixture/lnInclude/twoPhaseMixture.H \
-/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H \
+/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/mixedFvPatchFields.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/masterUncollatedFileOperation.H \
@@ -17,7 +17,7 @@ $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/fluidThermo.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/runTimeSelectionTables.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H \
-/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
+/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchField.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/fieldTypes.H \
@@ -553,7 +553,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/collatedFileOperation.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/psiThermo.H :
 $(WM_PROJECT_DIR)/src/transportModels/twoPhaseMixture/lnInclude/twoPhaseMixture.H :
-/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H :
+/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/interfaceProperties.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/mixedFvPatchFields.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/masterUncollatedFileOperation.H :
@@ -563,7 +563,7 @@ $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/fluidThermo.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/runTimeSelectionTables.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H :
-/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
+/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchField.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/fieldTypes.H :

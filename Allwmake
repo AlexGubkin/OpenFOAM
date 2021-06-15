@@ -11,7 +11,7 @@ export OWN_LIB_SRC
 src/Allwmake $targetType $*
 
 # Compile OpenFOAM libraries and applications
-# applications/Allwmake $targetType $*
+applications/Allwmake $targetType $*
 
 
 

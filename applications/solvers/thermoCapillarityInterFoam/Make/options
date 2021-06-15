@@ -18,8 +18,8 @@ EXE_INC = \
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -linterfacePropertiesTangentialForceAddition \
-    -ltwoPhaseMixtureThermo \
-    -ltwoPhaseSurfaceTension \
+    -ltwoPhaseMixtureThermo2 \
+    -ltwoPhaseSurfaceTension2 \
     -lcompressibleTransportModels \
     -lfluidThermophysicalModels \
     -lspecie \
@@ -27,7 +27,7 @@ EXE_LIBS = \
     -ltwoPhaseProperties \
     -lturbulenceModels \
     -lcompressibleTurbulenceModels \
-    -lVoFphaseCompressibleTurbulenceModels \
+    -lVoFphaseCompressibleTurbulenceModels2 \
     -lfiniteVolume \
     -lfvOptions \
     -lmeshTools \

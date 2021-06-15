@@ -3,7 +3,7 @@ liquidProperties/liquidPropertiesSurfaceTension.C \
 lnInclude/liquidPropertiesSurfaceTension.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/liquidThermo.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addToRunTimeSelectionTable.H \
-/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
+/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/heRhoThermo.H \
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/pureMixture.H \
@@ -549,7 +549,7 @@ $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/SpatialTensorI.H \
 lnInclude/liquidPropertiesSurfaceTension.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/liquidThermo.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/addToRunTimeSelectionTable.H :
-/home/itam-alex/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
+/home/alexgubkin/OpenFOAM/OpenFOAM/src/transportModels/interfaceProperties/lnInclude/surfaceTensionModel.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/rhoThermo.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/heRhoThermo.H :
 $(WM_PROJECT_DIR)/src/thermophysicalModels/basic/lnInclude/pureMixture.H :
