@@ -8,7 +8,7 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcDiv.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcGrad.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcSnGrad.H \
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H \
-lnInclude/surfaceTensionModel.H \
+$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/surfaceTensionModels/surfaceTensionModel/surfaceTensionModel.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H \
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchFields.H \
@@ -571,7 +571,7 @@ $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcDiv.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcGrad.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fvcSnGrad.H :
 $(WM_PROJECT_DIR)/src/OpenFOAM/lnInclude/IOdictionary.H :
-lnInclude/surfaceTensionModel.H :
+$(WM_PROJECT_DIR)/src/transportModels/interfaceProperties/surfaceTensionModels/surfaceTensionModel/surfaceTensionModel.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/volFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/surfaceFields.H :
 $(WM_PROJECT_DIR)/src/finiteVolume/lnInclude/fixedGradientFvPatchFields.H :

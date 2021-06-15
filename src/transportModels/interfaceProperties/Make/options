@@ -1,8 +1,13 @@
 EXE_INC = \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/interfaceCompression \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/surfaceTensionModels/constant \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/surfaceTensionModels/surfaceTensionModel \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/surfaceTensionModels/temperatureDependent\
     -I$(LIB_SRC)/transportModels/twoPhaseMixture/lnInclude \
     -I$(LIB_SRC)/transportModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle \
     -I$(LIB_SRC)/finiteVolume/lnInclude
     
 LIB_LIBS = \
+    -lOpenFOAM \
     -ltwoPhaseMixture \
     -lfiniteVolume
