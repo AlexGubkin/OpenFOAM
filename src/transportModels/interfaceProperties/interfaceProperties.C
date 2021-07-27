@@ -235,6 +235,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
     const fvMesh& mesh = alpha1_.mesh();
 
     /*Continuum surface force (CSF) approach*/
+
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
 
@@ -258,6 +259,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
 
     
     /*Sharp surface tension force (SSF) approach*/
+
 //     const scalarField& V = mesh.V();
 //     const vectorField& CC = mesh.C();
 // 
