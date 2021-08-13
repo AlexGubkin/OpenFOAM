@@ -1,1 +1,1 @@
-LIB = $(FOAM_USER_LIBBIN)/libtwoPhaseSurfaceTension2
+LIB = $(FOAM_USER_LIBBIN)/libtwoPhaseSurfaceTensionForThermoCapillarityInterFoam
