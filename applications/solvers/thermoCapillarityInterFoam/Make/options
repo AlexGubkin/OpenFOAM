@@ -1,5 +1,5 @@
 EXE_INC = \
-    -I$(OWN_LIB_SRC)/transportModels/interfaceProperties/lnInclude \
+    -I$(OWN_LIB_SRC)/lnInclude \
     -I. \
     -I$(FOAM_APP)/solvers/multiphase/VoF \
     -ItwoPhaseMixtureThermo \

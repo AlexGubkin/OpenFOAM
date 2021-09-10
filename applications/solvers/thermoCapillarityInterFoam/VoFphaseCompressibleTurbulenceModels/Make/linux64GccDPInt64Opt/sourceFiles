@@ -1,3 +1,0 @@
-SOURCE = \
-VoFphaseCompressibleTurbulenceModels.C \
-compressibleInterPhaseTransportModel.C 
