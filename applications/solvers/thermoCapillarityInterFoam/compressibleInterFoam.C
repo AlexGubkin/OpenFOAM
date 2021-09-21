@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2019 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,8 +48,11 @@ Description
 #include "CrankNicolsonDdtScheme.H"
 #include "subCycle.H"
 #include "compressibleInterPhaseTransportModel.H"
+#include "noPhaseChange.H"
 #include "pimpleControl.H"
-#include "fvOptions.H"
+#include "pressureReference.H"
+#include "fvModels.H"
+#include "fvConstraints.H"
 #include "CorrectPhi.H"
 #include "fvcSmooth.H"
 
@@ -65,26 +68,17 @@ int main(int argc, char *argv[])
     #include "initContinuityErrs.H"
     #include "createDyMControls.H"
     #include "createFields.H"
+    #include "createFieldRefs.H"
     #include "CourantNo.H"
     #include "setInitialDeltaT.H"
     #include "createUfIfPresent.H"
 
-    volScalarField& p = mixture.p();
-    volScalarField& T = mixture.T();
-    const volScalarField& psi1 = mixture.thermo1().psi();
-    const volScalarField& psi2 = mixture.thermo2().psi();
-
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.run())
+    while (pimple.run(runTime))
     {
         #include "readDyMControls.H"
-
-        // Store divU from the previous mesh so that it can be mapped
-        // and used in correctPhi to ensure the corrected phi has the
-        // same divergence
-        volScalarField divU("divU0", fvc::div(fvc::absolute(phi, U)));
 
         if (LTS)
         {
@@ -106,6 +100,23 @@ int main(int argc, char *argv[])
         {
             if (pimple.firstPimpleIter() || moveMeshOuterCorrectors)
             {
+                // Store divU from the previous mesh so that it can be mapped
+                // and used in correctPhi to ensure the corrected phi has the
+                // same divergence
+                tmp<volScalarField> divU;
+
+                if (correctPhi)
+                {
+                    // Construct and register divU for mapping
+                    divU = new volScalarField
+                    (
+                        "divU0",
+                        fvc::div(fvc::absolute(phi, U))
+                    );
+                }
+
+                fvModels.preUpdateMesh();
+
                 mesh.update();
 
                 if (mesh.changing())
@@ -117,14 +128,7 @@ int main(int argc, char *argv[])
 
                     if (correctPhi)
                     {
-                        // Calculate absolute flux
-                        // from the mapped surface velocity
-                        phi = mesh.Sf() & Uf();
-
                         #include "correctPhi.H"
-
-                        // Make the fluxes relative to the mesh motion
-                        fvc::makeRelative(phi, U);
                     }
 
                     mixture.correct();
@@ -134,9 +138,11 @@ int main(int argc, char *argv[])
                         #include "meshCourantNo.H"
                     }
                 }
+
+                divU.clear();
             }
 
-            divU = fvc::div(fvc::absolute(phi, U));
+            fvModels.correct();
 
             #include "alphaControls.H"
             #include "compressibleAlphaEqnSubCycle.H"

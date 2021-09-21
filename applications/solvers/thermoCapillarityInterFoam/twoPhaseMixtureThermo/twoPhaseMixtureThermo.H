@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2013-2019 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2013-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,6 +25,8 @@ Class
     Foam::twoPhaseMixtureThermo
 
 Description
+    Thermophysical properties class for a mixture of two rhoThermo including
+    interfaceProperties for VoF for use in compressibleInterFoam.
 
 SourceFiles
     twoPhaseMixtureThermoI.H
@@ -37,7 +39,6 @@ SourceFiles
 #define twoPhaseMixtureThermo_H
 
 #include "rhoThermo.H"
-#include "psiThermo.H"
 #include "twoPhaseMixture.H"
 #include "interfaceProperties.H"
 
@@ -47,12 +48,12 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                         Class twoPhaseMixtureThermo Declaration
+                    Class twoPhaseMixtureThermo Declaration
 \*---------------------------------------------------------------------------*/
 
 class twoPhaseMixtureThermo
 :
-    public psiThermo,
+    public rhoThermo::composite,
     public twoPhaseMixture,
     public interfaceProperties
 {
@@ -63,6 +64,12 @@ class twoPhaseMixtureThermo
 
         //- Thermo-package of phase 2
         autoPtr<rhoThermo> thermo2_;
+
+        //- Mass-fraction of phase 1
+        volScalarField Alpha1_;
+
+        //- Mass-fraction of phase 2
+        volScalarField Alpha2_;
 
 
 public:
@@ -87,24 +94,40 @@ public:
 
     // Member Functions
 
+        //- Return the thermo for phase 1
         const rhoThermo& thermo1() const
         {
             return thermo1_();
         }
 
+        //- Return the thermo for phase 2
         const rhoThermo& thermo2() const
         {
             return thermo2_();
         }
 
+        //- Return the thermo for phase 1
         rhoThermo& thermo1()
         {
             return thermo1_();
         }
 
+        //- Return the thermo for phase 2
         rhoThermo& thermo2()
         {
             return thermo2_();
+        }
+
+        //- Return the density of phase 1
+        const volScalarField& rho1() const
+        {
+            return thermo1_->rho();
+        }
+
+        //- Return the density of phase 2
+        const volScalarField& rho2() const
+        {
+            return thermo2_->rho();
         }
 
         //- Correct the thermodynamics of each phase
@@ -153,7 +176,6 @@ public:
             //- Enthalpy/Internal energy for cell-set [J/kg]
             virtual tmp<scalarField> he
             (
-                const scalarField& p,
                 const scalarField& T,
                 const labelList& cells
             ) const;
@@ -161,19 +183,75 @@ public:
             //- Enthalpy/Internal energy for patch [J/kg]
             virtual tmp<scalarField> he
             (
-                const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
 
-            //- Chemical enthalpy [J/kg]
+            //- Sensible enthalpy [J/kg]
+            virtual tmp<volScalarField> hs() const;
+
+            //- Sensible enthalpy
+            //  for given pressure and temperature [J/kg]
+            virtual tmp<volScalarField> hs
+            (
+                const volScalarField& p,
+                const volScalarField& T
+            ) const;
+
+            //- Sensible enthalpy for cell-set [J/kg]
+            virtual tmp<scalarField> hs
+            (
+                const scalarField& T,
+                const labelList& cells
+            ) const;
+
+            //- Sensible enthalpy for patch [J/kg]
+            virtual tmp<scalarField> hs
+            (
+                const scalarField& T,
+                const label patchi
+            ) const;
+
+            //- Absolute enthalpy [J/kg]
+            virtual tmp<volScalarField> ha() const;
+
+            //- Absolute enthalpy
+            //  for given pressure and temperature [J/kg]
+            virtual tmp<volScalarField> ha
+            (
+                const volScalarField& p,
+                const volScalarField& T
+            ) const;
+
+            //- Absolute enthalpy for cell-set [J/kg]
+            virtual tmp<scalarField> ha
+            (
+                const scalarField& T,
+                const labelList& cells
+            ) const;
+
+            //- Absolute enthalpy for patch [J/kg]
+            virtual tmp<scalarField> ha
+            (
+                const scalarField& T,
+                const label patchi
+            ) const;
+
+            //- Enthalpy of formation [J/kg]
             virtual tmp<volScalarField> hc() const;
+
+            //- Temperature from enthalpy/internal energy
+            virtual tmp<volScalarField> THE
+            (
+                const volScalarField& h,
+                const volScalarField& p,
+                const volScalarField& T0    // starting temperature
+            ) const;
 
             //- Temperature from enthalpy/internal energy for cell-set
             virtual tmp<scalarField> THE
             (
                 const scalarField& h,
-                const scalarField& p,
                 const scalarField& T0,      // starting temperature
                 const labelList& cells
             ) const;
@@ -182,7 +260,6 @@ public:
             virtual tmp<scalarField> THE
             (
                 const scalarField& h,
-                const scalarField& p,
                 const scalarField& T0,      // starting temperature
                 const label patchi
             ) const;
@@ -196,7 +273,6 @@ public:
             //- Heat capacity at constant pressure for patch [J/kg/K]
             virtual tmp<scalarField> Cp
             (
-                const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
@@ -207,7 +283,6 @@ public:
             //- Heat capacity at constant volume for patch [J/kg/K]
             virtual tmp<scalarField> Cv
             (
-                const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
@@ -218,7 +293,6 @@ public:
             //- Gamma = Cp/Cv for patch []
             virtual tmp<scalarField> gamma
             (
-                const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;
@@ -229,18 +303,6 @@ public:
             //- Heat capacity at constant pressure/volume for patch [J/kg/K]
             virtual tmp<scalarField> Cpv
             (
-                const scalarField& p,
-                const scalarField& T,
-                const label patchi
-            ) const;
-
-            //- Heat capacity ratio []
-            virtual tmp<volScalarField> CpByCpv() const;
-
-            //- Heat capacity ratio for patch []
-            virtual tmp<scalarField> CpByCpv
-            (
-                const scalarField& p,
                 const scalarField& T,
                 const label patchi
             ) const;

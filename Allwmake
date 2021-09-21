@@ -6,14 +6,16 @@ cd ${0%/*} || exit 1   # run from this directory
 
 OWN_SRC=$PWD/src
 
-# OF-7
-OWN_LIB_SRC=$OWN_SRC/transportModels/interfaceProperties
-
-# OF-9
-# OWN_LIB_SRC=$OWN_SRC/twoPhaseModels/interfaceProperties
-
 export OWN_SRC
+echo $OWN_SRC
+
+# OF-7
+# OWN_LIB_SRC=$OWN_SRC/transportModels/interfaceProperties
+# OF-9
+OWN_LIB_SRC=$OWN_SRC/twoPhaseModels/interfaceProperties
+
 export OWN_LIB_SRC
+echo $OWN_LIB_SRC
 
 # Compile OpenFOAM libraries and applications
 src/Allwmake $targetType $*

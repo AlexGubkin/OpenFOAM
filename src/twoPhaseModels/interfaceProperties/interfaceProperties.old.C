@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,11 +25,17 @@ License
 
 #include "interfaceProperties.H"
 #include "alphaContactAngleFvPatchScalarField.H"
-#include "unitConversion.H"
+#include "mathematicalConstants.H"
 #include "surfaceInterpolate.H"
 #include "fvcDiv.H"
 #include "fvcGrad.H"
 #include "fvcSnGrad.H"
+
+// * * * * * * * * * * * * * * * Static Member Data  * * * * * * * * * * * * //
+
+const Foam::scalar Foam::interfaceProperties::convertToRad =
+    Foam::constant::mathematical::pi/180.0;
+
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -43,28 +49,30 @@ void Foam::interfaceProperties::correctContactAngle
 (
     surfaceVectorField::Boundary& nHatb,
     const surfaceVectorField::Boundary& gradAlphaf
-)
+) const
 {
     const fvMesh& mesh = alpha1_.mesh();
-    volScalarField::Boundary& a1bf = alpha1_.boundaryFieldRef();
-    volScalarField::Boundary& a2bf = alpha2_.boundaryFieldRef();
+    const volScalarField::Boundary& abf = alpha1_.boundaryField();
 
     const fvBoundaryMesh& boundary = mesh.boundary();
 
     forAll(boundary, patchi)
     {
-        if (isA<alphaContactAngleFvPatchScalarField>(a1bf[patchi]))
+        if (isA<alphaContactAngleFvPatchScalarField>(abf[patchi]))
         {
-            alphaContactAngleFvPatchScalarField& a1cap =
-                refCast<alphaContactAngleFvPatchScalarField>
+            alphaContactAngleFvPatchScalarField& acap =
+                const_cast<alphaContactAngleFvPatchScalarField&>
                 (
-                    a1bf[patchi]
+                    refCast<const alphaContactAngleFvPatchScalarField>
+                    (
+                        abf[patchi]
+                    )
                 );
 
             fvsPatchVectorField& nHatp = nHatb[patchi];
             const scalarField theta
             (
-                degToRad(a1cap.theta(U_.boundaryField()[patchi], nHatp))
+                convertToRad*acap.theta(U_.boundaryField()[patchi], nHatp)
             );
 
             const vectorField nf
@@ -91,9 +99,8 @@ void Foam::interfaceProperties::correctContactAngle
             nHatp = a*nf + b*nHatp;
             nHatp /= (mag(nHatp) + deltaN_.value());
 
-            a1cap.gradient() = (nf & nHatp)*mag(gradAlphaf[patchi]);
-            a1cap.evaluate();
-            a2bf[patchi] = 1 - a1cap;
+            acap.gradient() = (nf & nHatp)*mag(gradAlphaf[patchi]);
+            acap.evaluate();
         }
     }
 }
@@ -116,6 +123,7 @@ void Foam::interfaceProperties::calculateK()
 
     // Face unit interface normal
     surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
+//     nHatfv_ = gradAlphaf/(mag(gradAlphaf) + deltaN_);
     // surfaceVectorField nHatfv
     // (
     //     (gradAlphaf + deltaN_*vector(0, 0, 1)
@@ -147,13 +155,19 @@ void Foam::interfaceProperties::calculateK()
 
 Foam::interfaceProperties::interfaceProperties
 (
-    volScalarField& alpha1,
-    volScalarField& alpha2,
+    const volScalarField& alpha1,
     const volVectorField& U,
     const IOdictionary& dict
 )
 :
     transportPropertiesDict_(dict),
+    cAlpha_
+    (
+        readScalar
+        (
+            alpha1.mesh().solverDict(alpha1.name()).lookup("cAlpha")
+        )
+    ),
 
     sigmaPtr_(surfaceTensionModel::New(dict, alpha1.mesh())),
 
@@ -164,8 +178,19 @@ Foam::interfaceProperties::interfaceProperties
     ),
 
     alpha1_(alpha1),
-    alpha2_(alpha2),
     U_(U),
+
+//     nHatfv_
+//     (
+//         IOobject
+//         (
+//             "nHatfv",
+//             alpha1_.time().timeName(),
+//             alpha1_.mesh()
+//         ),
+//         alpha1_.mesh(),
+//         dimensionedVector(dimless, vector::zero)
+//     ),
 
     nHatf_
     (
@@ -207,9 +232,6 @@ Foam::interfaceProperties::sigmaK() const
 Foam::tmp<Foam::surfaceScalarField>
 Foam::interfaceProperties::surfaceTensionForce() const
 {
-    /*Original source code*/
-//     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_);
-    
     const fvMesh& mesh = alpha1_.mesh();
 
     /*Continuum surface force (CSF) approach*/
@@ -306,6 +328,7 @@ void Foam::interfaceProperties::correct()
 
 bool Foam::interfaceProperties::read()
 {
+    alpha1_.mesh().solverDict(alpha1_.name()).lookup("cAlpha") >> cAlpha_;
     sigmaPtr_->readDict(transportPropertiesDict_);
 
     return true;

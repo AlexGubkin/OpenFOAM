@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2017-2018 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,11 +43,11 @@ Foam::compressibleInterPhaseTransportModel::compressibleInterPhaseTransportModel
     alphaPhi10_(alphaPhi10)
 {
     {
-        IOdictionary turbulenceProperties
+        IOdictionary momentumTransport
         (
             IOobject
             (
-                turbulenceModel::propertiesName,
+                momentumTransportModel::typeName,
                 U.time().constant(),
                 U.db(),
                 IOobject::MUST_READ,
@@ -57,7 +57,7 @@ Foam::compressibleInterPhaseTransportModel::compressibleInterPhaseTransportModel
 
         word simulationType
         (
-            turbulenceProperties.lookup("simulationType")
+            momentumTransport.lookup("simulationType")
         );
 
         if (simulationType == "twoPhaseTransport")
@@ -94,8 +94,7 @@ Foam::compressibleInterPhaseTransportModel::compressibleInterPhaseTransportModel
 
         turbulence1_ =
         (
-            ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>
-            ::New
+            phaseCompressible::momentumTransportModel::New
             (
                 alpha1,
                 rho1,
@@ -108,8 +107,7 @@ Foam::compressibleInterPhaseTransportModel::compressibleInterPhaseTransportModel
 
         turbulence2_ =
         (
-            ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>
-            ::New
+            phaseCompressible::momentumTransportModel::New
             (
                 alpha2,
                 rho2,
@@ -122,7 +120,7 @@ Foam::compressibleInterPhaseTransportModel::compressibleInterPhaseTransportModel
     }
     else
     {
-        turbulence_ = compressible::turbulenceModel::New
+        turbulence_ = compressible::momentumTransportModel::New
         (
             rho,
             U,
@@ -140,6 +138,7 @@ Foam::compressibleInterPhaseTransportModel::compressibleInterPhaseTransportModel
 Foam::tmp<Foam::volScalarField>
 Foam::compressibleInterPhaseTransportModel::alphaEff() const
 {
+    /* ***HGW
     if (twoPhaseTransport_)
     {
         return
@@ -156,11 +155,29 @@ Foam::compressibleInterPhaseTransportModel::alphaEff() const
     {
         return mixture_.alphaEff(turbulence_->alphat());
     }
+    */
+
+    if (twoPhaseTransport_)
+    {
+        return
+            mixture_.alpha1()*mixture_.thermo1().alphaEff
+            (
+                turbulence1_->mut()
+            )
+          + mixture_.alpha2()*mixture_.thermo2().alphaEff
+            (
+                turbulence2_->mut()
+            );
+    }
+    else
+    {
+        return mixture_.alphaEff(turbulence_->mut());
+    }
 }
 
 
 Foam::tmp<Foam::fvVectorMatrix>
-Foam::compressibleInterPhaseTransportModel::divDevRhoReff
+Foam::compressibleInterPhaseTransportModel::divDevTau
 (
     volVectorField& U
 ) const
@@ -168,12 +185,12 @@ Foam::compressibleInterPhaseTransportModel::divDevRhoReff
     if (twoPhaseTransport_)
     {
         return
-            turbulence1_->divDevRhoReff(U)
-          + turbulence2_->divDevRhoReff(U);
+            turbulence1_->divDevTau(U)
+          + turbulence2_->divDevTau(U);
     }
     else
     {
-        return turbulence_->divDevRhoReff(U);
+        return turbulence_->divDevTau(U);
     }
 }
 

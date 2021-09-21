@@ -1,3 +1,5 @@
+fvModels.source(alpha1, mixture.thermo1().rho());
+
 tmp<surfaceScalarField> talphaPhi1(alphaPhi10);
 
 if (nAlphaSubCycles > 1)
@@ -54,8 +56,6 @@ else
     #include "alphaEqn.H"
 }
 
-rho == alpha1*rho1 + alpha2*rho2;
-
 const surfaceScalarField& alphaPhi1 = talphaPhi1();
 surfaceScalarField alphaPhi2("alphaPhi2", phi - alphaPhi1);
 
@@ -63,7 +63,7 @@ volScalarField::Internal contErr
 (
     (
         fvc::ddt(rho) + fvc::div(rhoPhi)
-      - (fvOptions(alpha1, mixture.thermo1().rho())&rho1)
-      - (fvOptions(alpha2, mixture.thermo2().rho())&rho2)
+      - (fvModels.source(alpha1, mixture.thermo1().rho())&rho1)
+      - (fvModels.source(alpha2, mixture.thermo2().rho())&rho2)
     )()
 );

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2017-2019 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -31,7 +31,7 @@ Description
     By default the standard mixture transport modelling approach is used in
     which a single momentum stress model (laminar, non-Newtonian, LES or RAS) is
     constructed for the mixture.  However if the \c simulationType in
-    constant/turbulenceProperties is set to \c twoPhaseTransport the alternative
+    constant/momentumTransport is set to \c twoPhaseTransport the alternative
     Euler-Euler two-phase transport modelling approach is used in which separate
     stress models (laminar, non-Newtonian, LES or RAS) are instantiated for each
     of the two phases allowing for different modeling for the phases.
@@ -46,8 +46,8 @@ SourceFiles
 
 #include "twoPhaseMixture.H"
 #include "twoPhaseMixtureThermo.H"
-#include "turbulentFluidThermoModel.H"
-#include "VoFphaseCompressibleTurbulenceModel.H"
+#include "dynamicMomentumTransportModel.H"
+#include "phaseDynamicMomentumTransportModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,7 +55,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-             Class compressibleInterPhaseTransportModel Declaration
+            Class compressibleInterPhaseTransportModel Declaration
 \*---------------------------------------------------------------------------*/
 
 class compressibleInterPhaseTransportModel
@@ -81,19 +81,13 @@ class compressibleInterPhaseTransportModel
         tmp<surfaceScalarField> alphaRhoPhi2_;
 
         //- Mixture transport model (constructed for mixture transport)
-        autoPtr<compressible::turbulenceModel> turbulence_;
+        autoPtr<compressible::momentumTransportModel> turbulence_;
 
         //- Phase-1 transport model (constructed for two-phase transport)
-        autoPtr
-        <
-            ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>
-        > turbulence1_;
+        autoPtr<phaseCompressible::momentumTransportModel> turbulence1_;
 
         //- Phase-2 transport model (constructed for two-phase transport)
-        autoPtr
-        <
-            ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>
-        > turbulence2_;
+        autoPtr<phaseCompressible::momentumTransportModel> turbulence2_;
 
 
 public:
@@ -124,7 +118,7 @@ public:
         tmp<volScalarField> alphaEff() const;
 
         //- Return the effective momentum stress divergence
-        tmp<fvVectorMatrix> divDevRhoReff(volVectorField& U) const;
+        tmp<fvVectorMatrix> divDevTau(volVectorField& U) const;
 
         //- Correct the phase mass-fluxes
         // (required for the two-phase transport option)

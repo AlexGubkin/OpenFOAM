@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2017-2020 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,98 +22,98 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::surfaceTensionModels::liquidProperties
+    Foam::twoPhaseChangeModels::Merkle
 
 Description
-    Temperature-dependent surface tension model in which the surface tension
-    function provided by the phase Foam::liquidProperties class is used.
+    Merkle cavitation model.
 
-Usage
-    \table
-        Property     | Description               | Required    | Default value
-        phase        | Phase name                | yes         |
-    \endtable
-
-    Example of the surface tension specification:
+    Reference:
     \verbatim
-        sigma
-        {
-            type    liquidProperties;
-            phase   water;
-        }
-    \endverbatim
-
-See also
-    Foam::surfaceTensionModel
+        C. L. Merkle, J. Feng, and P. E. O. Buelow,
+        "Computational modeling of the dynamics of sheet cavitation",
+        in Proceedings Third International Symposium on Cavitation
+        Grenoble, France 1998.
+   \endverbatim
 
 SourceFiles
-    liquidPropertiesSurfaceTension.C
+    Merkle.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef liquidPropertiesSurfaceTension_H
-#define liquidPropertiesSurfaceTension_H
+#ifndef Merkle_H
+#define Merkle_H
 
-#include "surfaceTensionModel.H"
+#include "cavitationModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
-namespace surfaceTensionModels
+namespace twoPhaseChangeModels
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class liquidProperties Declaration
+                                 Class Merkle
 \*---------------------------------------------------------------------------*/
 
-class liquidProperties
+class Merkle
 :
-    public surfaceTensionModel
+    public cavitationModel
 {
     // Private Data
 
-        //- Name of the liquid phase
-        word phaseName_;
+        dimensionedScalar UInf_;
+        dimensionedScalar tInf_;
+        dimensionedScalar Cc_;
+        dimensionedScalar Cv_;
+
+        dimensionedScalar p0_;
+
+        dimensionedScalar mcCoeff_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("liquidProperties");
+    TypeName("Merkle");
 
 
     // Constructors
 
-        //- Construct from dictionary and mesh
-        liquidProperties
+        //- Construct for mixture
+        Merkle
         (
-            const dictionary& dict,
-            const fvMesh& mesh
+            const twoPhaseMixtureThermo& mixture
         );
 
 
     //- Destructor
-    virtual ~liquidProperties();
+    virtual ~Merkle()
+    {}
 
 
     // Member Functions
 
-        //- Surface tension coefficient
-        virtual tmp<volScalarField> sigma() const;
+        //- Return the mass condensation and vaporisation rates as a
+        //  coefficient to multiply (1 - alphal) for the condensation rate
+        //  and a coefficient to multiply  alphal for the vaporisation rate
+        virtual Pair<tmp<volScalarField::Internal>> mDotAlphal() const;
 
-        //- Update surface tension coefficient from given dictionary
-        virtual bool readDict(const dictionary& dict);
+        //- Return the mass condensation and vaporisation rates as coefficients
+        //  to multiply (p - pSat)
+        virtual Pair<tmp<volScalarField::Internal>> mDotP() const;
 
-        //- Write in dictionary format
-        virtual bool writeData(Ostream& os) const;
+        //- Correct the Merkle phaseChange model
+        virtual void correct();
+
+        //- Read the transportProperties dictionary and update
+        virtual bool read();
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace surfaceTensionModels
+} // End namespace twoPhaseChangeModels
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

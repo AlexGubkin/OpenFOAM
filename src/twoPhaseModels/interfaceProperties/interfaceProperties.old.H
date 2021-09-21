@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2019 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,7 +50,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class interfaceProperties Declaration
+                           Class interfaceProperties Declaration
 \*---------------------------------------------------------------------------*/
 
 class interfaceProperties
@@ -60,15 +60,18 @@ class interfaceProperties
         //- Keep a reference to the transportProperties dictionary
         const dictionary& transportPropertiesDict_;
 
+        //- Compression coefficient
+        scalar cAlpha_;
+
         //- Surface tension
         autoPtr<surfaceTensionModel> sigmaPtr_;
 
         //- Stabilisation for normalisation of the interface normal
         const dimensionedScalar deltaN_;
 
-        volScalarField& alpha1_;
-        volScalarField& alpha2_;
+        const volScalarField& alpha1_;
         const volVectorField& U_;
+//         surfaceVectorField nHatfv_;
         surfaceScalarField nHatf_;
         volScalarField K_;
 
@@ -82,7 +85,7 @@ class interfaceProperties
         (
             surfaceVectorField::Boundary& nHat,
             const surfaceVectorField::Boundary& gradAlphaf
-        );
+        ) const;
 
         //- Re-calculate the interface curvature
         void calculateK();
@@ -90,13 +93,16 @@ class interfaceProperties
 
 public:
 
+    //- Conversion factor for degrees into radians
+    static const scalar convertToRad;
+
+
     // Constructors
 
         //- Construct from volume fraction field gamma and IOdictionary
         interfaceProperties
         (
-            volScalarField& alpha1,
-            volScalarField& alpha2,
+            const volScalarField& alpha1,
             const volVectorField& U,
             const IOdictionary&
         );
@@ -107,10 +113,20 @@ public:
 
     // Member Functions
 
+        scalar cAlpha() const
+        {
+            return cAlpha_;
+        }
+
         const dimensionedScalar& deltaN() const
         {
             return deltaN_;
         }
+
+//         const surfaceVectorField& nHatfv() const
+//         {
+//             return nHatfv_;
+//         }
 
         const surfaceScalarField& nHatf() const
         {
