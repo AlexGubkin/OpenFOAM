@@ -169,16 +169,6 @@ bool Foam::twoPhaseMixtureThermo::isochoric() const
     return thermo1_->isochoric() && thermo2_->isochoric();
 }
 
-// Foam::volScalarField& Foam::twoPhaseMixtureThermo::he()
-// {
-//     return Alpha1_*thermo1_->he() + Alpha2_*thermo2_->he();
-// }
-// 
-// const Foam::volScalarField& Foam::twoPhaseMixtureThermo::he() const
-// {
-//     return Alpha1_*thermo1_->he() + Alpha2_*thermo2_->he();
-// }
-
 Foam::tmp<Foam::volScalarField> Foam::twoPhaseMixtureThermo::he
 (
     const volScalarField& p,

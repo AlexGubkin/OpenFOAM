@@ -103,6 +103,31 @@ void Foam::interfaceProperties::calculateK()
 {
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
+//     const vectorField& CC = mesh.C();
+
+//     const volVectorField smoothedAlpha(fvc::interpolate(alpha1_)*mesh.magSf());
+//     volScalarField smoothedAlpha
+//     (
+//         IOobject
+//         (
+//             "delta",
+//             alpha1_.time().timeName(),
+//             mesh
+//         ),
+//         mesh,
+//         dimensionedScalar(dimless, 0)
+//     );
+
+//     forAll(CC, CVCi)
+//     {
+//         forAll(Sf, Sfi)
+//             fvc::interpolate(alpha1_)*mesh.magSf()
+// 
+//         smoothedAlpha[CVCi] =
+//             (Foam::mag(alpha1_[CVCi] - alpha10) <= 0.5*epsilon)
+//             ? 1.0/epsilon*(1.0 + Foam::cos(Foam::constant::mathematical::twoPi*(alpha1_[CVCi] - alpha10)/epsilon))
+//             : 0;
+//     }
 
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
