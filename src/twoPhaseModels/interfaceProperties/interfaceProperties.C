@@ -103,20 +103,34 @@ void Foam::interfaceProperties::calculateK()
 {
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
+    const surfaceScalarField& magSf = mesh.magSf();
+//     const faceList& faces = mesh.faces();
+//     const labelListList& cellFaces = mesh.cellFaces();
+
+    const cellList& cells = mesh.cells();
 //     const vectorField& CC = mesh.C();
 
-//     const volVectorField smoothedAlpha(fvc::interpolate(alpha1_)*mesh.magSf());
-//     volScalarField smoothedAlpha
-//     (
-//         IOobject
-//         (
-//             "delta",
-//             alpha1_.time().timeName(),
-//             mesh
-//         ),
-//         mesh,
-//         dimensionedScalar(dimless, 0)
-//     );
+    const surfaceScalarField smoothedAlphaf(fvc::interpolate(alpha1_)*magSf);
+
+    volScalarField smoothedAlpha
+    (
+        IOobject
+        (
+            "smoothedAlpha",
+            alpha1_.time().timeName(),
+            mesh
+        ),
+        mesh,
+        dimensionedScalar(dimless, 0)
+    );
+
+    forAll(cells, cellID)
+    {
+        const cell& faces = cells[cellID];
+
+        forAll(faces, i)
+            smoothedAlpha[cellID] += smoothedAlphaf[i];
+    }
 
 //     forAll(CC, CVCi)
 //     {
