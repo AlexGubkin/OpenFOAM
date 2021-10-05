@@ -71,6 +71,7 @@ class interfaceProperties
         const volVectorField& U_;
         surfaceScalarField nHatf_;
         volScalarField K_;
+        volScalarField alphaTilda_;
 
 
     // Private Member Functions

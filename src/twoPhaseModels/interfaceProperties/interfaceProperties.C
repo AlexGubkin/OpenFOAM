@@ -30,6 +30,7 @@ License
 #include "fvcDiv.H"
 #include "fvcGrad.H"
 #include "fvcSnGrad.H"
+#include "fvcSurfaceIntegrate.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -104,33 +105,52 @@ void Foam::interfaceProperties::calculateK()
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
+
 //     const faceList& faces = mesh.faces();
 //     const labelListList& cellFaces = mesh.cellFaces();
 
-    const cellList& cells = mesh.cells();
+//     const cellList& cells = mesh.cells();
 //     const vectorField& CC = mesh.C();
 
-    const surfaceScalarField smoothedAlphaf(fvc::interpolate(alpha1_)*magSf);
+//     const surfaceScalarField smoothedAlphaf(fvc::interpolate(alpha1_)*magSf);
 
-    volScalarField smoothedAlpha
+    const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
+
+    const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 2));
+
+    const tmp<volScalarField> tSmoothedAlpha
     (
-        IOobject
-        (
-            "smoothedAlpha",
-            alpha1_.time().timeName(),
-            mesh
-        ),
-        mesh,
-        dimensionedScalar(dimless, 0)
+        fvc::surfaceSum(
+            fvc::interpolate(alpha1_)*magSf
+        )()
     );
 
-    forAll(cells, cellID)
-    {
-        const cell& faces = cells[cellID];
+    const volScalarField& smoothedAlpha = tSmoothedAlpha();
 
-        forAll(faces, i)
-            smoothedAlpha[cellID] += smoothedAlphaf[i];
-    }
+    const volScalarField asd
+    (
+        smoothedAlpha
+      / fvc::surfaceSum(magSf)
+    );
+
+//     (
+//         IOobject
+//         (
+//             "smoothedAlpha",
+//             alpha1_.time().timeName(),
+//             mesh
+//         ),
+//         mesh,
+//         dimensionedScalar(dimless, 0)
+//     );
+
+//     forAll(cells, cellID)
+//     {
+//         const cell& faces = cells[cellID];
+// 
+//         forAll(faces, i)
+//             smoothedAlpha[cellID] += smoothedAlphaf[i];
+//     }
 
 //     forAll(CC, CVCi)
 //     {
@@ -228,6 +248,18 @@ Foam::interfaceProperties::interfaceProperties
         ),
         alpha1_.mesh(),
         dimensionedScalar(dimless/dimLength, 0)
+    ),
+
+    alphaTilda_
+    (
+        IOobject
+        (
+            "alphaTilda",
+            alpha1_.time().timeName(),
+            alpha1_.mesh()
+        ),
+        alpha1_.mesh(),
+        dimensionedScalar(dimless, 0)
     )
 {
     calculateK();
@@ -247,11 +279,12 @@ Foam::tmp<Foam::surfaceScalarField>
 Foam::interfaceProperties::surfaceTensionForce() const
 {
     /*Original source code*/
+
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_);
-    
-    const fvMesh& mesh = alpha1_.mesh();
 
     /*Continuum surface force (CSF) approach*/
+
+    const fvMesh& mesh = alpha1_.mesh();
 
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
@@ -277,6 +310,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
     
     /*Sharp surface tension force (SSF) approach*/
 
+//     const fvMesh& mesh = alpha1_.mesh();
 //     const scalarField& V = mesh.V();
 //     const vectorField& CC = mesh.C();
 // 
