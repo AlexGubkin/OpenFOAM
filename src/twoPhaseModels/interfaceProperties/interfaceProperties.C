@@ -116,14 +116,18 @@ void Foam::interfaceProperties::calculateK()
 
     for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
     {
-        const tmp<volScalarField> tAlphaCFMagSf
+        Info<< "Alpha smoother #" << aSmoother << nl;
+
+        tmp<volScalarField> tAlphaCFMagSf
         (
             fvc::surfaceSum(fvc::interpolate(alphaTilda_)*magSf)()
         );
 
         const volScalarField& alphaCFMagSf = tAlphaCFMagSf();
-
+    
         alphaTilda_ = alphaCFMagSf/fvc::surfaceSum(magSf);
+
+        tAlphaCFMagSf.clear();
     }
 
     // Cell gradient of alpha
@@ -224,7 +228,9 @@ Foam::interfaceProperties::interfaceProperties
         (
             "interfaceProperties:K",
             alpha1_.time().timeName(),
-            alpha1_.mesh()
+            alpha1_.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
         ),
         alpha1_.mesh(),
         dimensionedScalar(dimless/dimLength, 0)
@@ -236,7 +242,9 @@ Foam::interfaceProperties::interfaceProperties
         (
             "alphaTilda",
             alpha1_.time().timeName(),
-            alpha1_.mesh()
+            alpha1_.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
         ),
         alpha1_.mesh(),
         dimensionedScalar(dimless, 0)
