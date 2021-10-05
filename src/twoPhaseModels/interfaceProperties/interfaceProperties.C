@@ -106,68 +106,33 @@ void Foam::interfaceProperties::calculateK()
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-//     const faceList& faces = mesh.faces();
-//     const labelListList& cellFaces = mesh.cellFaces();
-
-//     const cellList& cells = mesh.cells();
-//     const vectorField& CC = mesh.C();
-
-//     const surfaceScalarField smoothedAlphaf(fvc::interpolate(alpha1_)*magSf);
+    /*Smoother loop*/
 
     const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
 
     const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 2));
 
-    const tmp<volScalarField> tSmoothedAlpha
-    (
-        fvc::surfaceSum(
-            fvc::interpolate(alpha1_)*magSf
-        )()
-    );
+    alphaTilda_ = alpha1_;
 
-    const volScalarField& smoothedAlpha = tSmoothedAlpha();
+    for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
+    {
+        const tmp<volScalarField> tAlphaCFMagSf
+        (
+            fvc::surfaceSum(fvc::interpolate(alphaTilda_)*magSf)()
+        );
 
-    const volScalarField asd
-    (
-        smoothedAlpha
-      / fvc::surfaceSum(magSf)
-    );
+        const volScalarField& alphaCFMagSf = tAlphaCFMagSf();
 
-//     (
-//         IOobject
-//         (
-//             "smoothedAlpha",
-//             alpha1_.time().timeName(),
-//             mesh
-//         ),
-//         mesh,
-//         dimensionedScalar(dimless, 0)
-//     );
-
-//     forAll(cells, cellID)
-//     {
-//         const cell& faces = cells[cellID];
-// 
-//         forAll(faces, i)
-//             smoothedAlpha[cellID] += smoothedAlphaf[i];
-//     }
-
-//     forAll(CC, CVCi)
-//     {
-//         forAll(Sf, Sfi)
-//             fvc::interpolate(alpha1_)*mesh.magSf()
-// 
-//         smoothedAlpha[CVCi] =
-//             (Foam::mag(alpha1_[CVCi] - alpha10) <= 0.5*epsilon)
-//             ? 1.0/epsilon*(1.0 + Foam::cos(Foam::constant::mathematical::twoPi*(alpha1_[CVCi] - alpha10)/epsilon))
-//             : 0;
-//     }
+        alphaTilda_ = alphaCFMagSf/fvc::surfaceSum(magSf);
+    }
 
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
+    const volVectorField gradAlphaTilda(fvc::grad(alphaTilda_, "nHatTilda"));
 
     // Interpolated face-gradient of alpha
     surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
+    surfaceVectorField gradAlphaTildaf(fvc::interpolate(gradAlphaTilda));
 
     // gradAlphaf -=
     //    (mesh.Sf()/mesh.magSf())
@@ -175,6 +140,7 @@ void Foam::interfaceProperties::calculateK()
 
     // Face unit interface normal
     surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
+    const surfaceVectorField nHatTildafv(gradAlphaTildaf/(mag(gradAlphaTildaf) + deltaN_));
     // surfaceVectorField nHatfv
     // (
     //     (gradAlphaf + deltaN_*vector(0, 0, 1)
@@ -184,9 +150,11 @@ void Foam::interfaceProperties::calculateK()
 
     // Face unit interface normal flux
     nHatf_ = nHatfv & Sf;
+    nHatTildaf_ = nHatTildafv & Sf;
 
     // Simple expression for curvature
-    K_ = -fvc::div(nHatf_);
+//     K_ = -fvc::div(nHatf_);
+    K_ = -fvc::div(nHatTildaf_);
 
     // Complex expression for curvature.
     // Correction is formally zero but numerically non-zero.
@@ -231,6 +199,18 @@ Foam::interfaceProperties::interfaceProperties
         IOobject
         (
             "nHatf",
+            alpha1_.time().timeName(),
+            alpha1_.mesh()
+        ),
+        alpha1_.mesh(),
+        dimensionedScalar(dimArea, 0)
+    ),
+
+    nHatTildaf_
+    (
+        IOobject
+        (
+            "nHatTildaf",
             alpha1_.time().timeName(),
             alpha1_.mesh()
         ),
@@ -288,12 +268,15 @@ Foam::interfaceProperties::surfaceTensionForce() const
 
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
+//     const volVectorField gradAlphaTilda(fvc::grad(alphaTilda_, "nHat"));
 
     // Interpolated face-gradient of alpha
     const surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
+//     const surfaceVectorField gradAlphaTildaf(fvc::interpolate(gradAlphaTilda));
 
     // Face unit interface normal
     const surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
+//     const surfaceVectorField nHatTildafv(gradAlphaTildaf/(mag(gradAlphaTildaf) + deltaN_));
 
     // Cell gradient of sigma
     const volVectorField gradSigma(fvc::grad(sigmaPtr_->sigma()));
@@ -304,8 +287,8 @@ Foam::interfaceProperties::surfaceTensionForce() const
     // Interpolated tangent face-gradient of sigma
     const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf());
 
-//     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlpha));
-    return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*mag(gradAlphaf);
+    return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlpha));
+//     return fvc::interpolate(sigmaK())*fvc::snGrad(alphaTilda_) + tangentGradSigmaf*mag(gradAlphaf);
 
     
     /*Sharp surface tension force (SSF) approach*/
