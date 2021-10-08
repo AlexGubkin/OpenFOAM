@@ -99,20 +99,15 @@ void Foam::interfaceProperties::correctContactAngle
     }
 }
 
-
-void Foam::interfaceProperties::calculateK()
+void Foam::interfaceProperties::CSFsmoother()
 {
-    const fvMesh& mesh = alpha1_.mesh();
-    const surfaceVectorField& Sf = mesh.Sf();
-    const surfaceScalarField& magSf = mesh.magSf();
-
-    /*Smoother loop*/
-
     const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
 
     const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 2));
 
-    alphaTilda_ = alpha1_;
+    /*Smoother loop*/
+
+    alphaSmoothed_ = alpha1_;
 
     for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
     {
@@ -120,22 +115,52 @@ void Foam::interfaceProperties::calculateK()
 
         tmp<volScalarField> tSmoothedAlpha
         (
-            fvc::surfaceSum(fvc::interpolate(alphaTilda_)*magSf)()
+            fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()
           / fvc::surfaceSum(magSf)
         );
     
-        alphaTilda_ = tSmoothedAlpha();
+        alphaSmoothed_ = tSmoothedAlpha();
     }
 
 //     tAlphaCFMagSf.clear();
+}
+
+void Foam::interfaceProperties::SSFsmoother()
+{
+    const volVectorField alphaS1
+    (
+        0.5*fvc::reconstruct(fvc::interpolate(alpha1_))
+      + 0.5*alpha1_
+    );
+
+    const volVectorField alphaS2
+    (
+        0.5*fvc::reconstruct(fvc::interpolate(alphaS1))
+      + 0.5*alphaS1
+    );
+
+    alphaSmoothed_ =
+    (
+        0.5*fvc::reconstruct(fvc::interpolate(alphaS2))
+      + 0.5*alphaS2
+    );
+}
+
+void Foam::interfaceProperties::calculateK()
+{
+    const fvMesh& mesh = alpha1_.mesh();
+    const surfaceVectorField& Sf = mesh.Sf();
+    const surfaceScalarField& magSf = mesh.magSf();
+
+    CSFsmoother();
 
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
-    const volVectorField gradAlphaTilda(fvc::grad(alphaTilda_, "nHatTilda"));
+    const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatTilda"));
 
     // Interpolated face-gradient of alpha
     surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
-    surfaceVectorField gradAlphaTildaf(fvc::interpolate(gradAlphaTilda));
+    surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
 
     // gradAlphaf -=
     //    (mesh.Sf()/mesh.magSf())
@@ -143,22 +168,22 @@ void Foam::interfaceProperties::calculateK()
 
     // Face unit interface normal
     surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
-    surfaceVectorField nHatTildafv(gradAlphaTildaf/(mag(gradAlphaTildaf) + deltaN_));
+    surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
     // surfaceVectorField nHatfv
     // (
     //     (gradAlphaf + deltaN_*vector(0, 0, 1)
     //    *sign(gradAlphaf.component(vector::Z)))/(mag(gradAlphaf) + deltaN_)
     // );
-    correctContactAngle(nHatTildafv.boundaryFieldRef(), gradAlphaTildaf.boundaryField());
+    correctContactAngle(nHatSmoothedfv.boundaryFieldRef(), gradAlphaSmoothedf.boundaryField());
 //     correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
 
     // Face unit interface normal flux
     nHatf_ = nHatfv & Sf;
-    nHatTildaf_ = nHatTildafv & Sf;
+    nHatSmoothedf_ = nHatSmoothedfv & Sf;
 
     // Simple expression for curvature
 //     K_ = -fvc::div(nHatf_);
-    K_ = -fvc::div(nHatTildaf_);
+    K_ = -fvc::div(nHatSmoothedf_);
 
     // Complex expression for curvature.
     // Correction is formally zero but numerically non-zero.
@@ -210,11 +235,11 @@ Foam::interfaceProperties::interfaceProperties
         dimensionedScalar(dimArea, 0)
     ),
 
-    nHatTildaf_
+    nHatSmoothedf_
     (
         IOobject
         (
-            "nHatTildaf",
+            "nHatSmoothedf",
             alpha1_.time().timeName(),
             alpha1_.mesh()
         ),
@@ -236,11 +261,11 @@ Foam::interfaceProperties::interfaceProperties
         dimensionedScalar(dimless/dimLength, 0)
     ),
 
-    alphaTilda_
+    alphaSmoothed_
     (
         IOobject
         (
-            "alphaTilda",
+            "alphaSmoothed",
             alpha1_.time().timeName(),
             alpha1_.mesh(),
             IOobject::NO_READ,

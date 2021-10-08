@@ -70,9 +70,9 @@ class interfaceProperties
         volScalarField& alpha2_;
         const volVectorField& U_;
         surfaceScalarField nHatf_;
-        surfaceScalarField nHatTildaf_;
+        surfaceScalarField nHatSmoothedf_;
         volScalarField K_;
-        volScalarField alphaTilda_;
+        volScalarField alphaSmoothed_;
 
 
     // Private Member Functions
@@ -85,6 +85,11 @@ class interfaceProperties
             surfaceVectorField::Boundary& nHat,
             const surfaceVectorField::Boundary& gradAlphaf
         );
+
+        //- Smoothers for alpha marker
+        void CSFsmoother();
+
+        void SSFsmoother();
 
         //- Re-calculate the interface curvature
         void calculateK();
