@@ -73,6 +73,10 @@ class interfaceProperties
         surfaceScalarField nHatSmoothedf_;
         volScalarField K_;
         volScalarField alphaSmoothed_;
+        volScalarField alphaCut_;
+        volScalarField alphaSharpened_;
+        volScalarField w1_;
+        volScalarField w2_;
 
 
     // Private Member Functions
