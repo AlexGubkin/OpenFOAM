@@ -115,13 +115,13 @@ void Foam::interfaceProperties::CSFsmoother()
     {
         Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
-        tmp<volScalarField> tSmoothedAlpha
+        tmp<volScalarField> talphaSmoothed
         (
             fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()
           / fvc::surfaceSum(magSf)
         );
     
-        alphaSmoothed_ = tSmoothedAlpha();
+        alphaSmoothed_ = talphaSmoothed();
     }
 
 //     tAlphaCFMagSf.clear();
@@ -130,29 +130,52 @@ void Foam::interfaceProperties::CSFsmoother()
 void Foam::interfaceProperties::SSFsmoother()
 {
     const fvMesh& mesh = alpha1_.mesh();
+//     const surfaceVectorField& Sf = mesh.Sf();
+    const surfaceScalarField& magSf = mesh.magSf();
 
     const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
     const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<label>("cSharpeningCoeff", 0.5));
 
-    const volVectorField alphaS1
-    (
-        0.5*fvc::reconstruct(fvc::interpolate(alpha1_))
-      + 0.5*alpha1_
-    );
+    // Smoother loop
+    alphaSmoothed_ = alpha1_;
 
-    const volVectorField alphaS2
-    (
-        0.5*fvc::reconstruct(fvc::interpolate(alphaS1))
-      + 0.5*alphaS1
-    );
+    for (int aSmoother=0; aSmoother<3; aSmoother++)
+    {
+        Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
-    alphaSmoothed_ =
-    (
-        0.5*fvc::reconstruct(fvc::interpolate(alphaS2))
-      + 0.5*alphaS2
-    );
+//         tmp<volScalarField> talphaSmoothed
+//         (
+//             0.5*mag(fvc::reconstruct(fvc::interpolate(alphaSmoothed_))) + 0.5*alphaSmoothed_
+//         );
 
-    alphaCut_ = min(1.0, max(alpha1_, 0));
+        tmp<volScalarField> talphaSmoothed
+        (
+            0.5*fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()/fvc::surfaceSum(magSf)
+          + 0.5*alphaSmoothed_
+        );
+
+        alphaSmoothed_ = talphaSmoothed();
+    }
+
+//     const volVectorField alphaS1
+//     (
+//         0.5*fvc::reconstruct(fvc::interpolate(alpha1_))
+//       + 0.5*alpha1_
+//     );
+// 
+//     const volVectorField alphaS2
+//     (
+//         0.5*fvc::reconstruct(fvc::interpolate(alphaS1))
+//       + 0.5*alphaS1
+//     );
+// 
+//     alphaSmoothed_ =
+//     (
+//         0.5*fvc::reconstruct(fvc::interpolate(alphaS2))
+//       + 0.5*alphaS2
+//     );
+
+    alphaCut_ = min(scalar(1), max(alpha1_, scalar(0)));
 
     alphaSharpened_ =
     (
@@ -175,7 +198,7 @@ void Foam::interfaceProperties::calculateK()
 {
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
-//     const surfaceScalarField& magSf = mesh.magSf();
+    const surfaceScalarField& magSf = mesh.magSf();
 
 //     CSFsmoother();
     SSFsmoother();
@@ -219,21 +242,53 @@ void Foam::interfaceProperties::calculateK()
     // surface curvature for CSF model
 //     K_ = -fvc::div(nHatSmoothedf_);
     // surface curvature for SSF model
-    const volVectorField K(-fvc::div(nHatSmoothedf_));
-    const volVectorField KSmoothed1
-    (
-        2.0*w1_*K
-       +(1.0 - 2.0*w1_)*fvc::reconstruct(fvc::interpolate(w2_*K))
-       /fvc::reconstruct(fvc::interpolate(w2_))
-    );
+//     const volScalarField w2Smoothed
+//     (
+//         fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()/fvc::surfaceSum(magSf)
+//     );
 
-    const volVectorField KSmoothed2
-    (
-        2.0*w1_*K
-       +(1.0 - 2.0*w1_)*fvc::reconstruct(fvc::interpolate(w2_*KSmoothed1))
-       /fvc::reconstruct(fvc::interpolate(w2_))
-    );
-    K_ = fvc::reconstruct(fvc::interpolate(w2_*KSmoothed2))/fvc::reconstruct(fvc::interpolate(w2_))
+    // Smoother loop
+    K_ = -fvc::div(nHatSmoothedf_);
+
+    for (int KSmoother=0; KSmoother<2; KSmoother++)
+    {
+        Info<< "K smoother #" << KSmoother + 1 << nl;
+
+        tmp<volScalarField> tKSmoothed
+        (
+            2.0*w1_*K_
+           +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
+           /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
+        );
+
+        K_ = tKSmoothed();
+
+        if (KSmoother == 2)
+        {
+            tmp<volScalarField> tKSmoothed
+            (
+                2.0*w1_*K_
+               +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
+               /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
+            );
+        }
+    }
+
+//     const volScalarField KSmoothed1
+//     (
+//         2.0*w1_*K
+//        +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K)*magSf)()/fvc::surfaceSum(magSf)
+//        /w2Smoothed
+//     );
+// 
+//     const volScalarField KSmoothed2
+//     (
+//         2.0*w1_*K
+//        +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*KSmoothed1*magSf)()/fvc::surfaceSum(magSf)
+//        /w2Smoothed
+//     );
+
+    K_ = fvc::surfaceSum(fvc::interpolate(w2_*KSmoothed2)*magSf)()/fvc::surfaceSum(fvc::interpolate(w2_)*magSf)();
 
     // Complex expression for curvature.
     // Correction is formally zero but numerically non-zero.
