@@ -453,6 +453,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
 
     // Cell gradient of smoothed alpha
     const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
+    const volVectorField gradAlphaSharpened(fvc::grad(alphaSharpened_));
 
     // Interpolated face-gradient of smoothed alpha
     const surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
@@ -469,7 +470,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
     // Interpolated tangent face-gradient of sigma
     const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatSmoothedfv)*nHatSmoothedfv) & Sf/magSf);
 
-    return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlphaSmoothed));
+    return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlphaSharpened));
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*mag(gradAlphaf);
 
     
