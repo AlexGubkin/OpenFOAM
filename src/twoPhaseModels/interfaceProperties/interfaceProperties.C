@@ -118,13 +118,11 @@ void Foam::interfaceProperties::CSFsmoother()
         tmp<volScalarField> talphaSmoothed
         (
             fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()
-          / fvc::surfaceSum(magSf)
+           /fvc::surfaceSum(magSf)
         );
-    
         alphaSmoothed_ = talphaSmoothed();
+//         talphaSmoothed.clear();
     }
-
-//     tAlphaCFMagSf.clear();
 }
 
 void Foam::interfaceProperties::SSFsmoother()
@@ -151,29 +149,11 @@ void Foam::interfaceProperties::SSFsmoother()
         tmp<volScalarField> talphaSmoothed
         (
             0.5*fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()/fvc::surfaceSum(magSf)
-          + 0.5*alphaSmoothed_
+           +0.5*alphaSmoothed_
         );
-
         alphaSmoothed_ = talphaSmoothed();
+//         talphaSmoothed.clear();
     }
-
-//     const volVectorField alphaS1
-//     (
-//         0.5*fvc::reconstruct(fvc::interpolate(alpha1_))
-//       + 0.5*alpha1_
-//     );
-// 
-//     const volVectorField alphaS2
-//     (
-//         0.5*fvc::reconstruct(fvc::interpolate(alphaS1))
-//       + 0.5*alphaS1
-//     );
-// 
-//     alphaSmoothed_ =
-//     (
-//         0.5*fvc::reconstruct(fvc::interpolate(alphaS2))
-//       + 0.5*alphaS2
-//     );
 
     alphaCut_ = min(scalar(1), max(alpha1_, scalar(0)));
 
@@ -256,23 +236,23 @@ void Foam::interfaceProperties::calculateK()
 
         tmp<volScalarField> tKSmoothed
         (
-            2.0*w1_*K_
-           +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
+            (1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
            /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
+           -2.0*w1_*fvc::div(nHatSmoothedf_)
         );
-
         K_ = tKSmoothed();
-
-        if (KSmoother == 2)
-        {
-            tmp<volScalarField> tKSmoothed
-            (
-                2.0*w1_*K_
-               +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
-               /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
-            );
-        }
+//         tKSmoothed.clear();
     }
+
+    Info<< "K smoother #" << 3 << nl;
+
+    tmp<volScalarField> tKSmoothed
+    (
+        fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
+       /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
+    );
+    K_ = tKSmoothed();
+//     tKSmoothed.clear();
 
 //     const volScalarField KSmoothed1
 //     (
@@ -288,7 +268,7 @@ void Foam::interfaceProperties::calculateK()
 //        /w2Smoothed
 //     );
 
-    K_ = fvc::surfaceSum(fvc::interpolate(w2_*KSmoothed2)*magSf)()/fvc::surfaceSum(fvc::interpolate(w2_)*magSf)();
+//     K_ = fvc::surfaceSum(fvc::interpolate(w2_*KSmoothed2)*magSf)()/fvc::surfaceSum(fvc::interpolate(w2_)*magSf)();
 
     // Complex expression for curvature.
     // Correction is formally zero but numerically non-zero.
@@ -489,7 +469,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
     // Interpolated tangent face-gradient of sigma
     const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatSmoothedfv)*nHatSmoothedfv) & Sf/magSf);
 
-    return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(alphaSharpened_));
+    return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlphaSmoothed));
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*mag(gradAlphaf);
 
     
