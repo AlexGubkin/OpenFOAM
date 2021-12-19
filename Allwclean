@@ -1,6 +1,8 @@
 #!/bin/bash
 cd ${0%/*} || exit 1    # run from this directory
 
+applications/solvers/thermoCapillarityInterFoam/Allwclean
+
 # #Find out which OF version is loaded
 # if [ -z "$WM_PROJECT_VERSION" ];
 # then
