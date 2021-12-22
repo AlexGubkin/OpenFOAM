@@ -1,4 +1,0 @@
-VoFSolidificationMeltingSource/VoFSolidificationMeltingSource.C
-compressibleInterFoam.C
-
-EXE = $(FOAM_USER_APPBIN)/thermoCapillarityInterFoam

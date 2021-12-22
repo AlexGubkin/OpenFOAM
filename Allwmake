@@ -4,18 +4,18 @@ cd ${0%/*} || exit 1   # run from this directory
 # Parse arguments for library compilation
 . $WM_PROJECT_DIR/wmake/scripts/AllwmakeParseArguments
 
-OWN_SRC=$PWD/src
+OWN_LIB_SRC=$PWD/src
 
-export OWN_SRC
-echo $OWN_SRC
+export OWN_LIB_SRC
+echo $OWN_LIB_SRC
 
 # OF-7
 # OWN_LIB_SRC=$OWN_SRC/transportModels/interfaceProperties
 # OF-9
-OWN_LIB_SRC=$OWN_SRC/twoPhaseModels/interfaceProperties
+# OWN_LIB_SRC=$OWN_SRC/twoPhaseModels/interfaceProperties
 
-export OWN_LIB_SRC
-echo $OWN_LIB_SRC
+# export OWN_LIB_SRC
+# echo $OWN_LIB_SRC
 
 # Compile OpenFOAM libraries and applications
 src/Allwmake $targetType $*
