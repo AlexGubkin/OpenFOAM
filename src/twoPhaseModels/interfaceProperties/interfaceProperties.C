@@ -414,6 +414,20 @@ Foam::interfaceProperties::interfaceProperties
         ),
         alpha1_.mesh(),
         dimensionedScalar(dimless, 0)
+    ),
+
+    p_c_
+    (
+        IOobject
+        (
+            "p_c",
+            alpha1_.time().timeName(),
+            alpha1_.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        alpha1_.mesh(),
+        dimensionedScalar(dimPressure, 0)
     )
 {
     calculateK();

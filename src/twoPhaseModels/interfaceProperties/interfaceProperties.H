@@ -77,6 +77,7 @@ class interfaceProperties
         volScalarField alphaSharpened_;
         volScalarField w1_;
         volScalarField w2_;
+        volScalarField p_c_;
 
 
     // Private Member Functions
