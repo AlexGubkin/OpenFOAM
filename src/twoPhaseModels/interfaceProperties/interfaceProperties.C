@@ -100,78 +100,71 @@ void Foam::interfaceProperties::correctContactAngle
     }
 }
 
-void Foam::interfaceProperties::CSFsmoother()
+void Foam::interfaceProperties::alphaSmoother()
 {
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceScalarField& magSf = mesh.magSf();
 
     const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
     const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 2));
+    const scalar cSmoothingCoeff(alphaControls.lookupOrDefault<label>("cSmoothingCoeff", 0.5));
 
-    // Smoother loop
-    alphaSmoothed_ = alpha1_;
+    // Simple smooth for CSF
+//     alphaSmoothed_ = alpha1_;
+// 
+//     for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
+//     {
+//         Info<< "Alpha smoother #" << aSmoother + 1 << nl;
+// 
+//         tmp<volScalarField> talphaSmoothed
+//         (
+//             fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()
+//            /fvc::surfaceSum(magSf)
+//         );
+//         alphaSmoothed_ = talphaSmoothed();
+//     }
 
-    for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
-    {
-        Info<< "Alpha smoother #" << aSmoother + 1 << nl;
-
-        tmp<volScalarField> talphaSmoothed
-        (
-            fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()
-           /fvc::surfaceSum(magSf)
-        );
-        alphaSmoothed_ = talphaSmoothed();
-//         talphaSmoothed.clear();
-    }
-}
-
-void Foam::interfaceProperties::SSFsmoother()
-{
-    const fvMesh& mesh = alpha1_.mesh();
-//     const surfaceVectorField& Sf = mesh.Sf();
-    const surfaceScalarField& magSf = mesh.magSf();
-
-    const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
-    const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<label>("cSharpeningCoeff", 0.5));
-
-    // Smoother loop
+    // Smoother loop for SSF
     alphaSmoothed_ = alpha1_;
 
     for (int aSmoother=0; aSmoother<3; aSmoother++)
     {
         Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
-//         tmp<volScalarField> talphaSmoothed
-//         (
-//             0.5*mag(fvc::reconstruct(fvc::interpolate(alphaSmoothed_))) + 0.5*alphaSmoothed_
-//         );
-
         tmp<volScalarField> talphaSmoothed
         (
-            0.5*fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()/fvc::surfaceSum(magSf)
-           +0.5*alphaSmoothed_
+            cSmoothingCoeff*fvc::surfaceSum(fvc::interpolate(alphaSmoothed_)*magSf)()/fvc::surfaceSum(magSf)
+            +(1.0 - cSmoothingCoeff)*alphaSmoothed_
         );
         alphaSmoothed_ = talphaSmoothed();
-//         talphaSmoothed.clear();
     }
+}
+
+void Foam::interfaceProperties::alphaSharpener()
+{
+    const fvMesh& mesh = alpha1_.mesh();
+    const surfaceScalarField& magSf = mesh.magSf();
+
+    const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
+    const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<label>("cSharpeningCoeff", 0.5));
 
     alphaCut_ = min(scalar(1), max(alpha1_, scalar(0)));
+
+    w1_ = sqrt(alphaCut_*(1.0 - alphaCut_));
+    w2_ = sqrt(w1_*w1_ + 1e-6);
 
     alphaSharpened_ =
     (
         1.0/(1.0 - cSharpeningCoeff)
-       *(
+        *(
            min
            (
                 max(alpha1_, 0.5*cSharpeningCoeff),
                 1.0 - 0.5*cSharpeningCoeff
            )
-         - 0.5*cSharpeningCoeff
+           -0.5*cSharpeningCoeff
         )
     );
-
-    w1_ = sqrt(alphaCut_*(1.0 - alphaCut_));
-    w2_ = sqrt(w1_*w1_ + 1e-3);
 }
 
 void Foam::interfaceProperties::calculateK()
@@ -180,8 +173,12 @@ void Foam::interfaceProperties::calculateK()
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-//     CSFsmoother();
-    SSFsmoother();
+    const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
+    const label nKSmoothers(alphaControls.lookupOrDefault<label>("nKSmoothers", 2));
+
+    alphaSmoother();
+
+    alphaSharpener();
 
     // Cell gradient of alpha
     const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
@@ -228,31 +225,33 @@ void Foam::interfaceProperties::calculateK()
 //     );
 
     // Smoother loop
-    K_ = -fvc::div(nHatSmoothedf_);
+    K0_ = -fvc::div(nHatSmoothedf_);
+    K_ = K0_;
 
-    for (int KSmoother=0; KSmoother<2; KSmoother++)
+    for (int KSmoother=0; KSmoother<nKSmoothers; KSmoother++)
     {
         Info<< "K smoother #" << KSmoother + 1 << nl;
 
         tmp<volScalarField> tKSmoothed
         (
-            (1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
-           /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
-           -2.0*w1_*fvc::div(nHatSmoothedf_)
+            2.0*w1_*K0_
+            +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()/fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
         );
         K_ = tKSmoothed();
-//         tKSmoothed.clear();
     }
 
-    Info<< "K smoother #" << 3 << nl;
+//     Info<< "K smoother #" << 3 << nl;
+// 
+//     tmp<volScalarField> tKSmoothed
+//     (
+//         fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
+//        /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
+//     );
+//     K_ = tKSmoothed();
 
-    tmp<volScalarField> tKSmoothed
-    (
-        fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
-       /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
-    );
-    K_ = tKSmoothed();
-//     tKSmoothed.clear();
+
+
+
 
 //     const volScalarField KSmoothed1
 //     (
@@ -330,6 +329,20 @@ Foam::interfaceProperties::interfaceProperties
         ),
         alpha1_.mesh(),
         dimensionedScalar(dimArea, 0)
+    ),
+
+    K0_
+    (
+        IOobject
+        (
+            "interfaceProperties:K0",
+            alpha1_.time().timeName(),
+            alpha1_.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        alpha1_.mesh(),
+        dimensionedScalar(dimless/dimLength, 0)
     ),
 
     K_
@@ -447,11 +460,9 @@ Foam::tmp<Foam::surfaceScalarField>
 Foam::interfaceProperties::surfaceTensionForce() const
 {
     /*Original source code*/
-
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_);
 
     /*Continuum surface force (CSF) approach*/
-
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
