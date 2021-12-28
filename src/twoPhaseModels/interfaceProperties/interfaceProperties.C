@@ -27,11 +27,13 @@ License
 #include "alphaContactAngleFvPatchScalarField.H"
 #include "unitConversion.H"
 #include "surfaceInterpolate.H"
+// #include "fvCFD.H"
 #include "fvcDiv.H"
 #include "fvcGrad.H"
 #include "fvcSnGrad.H"
 #include "fvcSurfaceIntegrate.H"
 #include "fvcReconstruct.H"
+// #include "nonOrthogonalSolutionControl.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -181,7 +183,7 @@ void Foam::interfaceProperties::calculateK()
     alphaSharpener();
 
     // Cell gradient of alpha
-    const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
+    const volVectorField gradAlpha(fvc::grad(alphaSmoothed_, "nHat"));
 
     // Interpolated face-gradient of alpha
     surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
@@ -197,22 +199,22 @@ void Foam::interfaceProperties::calculateK()
     //     (gradAlphaf + deltaN_*vector(0, 0, 1)
     //    *sign(gradAlphaf.component(vector::Z)))/(mag(gradAlphaf) + deltaN_)
     // );
-//     correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
+    correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
 
     // Face unit interface normal flux
     nHatf_ = nHatfv & Sf;
 
     // Cell gradient of smoothed alpha
-    const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
+//     const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
+// 
+//     // Interpolated face-gradient of smoothed alpha
+//     surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
+// 
+//     // Face unit interface normal calculated by smoothed alpha
+//     surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
+//     correctContactAngle(nHatSmoothedfv.boundaryFieldRef(), gradAlphaSmoothedf.boundaryField());
 
-    // Interpolated face-gradient of smoothed alpha
-    surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
-
-    // Face unit interface normal calculated by smoothed alpha
-    surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
-    correctContactAngle(nHatSmoothedfv.boundaryFieldRef(), gradAlphaSmoothedf.boundaryField());
-
-    nHatSmoothedf_ = nHatSmoothedfv & Sf;
+//     nHatSmoothedf_ = nHatSmoothedfv & Sf;
 
     // Simple expression for curvature
 //     K_ = -fvc::div(nHatf_);
@@ -225,7 +227,8 @@ void Foam::interfaceProperties::calculateK()
 //     );
 
     // Smoother loop
-    K0_ = -fvc::div(nHatSmoothedf_);
+//     K0_ = -fvc::div(nHatSmoothedf_);
+    K0_ = -fvc::div(nHatf_);
     K_ = K0_;
 
     for (int KSmoother=0; KSmoother<nKSmoothers; KSmoother++)
@@ -319,17 +322,17 @@ Foam::interfaceProperties::interfaceProperties
         dimensionedScalar(dimArea, 0)
     ),
 
-    nHatSmoothedf_
-    (
-        IOobject
-        (
-            "nHatSmoothedf",
-            alpha1_.time().timeName(),
-            alpha1_.mesh()
-        ),
-        alpha1_.mesh(),
-        dimensionedScalar(dimArea, 0)
-    ),
+//     nHatSmoothedf_
+//     (
+//         IOobject
+//         (
+//             "nHatSmoothedf",
+//             alpha1_.time().timeName(),
+//             alpha1_.mesh()
+//         ),
+//         alpha1_.mesh(),
+//         dimensionedScalar(dimArea, 0)
+//     ),
 
     K0_
     (
@@ -440,9 +443,11 @@ Foam::interfaceProperties::interfaceProperties
             IOobject::AUTO_WRITE
         ),
         alpha1_.mesh(),
-        dimensionedScalar(dimPressure, 0)
+        dimensionedScalar(dimPressure, 0),
+        zeroGradientFvPatchScalarField::typeName
     )
 {
+//     nonOrthogonalSolutionControl potentialFlow(mesh, "potentialFlow");
     calculateK();
 }
 
@@ -462,7 +467,7 @@ Foam::interfaceProperties::surfaceTensionForce() const
     /*Original source code*/
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_);
 
-    /*Continuum surface force (CSF) approach*/
+    /*Filtred surface force (FSF) approach*/
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
@@ -495,10 +500,57 @@ Foam::interfaceProperties::surfaceTensionForce() const
     // Interpolated tangent face-gradient of sigma
     const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatSmoothedfv)*nHatSmoothedfv) & Sf/magSf);
 
+    label p_cRefCell = 0;
+    scalar p_cRefValue = 0.0;
+    setRefCell
+    (
+        p_c_,
+        potentialFlow.dict(),
+        p_cRefCell,
+        p_cRefValue
+    );
+
+    while (pimple.correctNonOrthogonal())
+    {
+        fvScalarMatrix p_cEqn
+        (
+            fvm::laplacian(p_c_)
+         ==
+            fvc::grad(f_c)
+        );
+
+        p_cEqn.setReference(p_cRefCell, p_cRefValue);
+        p_cEqn.solve();
+    }
+
     return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlphaSharpened));
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*mag(gradAlphaf);
+}
 
-    
+
+Foam::tmp<Foam::volScalarField>
+Foam::interfaceProperties::nearInterface() const
+{
+    return pos0(alpha1_ - 0.01)*pos0(0.99 - alpha1_);
+}
+
+
+void Foam::interfaceProperties::correct()
+{
+    calculateK();
+}
+
+
+bool Foam::interfaceProperties::read()
+{
+    sigmaPtr_->readDict(transportPropertiesDict_);
+
+    return true;
+}
+
+
+// ************************************************************************* //
+
     /*Sharp surface tension force (SSF) approach*/
 
 //     const fvMesh& mesh = alpha1_.mesh();
@@ -552,28 +604,3 @@ Foam::interfaceProperties::surfaceTensionForce() const
 //     surfaceScalarField tangentForce((gradSigmaByVf - (gradSigmaByVf & nHatfv)*nHatfv) & mesh.Sf());
 // 
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentForce;
-}
-
-
-Foam::tmp<Foam::volScalarField>
-Foam::interfaceProperties::nearInterface() const
-{
-    return pos0(alpha1_ - 0.01)*pos0(0.99 - alpha1_);
-}
-
-
-void Foam::interfaceProperties::correct()
-{
-    calculateK();
-}
-
-
-bool Foam::interfaceProperties::read()
-{
-    sigmaPtr_->readDict(transportPropertiesDict_);
-
-    return true;
-}
-
-
-// ************************************************************************* //
