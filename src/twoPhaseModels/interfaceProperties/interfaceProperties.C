@@ -33,7 +33,6 @@ License
 #include "fvcSnGrad.H"
 #include "fvcSurfaceIntegrate.H"
 #include "fvcReconstruct.H"
-// #include "nonOrthogonalSolutionControl.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -322,18 +321,6 @@ Foam::interfaceProperties::interfaceProperties
         dimensionedScalar(dimArea, 0)
     ),
 
-//     nHatSmoothedf_
-//     (
-//         IOobject
-//         (
-//             "nHatSmoothedf",
-//             alpha1_.time().timeName(),
-//             alpha1_.mesh()
-//         ),
-//         alpha1_.mesh(),
-//         dimensionedScalar(dimArea, 0)
-//     ),
-
     K0_
     (
         IOobject
@@ -447,7 +434,6 @@ Foam::interfaceProperties::interfaceProperties
         zeroGradientFvPatchScalarField::typeName
     )
 {
-//     nonOrthogonalSolutionControl potentialFlow(mesh, "potentialFlow");
     calculateK();
 }
 
@@ -482,17 +468,20 @@ Foam::interfaceProperties::surfaceTensionForce() const
     const surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
 
     // Cell gradient of smoothed alpha
-    const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
+//     const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
     const volVectorField gradAlphaSharpened(fvc::grad(alphaSharpened_));
 
     // Interpolated face-gradient of smoothed alpha
-    const surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
+//     const surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
 
     // Face unit interface normal calculated by smoothed alpha
-    const surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
+//     const surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
+
+    // Sigma
+    const volScalarField sigma(sigmaPtr_->sigma());
 
     // Cell gradient of sigma
-    const volVectorField gradSigma(fvc::grad(sigmaPtr_->sigma()));
+    const volVectorField gradSigma(fvc::grad(sigma));
 
     // Interpolated face-gradient of sigma
     const surfaceVectorField gradSigmaf(fvc::interpolate(gradSigma));
@@ -502,21 +491,20 @@ Foam::interfaceProperties::surfaceTensionForce() const
 
     label p_cRefCell = 0;
     scalar p_cRefValue = 0.0;
-    setRefCell
-    (
-        p_c_,
-        potentialFlow.dict(),
-        p_cRefCell,
-        p_cRefValue
-    );
 
     while (pimple.correctNonOrthogonal())
     {
+        const surfaceVectorField f_n
+        (
+            fvc::interpolate(sigma)*fvc::interpolate(w2_*K_)/fvc::interpolate(w2_)*fvc::snGrad(alphaSharpened_)
+           -fvc::snGrad(p_c_) - (fvc::grad(p_c_) & nHatSmoothedfv)*nHatSmoothedfv
+        );
+
         fvScalarMatrix p_cEqn
         (
             fvm::laplacian(p_c_)
          ==
-            fvc::grad(f_c)
+            fvc::div(f_n)
         );
 
         p_cEqn.setReference(p_cRefCell, p_cRefValue);
