@@ -70,7 +70,6 @@ class interfaceProperties
         volScalarField& alpha2_;
         const volVectorField& U_;
         surfaceScalarField nHatf_;
-//         surfaceScalarField nHatSmoothedf_;
         volScalarField K0_;
         volScalarField K_;
         volScalarField alphaSmoothed_;

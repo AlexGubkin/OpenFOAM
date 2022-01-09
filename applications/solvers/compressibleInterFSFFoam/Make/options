@@ -8,6 +8,7 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/surfaceTensionModels/surfaceTensionModel \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseMixture/lnInclude \
     -I$(OWN_LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
@@ -18,20 +19,20 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/fvModels/lnInclude
-    
+
 EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
-    -lcompressibleInterPhaseTransportModelFSF \
     -ltwoPhaseMixtureThermoFSF \
     -ltwoPhaseSurfaceTensionFSF \
-    -linterfacePropertiesFSF \
-    -lcompressibleTwoPhaseChangeModelsFSF \
     -lfluidThermophysicalModels \
     -lspecie \
     -ltwoPhaseMixture \
-    -ltwoPhasePropertiesFSF \
+    -ltwoPhaseProperties \
+    -linterfacePropertiesFSF \
+    -lcompressibleTwoPhaseChangeModelsFSF \
     -lmomentumTransportModels \
     -lcompressibleMomentumTransportModels \
+    -lcompressibleInterPhaseTransportModelFSF \
     -lfiniteVolume \
     -lfvModels \
     -lfvConstraints \

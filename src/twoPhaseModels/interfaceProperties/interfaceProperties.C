@@ -27,12 +27,13 @@ License
 #include "alphaContactAngleFvPatchScalarField.H"
 #include "unitConversion.H"
 #include "surfaceInterpolate.H"
-// #include "fvCFD.H"
-#include "fvcDiv.H"
-#include "fvcGrad.H"
-#include "fvcSnGrad.H"
-#include "fvcSurfaceIntegrate.H"
-#include "fvcReconstruct.H"
+#include "fvCFD.H"
+// #include "pimpleControl.H"
+// #include "fvcDiv.H"
+// #include "fvcGrad.H"
+// #include "fvcSnGrad.H"
+// #include "fvcSurfaceIntegrate.H"
+// #include "fvcReconstruct.H"
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -107,8 +108,8 @@ void Foam::interfaceProperties::alphaSmoother()
     const surfaceScalarField& magSf = mesh.magSf();
 
     const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
-    const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 2));
-    const scalar cSmoothingCoeff(alphaControls.lookupOrDefault<label>("cSmoothingCoeff", 0.5));
+    const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 3));
+    const scalar cSmoothingCoeff(alphaControls.lookupOrDefault<scalar>("cSmoothingCoeff", 0.5));
 
     // Simple smooth for CSF
 //     alphaSmoothed_ = alpha1_;
@@ -128,9 +129,9 @@ void Foam::interfaceProperties::alphaSmoother()
     // Smoother loop for SSF
     alphaSmoothed_ = alpha1_;
 
-    for (int aSmoother=0; aSmoother<3; aSmoother++)
+    for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
     {
-        Info<< "Alpha smoother #" << aSmoother + 1 << nl;
+//         Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
         tmp<volScalarField> talphaSmoothed
         (
@@ -144,10 +145,9 @@ void Foam::interfaceProperties::alphaSmoother()
 void Foam::interfaceProperties::alphaSharpener()
 {
     const fvMesh& mesh = alpha1_.mesh();
-    const surfaceScalarField& magSf = mesh.magSf();
 
     const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
-    const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<label>("cSharpeningCoeff", 0.5));
+    const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpeningCoeff", 0.5));
 
     alphaCut_ = min(scalar(1), max(alpha1_, scalar(0)));
 
@@ -170,6 +170,7 @@ void Foam::interfaceProperties::alphaSharpener()
 
 void Foam::interfaceProperties::calculateK()
 {
+    
     const fvMesh& mesh = alpha1_.mesh();
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
@@ -178,7 +179,6 @@ void Foam::interfaceProperties::calculateK()
     const label nKSmoothers(alphaControls.lookupOrDefault<label>("nKSmoothers", 2));
 
     alphaSmoother();
-
     alphaSharpener();
 
     // Cell gradient of alpha
@@ -203,36 +203,13 @@ void Foam::interfaceProperties::calculateK()
     // Face unit interface normal flux
     nHatf_ = nHatfv & Sf;
 
-    // Cell gradient of smoothed alpha
-//     const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
-// 
-//     // Interpolated face-gradient of smoothed alpha
-//     surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
-// 
-//     // Face unit interface normal calculated by smoothed alpha
-//     surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
-//     correctContactAngle(nHatSmoothedfv.boundaryFieldRef(), gradAlphaSmoothedf.boundaryField());
-
-//     nHatSmoothedf_ = nHatSmoothedfv & Sf;
-
-    // Simple expression for curvature
-//     K_ = -fvc::div(nHatf_);
-    // surface curvature for CSF model
-//     K_ = -fvc::div(nHatSmoothedf_);
-    // surface curvature for SSF model
-//     const volScalarField w2Smoothed
-//     (
-//         fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()/fvc::surfaceSum(magSf)
-//     );
-
     // Smoother loop
-//     K0_ = -fvc::div(nHatSmoothedf_);
     K0_ = -fvc::div(nHatf_);
     K_ = K0_;
 
     for (int KSmoother=0; KSmoother<nKSmoothers; KSmoother++)
     {
-        Info<< "K smoother #" << KSmoother + 1 << nl;
+//         Info<< "K smoother #" << KSmoother + 1 << nl;
 
         tmp<volScalarField> tKSmoothed
         (
@@ -241,35 +218,6 @@ void Foam::interfaceProperties::calculateK()
         );
         K_ = tKSmoothed();
     }
-
-//     Info<< "K smoother #" << 3 << nl;
-// 
-//     tmp<volScalarField> tKSmoothed
-//     (
-//         fvc::surfaceSum(fvc::interpolate(w2_*K_)*magSf)()
-//        /fvc::surfaceSum(fvc::interpolate(w2_)*magSf)()
-//     );
-//     K_ = tKSmoothed();
-
-
-
-
-
-//     const volScalarField KSmoothed1
-//     (
-//         2.0*w1_*K
-//        +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*K)*magSf)()/fvc::surfaceSum(magSf)
-//        /w2Smoothed
-//     );
-// 
-//     const volScalarField KSmoothed2
-//     (
-//         2.0*w1_*K
-//        +(1.0 - 2.0*w1_)*fvc::surfaceSum(fvc::interpolate(w2_*KSmoothed1*magSf)()/fvc::surfaceSum(magSf)
-//        /w2Smoothed
-//     );
-
-//     K_ = fvc::surfaceSum(fvc::interpolate(w2_*KSmoothed2)*magSf)()/fvc::surfaceSum(fvc::interpolate(w2_)*magSf)();
 
     // Complex expression for curvature.
     // Correction is formally zero but numerically non-zero.
@@ -431,7 +379,8 @@ Foam::interfaceProperties::interfaceProperties
         ),
         alpha1_.mesh(),
         dimensionedScalar(dimPressure, 0),
-        zeroGradientFvPatchScalarField::typeName
+        zeroGradientFvPatchField<scalar>::typeName
+//         zeroGradientFvPatchScalarField::typeName
     )
 {
     calculateK();
@@ -455,27 +404,34 @@ Foam::interfaceProperties::surfaceTensionForce() const
 
     /*Filtred surface force (FSF) approach*/
     const fvMesh& mesh = alpha1_.mesh();
+//     pimpleControl pimple(mesh);
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-    // Cell gradient of alpha
-    const volVectorField gradAlpha(fvc::grad(alpha1_, "nHat"));
+    const dictionary& alphaControls = mesh.solverDict(alpha1_.name());
+    const label nCapillaryForceCorrectors(alphaControls.lookupOrDefault<label>("nCapillaryForceCorrectors", 3));
 
-    // Interpolated face-gradient of alpha
+    // Cell gradient of smoothed alpha
+    const volVectorField gradAlpha(fvc::grad(alphaSmoothed_, "nHat"));
+
+    // Interpolated face-gradient of smoothed alpha
     const surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
 
     // Face unit interface normal
     const surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
 
-    // Cell gradient of smoothed alpha
-//     const volVectorField gradAlphaSmoothed(fvc::grad(alphaSmoothed_, "nHatSmoothed"));
+    // Cell gradient of sharpened alpha
     const volVectorField gradAlphaSharpened(fvc::grad(alphaSharpened_));
 
-    // Interpolated face-gradient of smoothed alpha
-//     const surfaceVectorField gradAlphaSmoothedf(fvc::interpolate(gradAlphaSmoothed));
+    // Interpolated face-gradient of sharpened alpha
+    const surfaceVectorField gradAlphaSharpenedf(fvc::interpolate(gradAlphaSharpened));
 
-    // Face unit interface normal calculated by smoothed alpha
-//     const surfaceVectorField nHatSmoothedfv(gradAlphaSmoothedf/(mag(gradAlphaSmoothedf) + deltaN_));
+    const surfaceScalarField deltaf(fvc::snGrad(alphaSharpened_));
+
+    const surfaceScalarField cutFactorf(deltaf/(mag(deltaf) + deltaN_));
+
+//     // Face unit interface normal
+//     const surfaceVectorField nHatSharpenedfv(gradAlphaSharpenedf/(mag(gradAlphaSharpenedf) + deltaN_));
 
     // Sigma
     const volScalarField sigma(sigmaPtr_->sigma());
@@ -487,31 +443,34 @@ Foam::interfaceProperties::surfaceTensionForce() const
     const surfaceVectorField gradSigmaf(fvc::interpolate(gradSigma));
 
     // Interpolated tangent face-gradient of sigma
-    const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatSmoothedfv)*nHatSmoothedfv) & Sf/magSf);
+    const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & Sf/magSf);
 
     label p_cRefCell = 0;
     scalar p_cRefValue = 0.0;
 
-    while (pimple.correctNonOrthogonal())
-    {
-        const surfaceVectorField f_n
-        (
-            fvc::interpolate(sigma)*fvc::interpolate(w2_*K_)/fvc::interpolate(w2_)*fvc::snGrad(alphaSharpened_)
-           -fvc::snGrad(p_c_) - (fvc::grad(p_c_) & nHatSmoothedfv)*nHatSmoothedfv
-        );
+    const surfaceScalarField capillaryForceFlux(fvc::interpolate(w2_*sigmaK())/fvc::interpolate(w2_)*deltaf*magSf);
+    surfaceScalarField capillaryForceFluxFiltered(capillaryForceFlux);
 
+    for (int capillaryForceCorrector=0; capillaryForceCorrector<nCapillaryForceCorrectors; capillaryForceCorrector++)
+    {
         fvScalarMatrix p_cEqn
         (
             fvm::laplacian(p_c_)
          ==
-            fvc::div(f_n)
+            fvc::div(capillaryForceFluxFiltered)
         );
 
         p_cEqn.setReference(p_cRefCell, p_cRefValue);
         p_cEqn.solve();
+
+        const surfaceVectorField gradPcf(fvc::interpolate(fvc::grad(p_c_)));
+
+        capillaryForceFluxFiltered = capillaryForceFlux - cutFactorf*((gradPcf - (gradPcf & nHatfv)*nHatfv) & Sf);
     }
 
-    return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlphaSharpened));
+    return capillaryForceFluxFiltered/magSf + tangentGradSigmaf*mag(gradAlphaSharpenedf);
+
+//     return fvc::interpolate(sigmaK())*fvc::snGrad(alphaSharpened_) + tangentGradSigmaf*fvc::interpolate(mag(gradAlphaSharpened));
 //     return fvc::interpolate(sigmaK())*fvc::snGrad(alpha1_) + tangentGradSigmaf*mag(gradAlphaf);
 }
 
