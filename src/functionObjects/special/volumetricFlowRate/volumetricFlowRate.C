@@ -240,7 +240,7 @@ bool Foam::functionObjects::volumetricFlowRate::write()
 //                     sumVolumetricFlowRate += alphaiVolumetricFlowRate;
 
                     Info<< "    volumetricFlowRate(" << phaseName << ") = "
-                        << alphaiVolumetricFlowRate << " [m^3 / s]" << nl;
+                        << alphaiVolumetricFlowRate << " [m^3/s]" << nl;
                 }
                 else if (phi.dimensions() == dimVolume/dimTime)
                 {
@@ -253,7 +253,7 @@ bool Foam::functionObjects::volumetricFlowRate::write()
 //                     sumVolumetricFlowRate += alphaiVolumetricFlowRate;
 
                     Info<< "    volumetricFlowRate(" << phaseName << ") = "
-                        << alphaiVolumetricFlowRate << " [m^3 / s]" << nl;
+                        << alphaiVolumetricFlowRate << " [m^3/s]" << nl;
                 }
                 else
                 {

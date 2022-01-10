@@ -25,14 +25,14 @@ Class
     Foam::functionObjects::massFlowRate
 
 Description
-    Evaluates and outputs massFlowRate for rhombohedron structure.
+    Evaluates and outputs massFlowRate for given patches.
 
     Example of function object specification:
     \verbatim
     massFlowRate1
     {
         type            massFlowRate;
-        libs            ("twoPhaseFlowRhombohedronStructureLibutilityFunctionObjects.so");
+        libs            ("specialFunctionObjects.so");
 
         phi             \<phi\> / \<rhoPhi\>;
         patches         (\<inflowPatchesSet\>);

@@ -236,7 +236,7 @@ bool Foam::functionObjects::massFlowRate::write()
 //                     sumMassFlowRate += alphaiMassFlowRate;
 
                     Info<< "    massFlowRate(" << phaseName << ") = "
-                        << alphaiMassFlowRate << " [kg / s]" << nl;
+                        << alphaiMassFlowRate << " [kg/s]" << nl;
                 }
                 else if (phi.dimensions() == dimVolume/dimTime)
                 {
@@ -256,7 +256,7 @@ bool Foam::functionObjects::massFlowRate::write()
 //                     sumMassFlowRate += alphaiMassFlowRate;
 
                     Info<< "    massFlowRate(" << phaseName << ") = "
-                        << alphaiMassFlowRate << " [kg / s]" << nl;
+                        << alphaiMassFlowRate << " [kg/s]" << nl;
                 }
                 else
                 {

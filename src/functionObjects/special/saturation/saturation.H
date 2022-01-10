@@ -25,15 +25,15 @@ Class
     Foam::functionObjects::saturation
 
 Description
-    Evaluates and outputs saturations for rhombohedron structure.
+    Evaluates and outputs saturations for given marker fields.
 
     Example of function object specification:
     \verbatim
     saturation1
     {
         type            saturation;
-        libs            ("twoPhaseFlowRhombohedronStructureLibutilityFunctionObjects.so");
-        
+        libs            ("specialFunctionObjects.so");
+
         markerFields    (alpha.\<phase1\> alpha.\<phase2\> alpha.\<phase3\>);
     }
     \endverbatim

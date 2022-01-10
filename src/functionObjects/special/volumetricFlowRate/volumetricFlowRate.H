@@ -25,17 +25,16 @@ Class
     Foam::functionObjects::volumetricFlowRate
 
 Description
-    Evaluates and outputs volumetricFlowRate for rhombohedron structure.
+    Evaluates and outputs volumetricFlowRate for given patches.
 
     Example of function object specification:
     \verbatim
     volumetricFlowRate1
     {
         type            volumetricFlowRate;
-        libs            ("twoPhaseFlowRhombohedronStructureLibutilityFunctionObjects.so");
+        libs            ("specialFunctionObjects.so");
 
         phi             \<phi\> / \<rhoPhi\>;
-        markerFields    (alpha.\<phase1\> alpha.\<phase2\> alpha.\<phase3\>);
         patches         (\<inflowPatchesSet\>);
     }
     \endverbatim
