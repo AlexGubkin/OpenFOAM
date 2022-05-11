@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
     #include "createDyMControls.H"
     #include "createFields.H"
     #include "createFieldRefs.H"
+    #include "createFSFFields.H"
     #include "CourantNo.H"
     #include "setInitialDeltaT.H"
     #include "createUfIfPresent.H"
@@ -146,6 +147,7 @@ int main(int argc, char *argv[])
 
             #include "alphaControls.H"
             #include "compressibleAlphaEqnSubCycle.H"
+//             #include "alphaProcessing.H"
 
             turbulence.correctPhasePhi();
 
