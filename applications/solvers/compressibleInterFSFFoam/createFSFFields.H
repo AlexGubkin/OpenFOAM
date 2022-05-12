@@ -1,6 +1,7 @@
 #include "surfaceTensionModel.H"
 //- Surface tension
 autoPtr<surfaceTensionModel> sigmaPtr;
+// sigmaPtr->readDict(transportPropertiesDict);
 // Sigma
 const volScalarField sigma(sigmaPtr->sigma());
 
@@ -35,7 +36,7 @@ volScalarField K
 )
 
 Info<< "Creation field alphaSm\n" << endl;
-volScalarField alphaSmoothed
+volScalarField alphaSm
 (
     IOobject
     (
@@ -50,7 +51,7 @@ volScalarField alphaSmoothed
 )
 
 Info<< "Creation field alphaC\n" << endl;
-volScalarField alphaSmoothed
+volScalarField alphaC
 (
     IOobject
     (
@@ -65,7 +66,7 @@ volScalarField alphaSmoothed
 )
 
 Info<< "Creation field alphaSh\n" << endl;
-volScalarField alphaSmoothed
+volScalarField alphaSh
 (
     IOobject
     (
@@ -80,7 +81,7 @@ volScalarField alphaSmoothed
 )
 
 Info<< "Creation field w1\n" << endl;
-volScalarField alphaSmoothed
+volScalarField w1
 (
     IOobject
     (
@@ -95,7 +96,7 @@ volScalarField alphaSmoothed
 )
 
 Info<< "Creation field w2\n" << endl;
-volScalarField alphaSmoothed
+volScalarField w2
 (
     IOobject
     (
@@ -124,3 +125,8 @@ volScalarField pc
     zeroGradientFvPatchField<scalar>::typeName
 //     zeroGradientFvPatchScalarField::typeName
 )
+
+const surfaceVectorField& Sf = mesh.Sf();
+const surfaceScalarField& magSf = mesh.magSf();
+
+const dictionary& alphaControls = mesh.solverDict(alpha1.name());

@@ -147,7 +147,8 @@ int main(int argc, char *argv[])
 
             #include "alphaControls.H"
             #include "compressibleAlphaEqnSubCycle.H"
-//             #include "alphaProcessing.H"
+            #include "alphaProcessing.H"
+            #include "pcEqn.H"
 
             turbulence.correctPhasePhi();
 
