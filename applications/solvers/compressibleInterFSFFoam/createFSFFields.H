@@ -126,7 +126,21 @@ volScalarField pc
 //     zeroGradientFvPatchScalarField::typeName
 )
 
-const surfaceVectorField& Sf = mesh.Sf();
-const surfaceScalarField& magSf = mesh.magSf();
+{
+    // Cell gradient of alpha
+    volScalarField gradAlphaSm("gradAlphaSm", fvc::grad(alphaSm));
 
-const dictionary& alphaControls = mesh.solverDict(alpha1.name());
+    // Interpolated face-gradient of alpha
+    surfaceVectorField gradAlphaSmf("gradAlphaSmf", fvc::interpolate(gradAlphaSm));
+
+    // Face unit interface normal
+    surfaceVectorField nHatfv("nHatfv", gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN()));
+
+    // Face unit interface normal flux
+    surfaceScalarField nHatf("nHatf", nHatfv & Sf);
+
+    const surfaceVectorField& Sf = mesh.Sf();
+    const surfaceScalarField& magSf = mesh.magSf();
+
+    const dictionary& alphaControls = mesh.solverDict(alpha1.name());
+}

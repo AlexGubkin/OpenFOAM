@@ -39,20 +39,8 @@ autoPtr<twoPhaseChangeModel> phaseChangePtr
 );
 
 volScalarField& alpha1(mixture.alpha1());
+volScalarField& alpha2(mixture.alpha2());
 const volScalarField& rho = mixture.rho();
-
-// volScalarField rho
-// (
-//     IOobject
-//     (
-//         "rho",
-//         runTime.timeName(),
-//         mesh,
-//         IOobject::READ_IF_PRESENT,
-//         IOobject::AUTO_WRITE
-//     ),
-//     mixture.rho()
-// );
 
 dimensionedScalar pMin
 (

@@ -30,7 +30,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
         tmp<volScalarField> talphaSmoothed
         (
             cSmoothingCoeff*fvc::surfaceSum(fvc::interpolate(alphaSm)*magSf)()/fvc::surfaceSum(magSf)
-            +(scalar(1) - cSmoothingCoeff)*alphaSm
+            +(scalar(1.0) - cSmoothingCoeff)*alphaSm
         );
         alphaSm = talphaSmoothed();
     }
@@ -38,19 +38,19 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
 // Sharpener for alpha
 {
-    alphaC = min(scalar(1), max(alpha1, scalar(0)));
+    alphaC = min(scalar(1.0), max(alpha1, scalar(0)));
 
-    w1 = sqrt(alphaC*(scalar(1) - alphaC));
-    w2 = sqrt(w1*w1 + 1e-6);
+    w1 = sqrt(alphaC*(scalar(1.0) - alphaC));
+    w2 = sqrt(w1*w1 + SMALL);
 
     alphaSh =
     (
-        scalar(1)/(scalar(1) - cSharpeningCoeff)
+        scalar(1.0)/(scalar(1.0) - cSharpeningCoeff)
         *(
            min
            (
                 max(alpha1, 0.5*cSharpeningCoeff),
-                scalar(1) - 0.5*cSharpeningCoeff
+                scalar(1.0) - 0.5*cSharpeningCoeff
            )
            -0.5*cSharpeningCoeff
         )
@@ -59,16 +59,74 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
 {
     // Cell gradient of alpha
-    const volVectorField gradAlpha(fvc::grad(alphaSm));
+    gradAlphaSm = fvc::grad(alphaSm);
 
     // Interpolated face-gradient of alpha
-    surfaceVectorField gradAlphaf(fvc::interpolate(gradAlpha));
+    gradAlphaSmf = fvc::interpolate(gradAlphaSm);
 
     // Face unit interface normal
-    surfaceVectorField nHatfv(gradAlphaf/(mag(gradAlphaf) + deltaN_));
-
-    correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
+    nHatfv = gradAlphaf/(mag(gradAlphaf) + mixture.deltaN());
 
     // Face unit interface normal flux
     nHatf = nHatfv & Sf;
+}
+
+// correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
+// void Foam::interfaceProperties::correctContactAngle
+// (
+//     surfaceVectorField::Boundary& nHatb,
+//     const surfaceVectorField::Boundary& gradAlphaf
+// )
+{
+//     const fvMesh& mesh = alpha1_.mesh();
+    volScalarField::Boundary& a1bf = alpha1.boundaryFieldRef();
+    volScalarField::Boundary& a2bf = alpha2.boundaryFieldRef();
+
+    const fvBoundaryMesh& boundary = mesh.boundary();
+
+    forAll(boundary, patchi)
+    {
+        if (isA<alphaContactAngleFvPatchScalarField>(a1bf[patchi]))
+        {
+            alphaContactAngleFvPatchScalarField& a1cap =
+                refCast<alphaContactAngleFvPatchScalarField>
+                (
+                    a1bf[patchi]
+                );
+
+            fvsPatchVectorField& nHatp = nHatb[patchi];
+            const scalarField theta
+            (
+                degToRad(a1cap.theta(U.boundaryField()[patchi], nHatp))
+            );
+
+            const vectorField nf
+            (
+                boundary[patchi].nf()
+            );
+
+            // Reset nHatp to correspond to the contact angle
+
+            const scalarField a12(nHatp & nf);
+            const scalarField b1(cos(theta));
+
+            scalarField b2(nHatp.size());
+            forAll(b2, facei)
+            {
+                b2[facei] = cos(acos(a12[facei]) - theta[facei]);
+            }
+
+            const scalarField det(1.0 - a12*a12);
+
+            scalarField a((b1 - a12*b2)/det);
+            scalarField b((b2 - a12*b1)/det);
+
+            nHatp = a*nf + b*nHatp;
+            nHatp /= (mag(nHatp) + deltaN_.value());
+
+            a1cap.gradient() = (nf & nHatp)*mag(gradAlphaf[patchi]);
+            a1cap.evaluate();
+            a2bf[patchi] = 1 - a1cap;
+        }
+    }
 }
