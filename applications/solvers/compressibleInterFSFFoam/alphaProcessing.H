@@ -65,20 +65,18 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
     gradAlphaSmf = fvc::interpolate(gradAlphaSm);
 
     // Face unit interface normal
-    nHatfv = gradAlphaf/(mag(gradAlphaf) + mixture.deltaN());
+    nHatfv = gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN());
 
     // Face unit interface normal flux
     nHatf = nHatfv & Sf;
 }
 
-// correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
-// void Foam::interfaceProperties::correctContactAngle
-// (
-//     surfaceVectorField::Boundary& nHatb,
-//     const surfaceVectorField::Boundary& gradAlphaf
-// )
+// Correction for the boundary condition on the unit normal nHat on
+// walls to produce the correct contact angle.
+
+// The dynamic contact angle is calculated from the component of the
+// velocity on the direction of the interface, parallel to the wall.
 {
-//     const fvMesh& mesh = alpha1_.mesh();
     volScalarField::Boundary& a1bf = alpha1.boundaryFieldRef();
     volScalarField::Boundary& a2bf = alpha2.boundaryFieldRef();
 
@@ -94,7 +92,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
                     a1bf[patchi]
                 );
 
-            fvsPatchVectorField& nHatp = nHatb[patchi];
+            fvsPatchVectorField& nHatp = nHatfv[patchi];
             const scalarField theta
             (
                 degToRad(a1cap.theta(U.boundaryField()[patchi], nHatp))
@@ -124,7 +122,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
             nHatp = a*nf + b*nHatp;
             nHatp /= (mag(nHatp) + deltaN_.value());
 
-            a1cap.gradient() = (nf & nHatp)*mag(gradAlphaf[patchi]);
+            a1cap.gradient() = (nf & nHatp)*mag(gradAlphaSmf[patchi]);
             a1cap.evaluate();
             a2bf[patchi] = 1 - a1cap;
         }

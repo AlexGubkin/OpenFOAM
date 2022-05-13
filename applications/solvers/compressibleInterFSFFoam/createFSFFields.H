@@ -1,16 +1,11 @@
 #include "surfaceTensionModel.H"
-//- Surface tension
-autoPtr<surfaceTensionModel> sigmaPtr;
-// sigmaPtr->readDict(transportPropertiesDict);
-// Sigma
-const volScalarField sigma(sigmaPtr->sigma());
 
-Info<< "Creation field K0\n" << endl;
-volScalarField K0
+Info<< "Creation field kappa0\n" << endl;
+volScalarField kappa0
 (
     IOobject
     (
-        "interfaceProperties:K0",
+        "interfaceProperties:kappa0",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -20,12 +15,12 @@ volScalarField K0
     dimensionedScalar(dimless/dimLength, 0)
 )
 
-Info<< "Creation field K\n" << endl;
-volScalarField K
+Info<< "Creation field kappa\n" << endl;
+volScalarField kappa
 (
     IOobject
     (
-        "interfaceProperties:K",
+        "interfaceProperties:kappa",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -127,6 +122,11 @@ volScalarField pc
 )
 
 {
+    const surfaceVectorField& Sf = mesh.Sf();
+    const surfaceScalarField& magSf = mesh.magSf();
+
+    const dictionary& alphaControls = mesh.solverDict(alpha1.name());
+
     // Cell gradient of alpha
     volScalarField gradAlphaSm("gradAlphaSm", fvc::grad(alphaSm));
 
@@ -139,8 +139,36 @@ volScalarField pc
     // Face unit interface normal flux
     surfaceScalarField nHatf("nHatf", nHatfv & Sf);
 
-    const surfaceVectorField& Sf = mesh.Sf();
-    const surfaceScalarField& magSf = mesh.magSf();
+    // Cell gradient of sharpened alpha
+    const volVectorField gradAlphaSharpened(fvc::grad(alphaSharpened_));
 
-    const dictionary& alphaControls = mesh.solverDict(alpha1.name());
+    // Interpolated face-gradient of sharpened alpha
+    const surfaceVectorField gradAlphaSharpenedf(fvc::interpolate(gradAlphaSharpened));
+
+    const surfaceScalarField deltaf(fvc::snGrad(alphaSharpened_));
+
+    const surfaceScalarField cutFactorf(deltaf/(mag(deltaf) + deltaN_));
+
+
+
+    // Sigma
+    const volScalarField sigma(sigmaPtr_->sigma());
+
+    // Cell gradient of sigma
+    const volVectorField gradSigma(fvc::grad(sigma));
+
+    // Interpolated face-gradient of sigma
+    const surfaceVectorField gradSigmaf(fvc::interpolate(gradSigma));
+
+    // Interpolated tangent face-gradient of sigma
+    const surfaceScalarField tangentGradSigmaf((gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & Sf/magSf);
+
+    const surfaceScalarField capillaryForceFlux(fvc::interpolate(w2_*sigmaK())/fvc::interpolate(w2_)*deltaf*magSf);
+    surfaceScalarField capillaryForceFluxFiltered(capillaryForceFlux);
+
+    //- Surface tension
+    autoPtr<surfaceTensionModel> sigmaPtr;
+    // sigmaPtr->readDict(transportPropertiesDict);
+    // Sigma
+//     const volScalarField sigma(sigmaPtr->sigma());
 }
