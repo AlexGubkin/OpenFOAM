@@ -7,17 +7,27 @@ while (pimple.correctNonOrthogonal())
     (
         fvm::laplacian(pc)
         ==
-        fvc::div(capillaryForceFluxFiltered)
+        fvc::div(capillaryForceFlux)
     );
 
     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
+    
+    gradPcf =
+        deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
 
-    const surfaceVectorField gradPcf(fvc::interpolate(fvc::grad(pc)));
+    capillaryForceFlux =
+        deltaf*fvc::interpolate(w2*sigma*kappa)/fvc::interpolate(w2)*magSf
+      - (gradPcf - (gradPcf & nHatfv)*nHatfv) & Sf
 
-    capillaryForceFluxFiltered = capillaryForceFlux - cutFactorf*((gradPcf - (gradPcf & nHatfv)*nHatfv) & Sf);
+    if (pimple.finalNonOrthogonalIter())
+    {
+        gradSigmaf =
+            fvc::interpolate(fvc::grad(sigma));
 
-//     if (pimple.finalNonOrthogonalIter())
-//     {
-//     }
+        tangentGradSigmaf =
+            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & Sf/magSf;
+
+        surfaceTensionForce = capillaryForceFlux/magSf + tangentGradSigmaf
+    }
 }

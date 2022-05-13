@@ -59,10 +59,10 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
 {
     // Cell gradient of alpha
-    gradAlphaSm = fvc::grad(alphaSm);
+//     gradAlphaSm = fvc::grad(alphaSm);
 
     // Interpolated face-gradient of alpha
-    gradAlphaSmf = fvc::interpolate(gradAlphaSm);
+    gradAlphaSmf = fvc::interpolate(fvc::grad(alphaSm));
 
     // Face unit interface normal
     nHatfv = gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN());
