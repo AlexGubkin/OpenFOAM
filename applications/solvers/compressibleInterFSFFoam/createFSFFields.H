@@ -117,9 +117,6 @@ volScalarField pc
 );
 
 
-const dictionary& alphaControls = mesh.solverDict(alpha1.name());
-
-
 // Face unit interface normal initialization
 // Interpolated face-gradient of alpha
 surfaceVectorField gradAlphaSmf
@@ -145,7 +142,12 @@ surfaceScalarField nHatf
 
 // Initialization fields for surface tension force calculation
 //- Surface tension
-autoPtr<surfaceTensionModel> sigmaPtr;
+const dictionary&
+    thermophysicalPropertiesDict = mesh.lookupObject<IOdictionary>("thermophysicalProperties");
+
+autoPtr<surfaceTensionModel> sigmaPtr(surfaceTensionModel::New(thermophysicalPropertiesDict, mesh));
+// sigmaPtr(surfaceTensionModel::New(thermophysicalPropertiesDict, mesh))
+sigmaPtr->readDict(thermophysicalPropertiesDict);
 
 // Sigma
 const volScalarField sigma(sigmaPtr->sigma());

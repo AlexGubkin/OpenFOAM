@@ -1,3 +1,5 @@
+// const dictionary& alphaControls = mesh.solverDict(alpha1.name());
+
 const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 3));
 const scalar cSmoothingCoeff(alphaControls.lookupOrDefault<scalar>("cSmoothingCoeff", 0.5));
 const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpeningCoeff", 0.5));
@@ -29,8 +31,9 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
         tmp<volScalarField> talphaSmoothed
         (
-            cSmoothingCoeff*fvc::surfaceSum(fvc::interpolate(alphaSm)*mesh.magSf())()/fvc::surfaceSum(mesh.magSf())
-            +(scalar(1.0) - cSmoothingCoeff)*alphaSm
+            cSmoothingCoeff*fvc::surfaceSum(fvc::interpolate(alphaSm)*mesh.magSf())()
+           /fvc::surfaceSum(mesh.magSf())
+          + (scalar(1.0) - cSmoothingCoeff)*alphaSm
         );
         alphaSm = talphaSmoothed();
     }
@@ -43,13 +46,13 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
     alphaSh =
     (
         scalar(1.0)/(scalar(1.0) - cSharpeningCoeff)
-        *(
-           min
-           (
+       *(
+            min
+            (
                 max(alpha1, 0.5*cSharpeningCoeff),
                 scalar(1.0) - 0.5*cSharpeningCoeff
-           )
-           -0.5*cSharpeningCoeff
+            )
+          - 0.5*cSharpeningCoeff
         )
     );
 
