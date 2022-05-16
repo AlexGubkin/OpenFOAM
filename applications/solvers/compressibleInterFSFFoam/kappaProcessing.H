@@ -12,7 +12,8 @@ const label nKappaSmoothers(alphaControls.lookupOrDefault<label>("nKappaSmoother
         tmp<volScalarField> tKappaSm
         (
             2.0*w1*kappa0
-            +(scalar(1.0) - 2.0*w1)*fvc::surfaceSum(fvc::interpolate(w2*kappa)*magSf)()/fvc::surfaceSum(fvc::interpolate(w2)*magSf)()
+          + (scalar(1.0) - 2.0*w1)*fvc::surfaceSum(fvc::interpolate(w2*kappa)*mesh.magSf())()
+            / fvc::surfaceSum(fvc::interpolate(w2)*mesh.magSf())()
         );
         kappa = tKappaSm();
     }

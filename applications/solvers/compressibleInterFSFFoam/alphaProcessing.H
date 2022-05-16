@@ -21,7 +21,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
 // Smoother loop for SSF
 {
-    alphaSm = alpha1;
+//     alphaSm = alpha1;
 
     for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
     {
@@ -29,7 +29,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
         tmp<volScalarField> talphaSmoothed
         (
-            cSmoothingCoeff*fvc::surfaceSum(fvc::interpolate(alphaSm)*magSf)()/fvc::surfaceSum(magSf)
+            cSmoothingCoeff*fvc::surfaceSum(fvc::interpolate(alphaSm)*mesh.magSf())()/fvc::surfaceSum(mesh.magSf())
             +(scalar(1.0) - cSmoothingCoeff)*alphaSm
         );
         alphaSm = talphaSmoothed();
@@ -39,9 +39,6 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 // Sharpener for alpha
 {
     alphaC = min(scalar(1.0), max(alpha1, scalar(0)));
-
-    w1 = sqrt(alphaC*(scalar(1.0) - alphaC));
-    w2 = sqrt(w1*w1 + SMALL);
 
     alphaSh =
     (
@@ -55,12 +52,12 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
            -0.5*cSharpeningCoeff
         )
     );
+
+    w1 = sqrt(alphaC*(scalar(1.0) - alphaC));
+    w2 = sqrt(w1*w1 + SMALL);
 }
 
 {
-    // Cell gradient of alpha
-//     gradAlphaSm = fvc::grad(alphaSm);
-
     // Interpolated face-gradient of alpha
     gradAlphaSmf = fvc::interpolate(fvc::grad(alphaSm));
 
@@ -68,7 +65,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
     nHatfv = gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN());
 
     // Face unit interface normal flux
-    nHatf = nHatfv & Sf;
+    nHatf = nHatfv & mesh.Sf();
 }
 
 // Correction for the boundary condition on the unit normal nHat on
@@ -92,7 +89,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
                     a1bf[patchi]
                 );
 
-            fvsPatchVectorField& nHatp = nHatfv[patchi];
+            fvsPatchVectorField& nHatp = nHatfv.boundaryFieldRef()[patchi];
             const scalarField theta
             (
                 degToRad(a1cap.theta(U.boundaryField()[patchi], nHatp))
@@ -106,12 +103,12 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
             // Reset nHatp to correspond to the contact angle
 
             const scalarField a12(nHatp & nf);
-            const scalarField b1(cos(theta));
+            const scalarField b1(Foam::cos(theta));
 
             scalarField b2(nHatp.size());
             forAll(b2, facei)
             {
-                b2[facei] = cos(acos(a12[facei]) - theta[facei]);
+                b2[facei] = Foam::cos(Foam::acos(a12[facei]) - theta[facei]);
             }
 
             const scalarField det(1.0 - a12*a12);
@@ -120,9 +117,9 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
             scalarField b((b2 - a12*b1)/det);
 
             nHatp = a*nf + b*nHatp;
-            nHatp /= (mag(nHatp) + deltaN_.value());
+            nHatp /= (mag(nHatp) + mixture.deltaN().value());
 
-            a1cap.gradient() = (nf & nHatp)*mag(gradAlphaSmf[patchi]);
+            a1cap.gradient() = (nf & nHatp)*mag(gradAlphaSmf.boundaryField()[patchi]);
             a1cap.evaluate();
             a2bf[patchi] = 1 - a1cap;
         }

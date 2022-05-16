@@ -13,7 +13,7 @@ volScalarField kappa0
     ),
     mesh,
     dimensionedScalar(dimless/dimLength, 0)
-)
+);
 
 Info<< "Creation field kappa\n" << endl;
 volScalarField kappa
@@ -28,7 +28,7 @@ volScalarField kappa
     ),
     mesh,
     dimensionedScalar(dimless/dimLength, 0)
-)
+);
 
 Info<< "Creation field alphaSm\n" << endl;
 volScalarField alphaSm
@@ -42,7 +42,7 @@ volScalarField alphaSm
         IOobject::AUTO_WRITE
     ),
     alpha1
-)
+);
 
 Info<< "Creation field alphaC\n" << endl;
 volScalarField alphaC
@@ -56,7 +56,7 @@ volScalarField alphaC
         IOobject::AUTO_WRITE
     ),
     alpha1
-)
+);
 
 Info<< "Creation field alphaSh\n" << endl;
 volScalarField alphaSh
@@ -70,7 +70,7 @@ volScalarField alphaSh
         IOobject::AUTO_WRITE
     ),
     alpha1
-)
+);
 
 Info<< "Creation field w1\n" << endl;
 volScalarField w1
@@ -83,8 +83,8 @@ volScalarField w1
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    sqrt(alphaC*(scalar(1.0) - alphaC));
-)
+    sqrt(alphaC*(scalar(1.0) - alphaC))
+);
 
 Info<< "Creation field w2\n" << endl;
 volScalarField w2
@@ -97,8 +97,8 @@ volScalarField w2
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    sqrt(w1*w1 + SMALL);
-)
+    sqrt(w1*w1 + SMALL)
+);
 
 volScalarField pc
 (
@@ -114,93 +114,83 @@ volScalarField pc
     dimensionedScalar(dimPressure, 0),
     zeroGradientFvPatchField<scalar>::typeName
 //     zeroGradientFvPatchScalarField::typeName
-)
+);
 
 
-{
-    const surfaceVectorField& Sf = mesh.Sf();
-    const surfaceScalarField& magSf = mesh.magSf();
-
-    const dictionary& alphaControls = mesh.solverDict(alpha1.name());
-}
+const dictionary& alphaControls = mesh.solverDict(alpha1.name());
 
 
 // Face unit interface normal initialization
-{
-    // Interpolated face-gradient of alpha
-    surfaceVectorField gradAlphaSmf
-    (
-        "gradAlphaSmf",
-        fvc::interpolate(fvc::grad(alphaSm))
-    );
+// Interpolated face-gradient of alpha
+surfaceVectorField gradAlphaSmf
+(
+    "gradAlphaSmf",
+    fvc::interpolate(fvc::grad(alphaSm))
+);
 
-    // Face unit interface normal
-    surfaceVectorField nHatfv
-    (
-        "nHatfv",
-        gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN())
-    );
+// Face unit interface normal
+surfaceVectorField nHatfv
+(
+    "nHatfv",
+    gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN())
+);
 
-    // Face unit interface normal flux
-    surfaceScalarField nHatf
-    (
-        "nHatf",
-        nHatfv & Sf
-    );
-}
+// Face unit interface normal flux
+surfaceScalarField nHatf
+(
+    "nHatf",
+    nHatfv & mesh.Sf()
+);
 
 
 // Initialization fields for surface tension force calculation
-{
-    //- Surface tension
-    autoPtr<surfaceTensionModel> sigmaPtr;
+//- Surface tension
+autoPtr<surfaceTensionModel> sigmaPtr;
 
-    // Sigma
-    const volScalarField sigma(sigmaPtr->sigma());
+// Sigma
+const volScalarField sigma(sigmaPtr->sigma());
 
-    // Interpolated face-gradient of sharpened alpha
-    surfaceVectorField gradAlphaShf
-    (
-        "gradAlphaShf",
-        fvc::interpolate(fvc::grad(alphaSh))
-    );
+// Interpolated face-gradient of sharpened alpha
+surfaceVectorField gradAlphaShf
+(
+    "gradAlphaShf",
+    fvc::interpolate(fvc::grad(alphaSh))
+);
 
-    surfaceScalarField deltaf
-    (
-        "deltaf",
-        fvc::snGrad(alphaSh)
-    );
+surfaceScalarField deltaf
+(
+    "deltaf",
+    fvc::snGrad(alphaSh)
+);
 
-    // Interpolated face-gradient of sigma
-    surfaceVectorField gradSigmaf
-    (
-        "gradSigmaf",
-        fvc::interpolate(fvc::grad(sigma))
-    );
+// Interpolated face-gradient of sigma
+surfaceVectorField gradSigmaf
+(
+    "gradSigmaf",
+    fvc::interpolate(fvc::grad(sigma))
+);
 
-    // Interpolated tangent face-gradient of sigma
-    surfaceScalarField tangentGradSigmaf
-    (
-        "tangentGradSigmaf",
-        mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & Sf/magSf
-    );
+// Interpolated tangent face-gradient of sigma
+surfaceScalarField tangentGradSigmaf
+(
+    "tangentGradSigmaf",
+    mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf()
+);
 
-    surfaceVectorField gradPcf
-    (
-        "gradPcf",
-        deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
-    );
+surfaceVectorField gradPcf
+(
+    "gradPcf",
+    deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
+);
 
-    surfaceScalarField capillaryForceFlux
-    (
-        "capillaryForceFlux",
-        deltaf*fvc::interpolate(w2*sigma*kappa)/fvc::interpolate(w2)*magSf
-      - (gradPcf - (gradPcf & nHatfv)*nHatfv) & Sf
-    );
+surfaceScalarField capillaryForceFlux
+(
+    "capillaryForceFlux",
+    fvc::interpolate(w2*sigma*kappa)/fvc::interpolate(w2)*deltaf*mesh.magSf()
+);
 
-    surfaceScalarField surfaceTensionForce
-    (
-        "surfaceTensionForce"
-        capillaryForceFlux/magSf + tangentGradSigmaf
-    );
-}
+surfaceScalarField surfaceTensionForce
+(
+    "surfaceTensionForce",
+    capillaryForceFlux/mesh.magSf() + tangentGradSigmaf
+);

@@ -1,5 +1,6 @@
 label   pcRefCell = 0;
 scalar pcRefValue = 0.0;
+const scalar cCapillaryForceFluxCoeff(alphaControls.lookupOrDefault<scalar>("cCapillaryForceFluxCoeff", 0.01));
 
 while (pimple.correctNonOrthogonal())
 {
@@ -17,17 +18,35 @@ while (pimple.correctNonOrthogonal())
         deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
 
     capillaryForceFlux =
-        deltaf*fvc::interpolate(w2*sigma*kappa)/fvc::interpolate(w2)*magSf
-      - (gradPcf - (gradPcf & nHatfv)*nHatfv) & Sf
+        fvc::interpolate(w2*sigma*kappa)/fvc::interpolate(w2)*deltaf*mesh.magSf();
 
+      capillaryForceFlux -= (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
+      
     if (pimple.finalNonOrthogonalIter())
     {
+        const scalar capillaryForceAvg =
+            gSum(capillaryForceFlux)
+          / gSum(static_cast<surfaceScalarField>(fvc::interpolate(alphaSh)*mesh.magSf()));
+
         gradSigmaf =
             fvc::interpolate(fvc::grad(sigma));
 
         tangentGradSigmaf =
-            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & Sf/magSf;
+            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf();
 
-        surfaceTensionForce = capillaryForceFlux/magSf + tangentGradSigmaf
+        surfaceTensionForce =
+            (
+                capillaryForceFlux
+              - max
+                (
+                    min
+                    (
+                        capillaryForceFlux,
+                        cCapillaryForceFluxCoeff*capillaryForceAvg*mesh.magSf()
+                    ),
+                    -cCapillaryForceFluxCoeff*capillaryForceAvg*mesh.magSf()
+                )
+            )/mesh.magSf()
+          + tangentGradSigmaf;
     }
 }

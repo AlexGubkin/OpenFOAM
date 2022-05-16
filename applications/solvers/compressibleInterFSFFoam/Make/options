@@ -1,16 +1,16 @@
 EXE_INC = \
     -I. \
-    -ItwoPhaseMixtureThermo \
-    -IcompressibleInterPhaseTransportModel/lnInclude \
-    -ItwoPhaseChange/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle \
+    -I$(FOAM_APP)/solvers/multiphase/compressibleInterFoam/twoPhaseMixtureThermo \
+    -I$(FOAM_APP)/solvers/multiphase/compressibleInterFoam/compressibleInterPhaseTransportModel/lnInclude \
+    -I$(FOAM_APP)/solvers/multiphase/compressibleInterFoam/twoPhaseChange/lnInclude \
     -I$(LIB_SRC)/transportModels/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
-    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/surfaceTensionModels/surfaceTensionModel \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseMixture/lnInclude \
-    -I$(OWN_LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/phaseCompressible/lnInclude \
@@ -21,18 +21,17 @@ EXE_INC = \
     -I$(LIB_SRC)/fvModels/lnInclude
 
 EXE_LIBS = \
-    -L$(FOAM_USER_LIBBIN) \
-    -ltwoPhaseMixtureThermoFSF \
-    -ltwoPhaseSurfaceTensionFSF \
+    -ltwoPhaseMixtureThermo \
+    -ltwoPhaseSurfaceTension \
     -lfluidThermophysicalModels \
     -lspecie \
     -ltwoPhaseMixture \
     -ltwoPhaseProperties \
-    -linterfacePropertiesFSF \
-    -lcompressibleTwoPhaseChangeModelsFSF \
+    -linterfaceProperties \
+    -lcompressibleTwoPhaseChangeModels \
     -lmomentumTransportModels \
     -lcompressibleMomentumTransportModels \
-    -lcompressibleInterPhaseTransportModelFSF \
+    -lcompressibleInterPhaseTransportModel \
     -lfiniteVolume \
     -lfvModels \
     -lfvConstraints \
