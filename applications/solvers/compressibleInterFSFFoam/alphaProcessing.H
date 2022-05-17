@@ -23,7 +23,7 @@ const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpening
 
 // Smoother loop for SSF
 {
-//     alphaSm = alpha1;
+    alphaSm = alpha1;
 
     for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
     {

@@ -1,6 +1,0 @@
-could not open file meshToMesh.H for source file compressibleInterFSFFoam.C due to No such file or directory
-In file included from compressibleInterFSFFoam.C:74:
-createFSFFields.H: In function ‘int main(int, char**)’:
-createFSFFields.H:120:19: warning: unused variable ‘alphaControls’ [-Wunused-variable]
-  120 | const dictionary& alphaControls = mesh.solverDict(alpha1.name());
-      |                   ^~~~~~~~~~~~~
