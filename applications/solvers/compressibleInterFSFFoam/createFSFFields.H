@@ -116,7 +116,6 @@ volScalarField pc
 //     zeroGradientFvPatchScalarField::typeName
 );
 
-// pc.storeOldTime();
 
 // Face unit interface normal initialization
 // Interpolated face-gradient of alpha
@@ -152,8 +151,6 @@ autoPtr<surfaceTensionModel> sigmaPtr
 );
 sigmaPtr->readDict(thermophysicalPropertiesDict);
 
-// Sigma
-// const volScalarField sigma(sigmaPtr->sigma());
 
 // Interpolated face-gradient of sharpened alpha
 surfaceVectorField gradAlphaShf
@@ -188,14 +185,19 @@ surfaceVectorField gradPcf
     deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
 );
 
-surfaceScalarField capillaryForceFlux
+// Surface tension force flux
+surfaceScalarField phic
 (
-    "capillaryForceFlux",
-    fvc::interpolate(w2*sigmaPtr->sigma()*kappa)/fvc::interpolate(w2)*deltaf*mesh.magSf()
+    "phic",
+    fvc::interpolate(sigmaPtr->sigma())
+   *fvc::interpolate(w2*kappa)
+   /fvc::interpolate(w2)*deltaf*mesh.magSf();
 );
 
-surfaceScalarField surfaceTensionForce
-(
-    "surfaceTensionForce",
-    capillaryForceFlux/mesh.magSf() + tangentGradSigmaf
-);
+// surfaceScalarField surfaceTensionForce
+// (
+//     "surfaceTensionForce",
+//     capillaryForceFlux/mesh.magSf() + tangentGradSigmaf
+// );
+// 
+// surfaceTensionForce.storeOldTime();
