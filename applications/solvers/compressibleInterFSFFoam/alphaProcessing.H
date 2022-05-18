@@ -35,7 +35,7 @@ alphaSh =
         - 0.5*cSharpeningCoeff
     );
 
-// alphaSh.correctBoundaryConditions();
+alphaSh.correctBoundaryConditions();
 
 w1 = sqrt(alphaC*(1.0 - alphaC));
 w2 = sqrt(w1*w1 + SMALL);

@@ -191,7 +191,14 @@ surfaceScalarField phic
     "phic",
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf();
+   /fvc::interpolate(w2)*deltaf*mesh.magSf()
+);
+
+// Surface tension force flux
+surfaceScalarField phicFilt
+(
+    "phicFilt",
+    (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
 );
 
 // surfaceScalarField surfaceTensionForce
