@@ -201,6 +201,13 @@ surfaceScalarField phicFilt
     (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
 );
 
+// Surface tension force flux (tangent force flux)
+surfaceScalarField phict
+(
+    "phict",
+    mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
+);
+
 // surfaceScalarField surfaceTensionForce
 // (
 //     "surfaceTensionForce",

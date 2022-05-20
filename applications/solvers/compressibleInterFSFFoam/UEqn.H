@@ -21,11 +21,11 @@
             fvc::reconstruct
             (
                 (
-//                     surfaceTensionForce
                   - ghf*fvc::snGrad(rho)
                   - fvc::snGrad(p_rgh)
                 ) * mesh.magSf()
               + phic
+              + phict
             )
         );
 

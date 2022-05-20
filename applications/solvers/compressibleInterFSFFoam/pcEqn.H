@@ -1,7 +1,7 @@
 label pcRefCell = 0;
 scalar pcRefValue = 0.0;
-const scalar cPhicCoeff(alphaControls.lookupOrDefault<scalar>("cPhicCoeff", 0.01));
-const scalar cPhicRelaxCoeff(alphaControls.lookupOrDefault<scalar>("cPhicRelaxCoeff", 0.7));
+const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThresholdCoeff", 0.01));
+const scalar cPhicRelaxCoeff(alphaControls.lookupOrDefault<scalar>("cPhicRelaxCoeff", 0.9));
 
 // pc.storeOldTime();
 // pc.oldTime();
@@ -16,6 +16,11 @@ phic =
 
 // phic -=
 //     (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
+
+phicFilt =
+    cPhicRelaxCoeff*phicFilt
+  + (1.0 - cPhicRelaxCoeff)
+   *((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
 
 phic -=
     phicFilt;
@@ -34,29 +39,48 @@ while (pimple.correctNonOrthogonal())
 
     if (pimple.finalNonOrthogonalIter())
     {
-        gradPcf =
-            mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
+//         gradPcf =
+//             mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
+// 
+//         phic -=
+//             (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
+// 
+//         phicFilt =
+//             cPhicRelaxCoeff*phicFilt + (1.0 - cPhicRelaxCoeff)*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
 
-        phic -=
-            (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
+        phic =
+            mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
 
-        phicFilt =
-            cPhicRelaxCoeff*phicFilt + cPhicCoeff*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
-
-        const dimensionedScalar capillaryForceAvg
+        const dimensionedScalar phicThreshold
         (
-            dimForce/dimVolume,
-            gSum(phic)
-           /gSum(static_cast<surfaceScalarField>(fvc::interpolate(alphaSh)*mesh.magSf()))
+            dimForce/dimLength,
+            cPhicThresholdCoeff
+           *gSum(static_cast<surfaceScalarField>(mag(phic)*mesh.magSf()))
+           /(gSum(static_cast<surfaceScalarField>(pos(mag(phic))*mesh.magSf())) + SMALL)
         );
 
-        Info<< "capillaryForceAvg = " << capillaryForceAvg.value() << endl;
+        Info<< "phicThreshold = " << phicThreshold.value() << nl;
 
+        phic =
+            phic
+          - max
+            (
+                min
+                (
+                    phic,
+                    phicThreshold
+                ),
+              - phicThreshold
+            );
+            
         gradSigmaf =
             fvc::interpolate(fvc::grad(sigmaPtr->sigma()));
 
-        tangentGradSigmaf =
-            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf();
+        phict =
+            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
+
+//         tangentGradSigmaf =
+//             mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf();
 
 //         surfaceTensionForce =
 //             (
@@ -66,9 +90,9 @@ while (pimple.correctNonOrthogonal())
 //                     min
 //                     (
 //                         phic,
-//                         cPhicCoeff*capillaryForceAvg*mesh.magSf()
+//                         phicThreshold
 //                     ),
-//                   - cPhicCoeff*capillaryForceAvg*mesh.magSf()
+//                   - phicThreshold
 //                 )
 //             )/mesh.magSf()
 //           + tangentGradSigmaf;
