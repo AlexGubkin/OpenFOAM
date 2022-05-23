@@ -1,0 +1,146 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+boxHeight   1.0;
+boxWidth    20.0;
+
+NH          40;
+NW          #calc "int($NH*$boxWidth / $boxHeight)";
+
+boxDepth    #calc "$boxHeight / $NH";
+// boxDepth    0.1;
+
+//box0
+box0x0      #calc "-0.5*$boxWidth";
+box0y0      0;
+box0z0      0;
+
+box0x1      #calc "0.5*$boxWidth";
+box0y1      0;
+box0z1      0;
+
+box0x2      #calc "0.5*$boxWidth";
+box0y2      $boxDepth;
+box0z2      0;
+
+box0x3      #calc "-0.5*$boxWidth";
+box0y3      $boxDepth;
+box0z3      0;
+
+box0x4      #calc "-0.5*$boxWidth";
+box0y4      0;
+box0z4      $boxHeight;
+
+box0x5      #calc "0.5*$boxWidth";
+box0y5      0;
+box0z5      $boxHeight;
+
+box0x6      #calc "0.5*$boxWidth";
+box0y6      $boxDepth;
+box0z6      $boxHeight;
+
+box0x7      #calc "-0.5*$boxWidth";
+box0y7      $boxDepth;
+box0z7      $boxHeight;
+
+vertices
+(
+    //box0
+    ($box0x0 $box0y0 $box0z0)
+    ($box0x1 $box0y1 $box0z1)
+    ($box0x2 $box0y2 $box0z2)
+    ($box0x3 $box0y3 $box0z3)
+    ($box0x4 $box0y4 $box0z4)
+    ($box0x5 $box0y5 $box0z5)
+    ($box0x6 $box0y6 $box0z6)
+    ($box0x7 $box0y7 $box0z7)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7)
+    ($NW 1 $NH)
+    simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    symmetryPlane1
+    {
+        type symmetryPlane;
+        faces
+        (
+            (3 2 6 7)
+        );
+    }
+
+    symmetryPlane2
+    {
+        type symmetryPlane;
+        faces
+        (
+            (0 4 5 1)
+        );
+    }
+
+    bottom
+    {
+        type wall;
+        faces
+        (
+            (0 1 2 3)
+        );
+    }
+
+    right
+    {
+        type wall;
+        faces
+        (
+            (1 5 6 2)
+        );
+    }
+
+    top
+    {
+        type patch;
+        faces
+        (
+            (4 7 6 5)
+        );
+    }
+
+    left
+    {
+        type wall;
+        faces
+        (
+            (0 3 7 4)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

@@ -1,0 +1,165 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      alpha.liquid;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   uniform 0;
+
+/*internalField   #codeStream
+{
+    code
+    #{
+        const IOdictionary&
+            d = static_cast<const IOdictionary&>(dict);
+        const fvMesh&
+            mesh = refCast<const fvMesh>(d.db());
+        const vectorField&
+            CC = mesh.C();
+        scalarField
+            initialField(mesh.nCells());
+
+        dimensionedScalar modeNumber
+        (
+            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("modeNumber")
+        );
+
+        dimensionedScalar p_0
+        (
+            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("p_0")
+        );
+
+        dimensionedScalar sigma
+        (
+            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("sigma")
+        );
+
+        dimensionedScalar gamma
+        (
+            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("gamma")
+        );
+
+        dimensionedScalar a_0
+        (
+            "a_0",
+            dimensionSet(0, 1, 0, 0, 0, 0, 0),
+            0
+        );
+
+        a_0 =
+            sigma / p_0
+          * (
+                4.0 / (3.0 * gamma)
+              * (
+                    (modeNumber + 2.0)
+                  * (modeNumber + 1.0)
+                  * (modeNumber - 1.0)
+                  + 2.0
+                )
+              - 2.0
+            );
+
+        scalar
+            x = 0;
+        scalar
+            y = 0;
+        scalar
+            z = 0;
+
+        forAll(CC, cellI)
+        {
+            x = CC[cellI].x();
+            y = CC[cellI].y(); 
+            z = CC[cellI].z();
+
+            if
+            (
+                sqrt(x * x + y * y + z * z) <= a_0.value()
+            )
+                initialField[cellI] = scalar(1.0);
+            else
+                initialField[cellI] = scalar(0);
+        }
+
+        initialField.writeEntry("", os); 
+    #};
+
+    codeInclude
+    #{
+        #include "fvCFD.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+        -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    codeLibs
+    #{
+        -lmeshTools \
+        -lfiniteVolume
+    #};
+};*/
+
+boundaryField
+{
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    symmetryPlane1
+    {
+        type            symmetryPlane;
+    }
+    symmetryPlane2
+    {
+        type            symmetryPlane;
+    }
+    bottom
+    {
+        type            temperatureDependentAlphaContactAngle;
+        theta0          constant 20;
+        limit           gradient;
+        value           uniform 0;
+
+//         type            zeroGradient;
+    }
+    right
+    {
+        type            constantAlphaContactAngle;
+        theta0          90.0;
+        limit           gradient;
+        value           uniform 0;
+
+//         type            zeroGradient;
+    }
+    top
+    {
+        type            inletOutlet;
+        inletValue      uniform 0;
+        value           uniform 0;
+    }
+    left
+    {
+        type            constantAlphaContactAngle;
+        theta0          90.0;
+        limit           gradient;
+        value           uniform 0;
+
+//         type            zeroGradient;
+    }
+}
+
+// ************************************************************************* //

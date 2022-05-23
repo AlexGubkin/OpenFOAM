@@ -1,10 +1,10 @@
 EXE_INC = \
+    -I$(LIB_SRC)/twoPhaseModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle \
     -I$(LIB_SRC)/transportModels/lnInclude \
-    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/surfaceTensionModels/surfaceTensionModel \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseMixture/lnInclude \
-    -I$(OWN_LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
     -I$(LIB_SRC)/twoPhaseModels/incompressibleTwoPhaseMixture/lnInclude \
-    -I$(OWN_LIB_SRC)/twoPhaseModels/immiscibleIncompressibleTwoPhaseMixture/lnInclude \
+    -I$(LIB_SRC)/twoPhaseModels/immiscibleIncompressibleTwoPhaseMixture/lnInclude \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseChange/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/incompressible/lnInclude \
@@ -14,8 +14,7 @@ EXE_INC = \
     -I$(LIB_SRC)/sampling/lnInclude
 
 EXE_LIBS = \
-    -L$(FOAM_USER_LIBBIN) \
-    -limmiscibleIncompressibleTwoPhaseMixtureFSF \
+    -limmiscibleIncompressibleTwoPhaseMixture \
     -ltwoPhaseChangeModels \
     -lmomentumTransportModels \
     -lincompressibleMomentumTransportModels \

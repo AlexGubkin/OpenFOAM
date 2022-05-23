@@ -1,0 +1,169 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.2                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      codeDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+heater
+{
+    code
+    #{
+        const dictionary&
+            caseProperties = db().lookupObject<IOdictionary>("thermophysicalProperties");
+
+        const fvPatch& boundaryPatch = patch();
+        const vectorField& Cf = boundaryPatch.Cf();
+        scalarField& field = *this;
+
+        field = patchInternalField();
+
+//         const dictionary&
+//             caseProperties = db().lookupObject<IOdictionary>("caseProperties");
+
+        dimensionedScalar
+            heaterRadius(caseProperties.lookup("heaterRadius"));
+//             modeNumber(caseProperties.lookup("modeNumber")),
+//             t_start(caseProperties.lookup("t_start")),
+//             p_0(caseProperties.lookup("p_0")),
+//             rhol_0(caseProperties.lookup("rhol_0")),
+//             sigma(caseProperties.lookup("sigma")),
+//             gamma(caseProperties.lookup("gamma")),
+//             r_p_inlet(caseProperties.lookup("r_p_inlet")),
+//             r_p_inlet_start(caseProperties.lookup("r_p_inlet_start")),
+//             alpha(caseProperties.lookup("alpha"));
+
+//         dimensionedScalar
+//             currentTime
+//             (
+//                 "currentTime",
+//                 dimensionSet(0, 0, 1, 0, 0, 0 ,0),
+//                 this->db().time().value()
+//             ),
+//             a_0
+//             (
+//                 "a_0",
+//                 dimensionSet(0, 1, 0, 0, 0, 0, 0),
+//                 0
+//             ),
+//             omega
+//             (
+//                 "omega",
+//                 dimensionSet(0, 0, -1, 0, 0, 0, 0),
+//                 0
+//             ),
+//             a
+//             (
+//                 "a",
+//                 dimensionSet(0, 0, 0, 0, 0, 0, 0),
+//                 0
+//             ),
+//             b
+//             (
+//                 "b",
+//                 dimensionSet(0, 0, 0, 0, 0, 0, 0),
+//                 0
+//             ),
+//             t_0
+//             (
+//                 "t_0",
+//                 dimensionSet(0, 0, 1, 0, 0, 0, 0),
+//                 0
+//             );
+
+//         a_0 =
+//             sigma / p_0
+//           * (
+//                 4.0 / (3.0 * gamma)
+//               * (
+//                     (modeNumber + 2.0)
+//                   * (modeNumber + 1.0)
+//                   * (modeNumber - 1.0)
+//                   + 2.0
+//                 )
+//               - 2.0
+//             );
+// 
+//         omega =
+//             Foam::sqrt
+//             (
+//                 p_0 / (rhol_0 * a_0 * a_0)
+//               * (
+//                     3.0 * gamma
+//                   + 2.0 * sigma / (a_0 * p_0)
+//                   * (3.0 * gamma - 1.0)
+//                 )
+//             );
+// 
+//         a = 0.5 * (r_p_inlet_start - r_p_inlet);
+//         b = 0.5 * (r_p_inlet_start + r_p_inlet);
+//         t_0 = 2.0 * constant::mathematical::pi / omega;
+
+            /*Tophat distribution*/
+//         forAll(Cf, faceI)
+//         {
+//             if (
+//                 sqrt(
+//                     Cf[faceI].x()*Cf[faceI].x()
+//                   + Cf[faceI].y()*Cf[faceI].y()
+//                 )
+//                 <= heaterRadius.value()
+//             )
+//                 field[faceI] = 320.0;
+//             else
+//                 field[faceI] = 300.0;
+//         }
+
+        /*Gauss distribution*/
+//         forAll(Cf, faceI)
+//         {
+//                 field[faceI] =
+//                     12.3e-3/(2.0*constant::mathematical::pi*0.67e-3*0.67e-3)
+//                     *exp(
+//                         -(Cf[faceI].x()*Cf[faceI].x() + Cf[faceI].y()*Cf[faceI].y())/(2.0*0.67e-3*0.67e-3)
+//                     );
+//         }
+
+        forAll(Cf, faceI)
+        {
+                field[faceI] =
+                    10.0
+                    *exp(
+                        -(Cf[faceI].x()*Cf[faceI].x() + Cf[faceI].y()*Cf[faceI].y())/(0.002*0.002)
+                    )
+                    + 300.0;
+        }
+
+//         operator == 
+//         (
+//             (
+//                 currentTime.value() >= t_0.value()
+//             )
+//             ?
+//                 p_0.value()
+//               * (
+//                     1
+//                   + (
+//                         a.value()
+//                       * erf(alpha.value() * (currentTime.value() - t_start.value()))
+//                       + b.value()
+//                     )
+//                       * cos(omega.value() * (currentTime.value() - t_0.value()))
+//                 )
+//             :
+//                 p_0.value()
+//         );
+    #};
+}
+
+// ************************************************************************* //

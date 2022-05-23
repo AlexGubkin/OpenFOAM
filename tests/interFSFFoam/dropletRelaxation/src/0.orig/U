@@ -1,0 +1,94 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+/*internalField   #codeStream
+{
+    code
+    #{
+        const IOdictionary&
+            d = static_cast<const IOdictionary&>(dict);
+        const fvMesh&
+            mesh = refCast<const fvMesh>(d.db());
+        const vectorField&
+            CC = mesh.C();
+        vectorField
+            initialField(mesh.nCells());
+
+        forAll(CC, cellI)
+        {
+        	initialField[cellI] = vector(0, 0, 0);
+        }
+
+        initialField.writeEntry("", os); 
+    #};
+
+    codeInclude
+    #{
+        #include "fvCFD.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+        -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    codeLibs
+    #{
+        -lmeshTools \
+        -lfiniteVolume
+    #};
+};*/
+
+boundaryField
+{
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    symmetryPlane1
+    {
+        type            symmetryPlane;
+    }
+    symmetryPlane2
+    {
+        type            symmetryPlane;
+    }
+    bottom
+    {
+        type            noSlip;
+    }
+    right
+    {
+        type            noSlip;
+    }
+    top
+    {
+        type            pressureInletOutletVelocity;
+        phi             phi;
+        tangentialVelocity uniform (0 0 0);
+        value           uniform (0 0 0);
+    }
+    left
+    {
+        type            noSlip;
+    }
+}
+
+// ************************************************************************* //

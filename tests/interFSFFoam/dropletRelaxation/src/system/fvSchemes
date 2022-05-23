@@ -1,0 +1,85 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+//     default         CrankNicolson 0.2;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+//     default         cellLimited leastSquares 1.0;
+}
+
+divSchemes
+{
+//     div(phi,alpha)                      Gauss vanLeer01;
+    div(phi,alpha)                      Gauss interfaceCompression vanLeer 1;
+//     div(phi,alpha)                      Gauss PLICU interfaceCompression vanLeer 1;
+//     div(phi,alpha)                      Gauss MPLIC;
+//     div(phi,alpha)                      Gauss MPLICU;
+
+//     div(rhoPhi,U)                       Gauss limitedCubic 1;
+//     div(rhoPhi,U)                       Gauss linearUpwind grad(U);
+    div(rhoPhi,U)                       Gauss vanLeerV;
+//     div(phi,thermo:rho.liquid)          Gauss upwind;
+//     div(phi,thermo:rho.gas)             Gauss upwind;
+//     div(rhoPhi,T)                       Gauss upwind;
+//     div(rhoPhi,K)                       Gauss upwind;
+//     div(phi,p)                          Gauss upwind;
+//     div(phi,k)                          Gauss upwind;
+//     div(phid1,p_rgh)                    Gauss upwind;
+//     div(phid2,p_rgh)                    Gauss upwind;
+
+//     div(rhoPhi,U)   Gauss upwind;
+    div(rhoPhi,T)   Gauss upwind;
+    div(rhoPhi,K)   Gauss upwind;
+    div(phi,p)      Gauss upwind;
+    div(phi,k)      Gauss upwind;
+
+//     div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+    div(((thermo:rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+}
+
+laplacianSchemes
+{
+//     default         Gauss linear orthogonal;
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+//     default         orthogonal;
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+    p_rgh;
+    pcorr;
+}
+
+
+// ************************************************************************* //

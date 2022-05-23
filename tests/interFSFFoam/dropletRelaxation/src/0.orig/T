@@ -1,0 +1,147 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      T;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 300;
+
+/*internalField   #codeStream
+{
+    code
+    #{
+        const IOdictionary&
+            d = static_cast<const IOdictionary&>(dict);
+        const fvMesh&
+            mesh = refCast<const fvMesh>(d.db());
+        const vectorField&
+            CC = mesh.C();
+        scalarField
+            initialField(mesh.nCells());
+
+        forAll(CC, cellI)
+        {
+        	initialField[cellI] = scalar(300.0);
+        }
+
+        initialField.writeEntry("", os); 
+    #};
+
+    codeInclude
+    #{
+        #include "fvCFD.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+        -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    codeLibs
+    #{
+        -lmeshTools \
+        -lfiniteVolume
+    #};
+};*/
+
+boundaryField
+{
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    symmetryPlane1
+    {
+        type            symmetryPlane;
+    }
+    symmetryPlane2
+    {
+        type            symmetryPlane;
+    }
+    bottom
+    {
+        type            codedFixedValue;
+        value           uniform 300;
+        name            heater;
+        
+        code
+        #{
+            const dictionary&
+                caseProperties = db().lookupObject<IOdictionary>("thermophysicalProperties");
+
+            const fvPatch& boundaryPatch = patch();
+            const vectorField& Cf = boundaryPatch.Cf();
+            scalarField& field = *this;
+
+            field = patchInternalField();
+
+            dimensionedScalar
+                heaterRadius(caseProperties.lookup("heaterRadius"));
+
+            /*Tophat distribution*/
+//             forAll(Cf, faceI)
+//             {
+//                 if (
+//                     sqrt(
+//                         Cf[faceI].x()*Cf[faceI].x()
+//                       + Cf[faceI].y()*Cf[faceI].y()
+//                     )
+//                     <= heaterRadius.value()
+//                 )
+//                     field[faceI] = 320.0;
+//                 else
+//                     field[faceI] = 300.0;
+//             }
+
+            /*Gauss distribution*/
+//             forAll(Cf, faceI)
+//             {
+//                 field[faceI] =
+//                     12.3e-3/(2.0*constant::mathematical::pi*0.67e-3*0.67e-3)
+//                     *exp(
+//                         -(Cf[faceI].x()*Cf[faceI].x() + Cf[faceI].y()*Cf[faceI].y())/(2.0*0.67e-3*0.67e-3)
+//                     );
+//             }
+
+            forAll(Cf, faceI)
+            {
+                field[faceI] =
+                    10.0
+                    *exp(
+                        -(Cf[faceI].x()*Cf[faceI].x() + Cf[faceI].y()*Cf[faceI].y())/(0.002*0.002)
+                    )
+                    + 300.0;
+            }
+        #};
+    }
+    right
+    {
+        type            fixedValue;
+        value           uniform 300;
+    }
+    top
+    {
+        type            inletOutlet;
+        inletValue      uniform 300;
+        value           uniform 300;
+    }
+    left
+    {
+        type            fixedValue;
+        value           uniform 300;
+    }
+}
+
+// ************************************************************************* //

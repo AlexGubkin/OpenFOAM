@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.2                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// oscillationNumber   100;
+// omega               3086896.454289302;
+// 
+// t_0                 #codeStream
+// {
+//     code
+//     #{
+//         scalar omega = readScalar(dict.lookup("omega"));
+// 
+//         os  << (2.0 * constant::mathematical::pi / omega);
+//     #};
+// };
+
+application         compressibleInterFoam;
+
+startFrom           latestTime;
+
+startTime           0;
+
+stopAt              endTime;
+
+// endTime             #codeStream
+// {
+//     code
+//     #{
+//         scalar
+//             oscillationNumber = readScalar(dict.lookup("oscillationNumber")),
+//             t_0 = readScalar(dict.lookup("t_0")),
+//             omega = readScalar(dict.lookup("omega"));
+// 
+//         os  << (2.0 * constant::mathematical::pi * oscillationNumber / omega + t_0);
+//     #};
+// };
+
+endTime             10.0;
+
+deltaT              1e-10;
+
+writeControl        adjustableRunTime;
+
+// writeInterval       #codeStream
+// {
+//     code
+//     #{
+//         scalar omega = readScalar(dict.lookup("omega"));
+// 
+//         os  << (0.05 * 2.0 * constant::mathematical::pi / omega);
+//     #};
+// };
+
+writeInterval       0.01;
+
+purgeWrite          0;
+
+writeFormat         ascii;
+
+writePrecision      10;
+
+writeCompression    compressed;
+
+timeFormat          general;
+
+timePrecision       10;
+
+runTimeModifiable   yes;
+
+adjustTimeStep      yes;
+
+maxCo               0.1;
+maxAlphaCo          0.1;
+
+maxDeltaT           $writeInterval;
+
+libs (
+    "libOpenFOAM.so"
+//     "libtwoPhaseProperties.so"
+//     "libinterfacePropertiesTangentialForceAddition.so"
+);
+
+functions
+{
+    processorField1
+    {
+        type            processorField;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        writeInterval   1;
+    }
+    /*CLI*/
+    #includeFunc    residuals
+//     #includeFunc    flowRatePatch(name=open)
+    /*CodeStream section*/
+//     #include        "inputOutputMassFlowLUFO"
+//     #include        "bubbleRadiusLUFO"
+//     #include        "bubbleMassConservationLUFO"
+//     #include        "centerOfMassLUFO"
+};
+
+// ************************************************************************* //

@@ -49,6 +49,8 @@ Description
 #include "CorrectPhi.H"
 #include "fvcSmooth.H"
 
+#include "alphaContactAngleFvPatchScalarField.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -62,6 +64,7 @@ int main(int argc, char *argv[])
     #include "createDyMControls.H"
     #include "createFields.H"
     #include "createFieldRefs.H"
+    #include "createFSFFields.H"
     #include "createAlphaFluxes.H"
     #include "initCorrectPhi.H"
     #include "createUfIfPresent.H"
@@ -172,6 +175,10 @@ int main(int argc, char *argv[])
             #include "alphaEqnSubCycle.H"
 
             mixture.correct();
+
+            #include "alphaProcessing.H"
+            #include "kappaProcessing.H"
+            #include "pcEqn.H"
 
             #include "UEqn.H"
 

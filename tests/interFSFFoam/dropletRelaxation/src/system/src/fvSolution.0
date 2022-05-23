@@ -1,0 +1,152 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.3.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    alpha.liquid
+    {
+        nAlphaCorr      1;
+        nAlphaSubCycles 1;
+        cAlpha          1;
+    }
+
+    ".*(rho|rhoFinal)"
+    {
+        solver          diagonal;
+    }
+
+    pcorr
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    pcorrFinal
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-8;
+        relTol          1e-3;
+    }
+
+    p_rghFinal
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-10;
+        relTol          0;
+    }
+
+//     "(h|e).*"
+//     {
+//         solver          PBiCGStab;
+//         preconditioner  DILU;
+//         tolerance       1e-10;
+//         relTol          0;
+//     }
+
+//     "(h|e)Final"
+//     {
+//         solver          PBiCGStab;
+//         preconditioner  DILU;
+//         tolerance       1e-10;
+//         relTol          0;
+//     }
+
+    "U.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    "(T|k|epsilon|omega).*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-12;
+        relTol          0;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor           no;
+    transonic                   no;
+    nOuterCorrectors            3;
+    nCorrectors                 1;
+    nNonOrthogonalCorrectors    2;
+    consistent                  yes;
+
+    outerCorrectorResidualControl
+    {
+        p_rgh
+        {
+            tolerance           1e-4;
+            relTol              0;
+        }
+
+        U
+        {
+            tolerance           1e-4;
+            relTol              0;
+        }
+
+        T
+        {
+            tolerance           1e-4;
+            relTol              0;
+        }
+    }
+
+    residualControl
+    {
+        p_rgh                   1e-4;
+        U                       1e-4;
+        T                       1e-4;
+    }
+
+    turbOnFinalIterOnly on;
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p_rgh                   1;
+        p_rghFinal              1;
+    }
+    equations
+    {
+        "(U|k|epsilon|omega).*" 1;
+        UFinal                  1;
+    }
+}
+
+
+// ************************************************************************* //
