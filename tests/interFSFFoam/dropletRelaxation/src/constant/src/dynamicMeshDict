@@ -17,36 +17,36 @@ FoamFile
 dynamicFvMesh   dynamicRefineFvMesh;
 
 // How often to refine
-refineInterval  1;
+refineInterval  10;
 
 // Field to be refinement on
-field           alpha.liquid;
+field           alpha.liquid1;
 
 // Refine field in between lower..upper
-lowerRefineLevel 0.001;
-upperRefineLevel 0.999;
+lowerRefineLevel 0.01;
+upperRefineLevel 0.99;
 
 // If value < unrefineLevel unrefine
-unrefineLevel   10;
+unrefineLevel   2.0;
 
 // Have slower than 2:1 refinement
 nBufferLayers   4;
 
 // Refine cells only up to maxRefinement levels
-maxRefinement   1;
+maxRefinement   2;
 
 // Stop refinement if maxCells reached
-maxCells        500000;
+maxCells        10000000;
 
 // Flux field and corresponding velocity field. Fluxes on changed
 // faces get recalculated by interpolating the velocity. Use 'none'
 // on surfaceScalarFields that do not need to be reinterpolated.
 correctFluxes
 (
-    (phi U)
+    (phi none)
     (nHatf none)
     (rhoPhi none)
-    (alphaPhi0.liquid none)
+    (alphaPhi0.liquid1 none)
     (ghf none)
 );
 

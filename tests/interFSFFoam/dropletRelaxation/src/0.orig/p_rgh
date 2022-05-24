@@ -1,153 +1,38 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:                                        |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      p_rgh;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   uniform 1e5;
-
-/*internalField   #codeStream
-{
-    code
-    #{
-        const IOdictionary&
-            d = static_cast<const IOdictionary&>(dict);
-        const fvMesh&
-            mesh = refCast<const fvMesh>(d.db());
-        const vectorField&
-            CC = mesh.C();
-        scalarField
-            initialField(mesh.nCells());
-
-        dimensionedScalar modeNumber
-        (
-            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("modeNumber")
-        );
-
-        dimensionedScalar p_0
-        (
-            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("p_0")
-        );
-
-        dimensionedScalar sigma
-        (
-            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("sigma")
-        );
-
-        dimensionedScalar gamma
-        (
-            d.db().lookupObject<IOdictionary>("thermophysicalProperties").lookup("gamma")
-        );
-
-        dimensionedScalar a_0
-        (
-            "a_0",
-            dimensionSet(0, 1, 0, 0, 0, 0, 0),
-            0
-        );
-
-        a_0 =
-            sigma / p_0
-          * (
-                4.0 / (3.0 * gamma)
-              * (
-                    (modeNumber + 2.0)
-                  * (modeNumber + 1.0)
-                  * (modeNumber - 1.0)
-                  + 2.0
-                )
-              - 2.0
-            );
-
-        scalar
-            x = 0;
-        scalar
-            y = 0;
-        scalar
-            z = 0;
-
-        forAll(CC, cellI)
-        {
-            x = CC[cellI].x();
-            y = CC[cellI].y(); 
-            z = CC[cellI].z();
-
-            if
-            (
-                sqrt(x * x + y * y + z * z) <= a_0.value()
-            )
-                initialField[cellI] = scalar(p_0.value() + 2.0 * sigma.value() / a_0.value());
-            else
-                initialField[cellI] = scalar(p_0.value());
-        }
-
-        initialField.writeEntry("", os); 
-    #};
-
-    codeInclude
-    #{
-        #include "fvCFD.H"
-    #};
-
-    codeOptions
-    #{
-        -I$(LIB_SRC)/finiteVolume/lnInclude \
-        -I$(LIB_SRC)/meshTools/lnInclude
-    #};
-
-    codeLibs
-    #{
-        -lmeshTools \
-        -lfiniteVolume
-    #};
-};*/
+internalField   uniform 0;
 
 boundaryField
 {
     //- Set patchGroups for constraint patches
     #includeEtc "caseDicts/setConstraintTypes"
 
-    symmetryPlane1
+    open
     {
-        type            symmetryPlane;
-    }
-    symmetryPlane2
-    {
-        type            symmetryPlane;
-    }
-    bottom
-    {
-        type            fixedFluxPressure;
-        value           uniform 1e5;
-    }
-    right
-    {
-        type            fixedFluxPressure;
-        value           uniform 1e5;
-    }
-    top
-    {
+//         type            fixedValue;
+//         value           uniform 1e-3;
+//         type            fixedValue;
+//         value           $internalField;
         type            totalPressure;
-        rho             thermo:rho;
-        p0              uniform 1e5;
-    }
-    left
-    {
-        type            fixedFluxPressure;
-        value           uniform 1e5;
+        p0              uniform 0;
     }
 }
+
 
 // ************************************************************************* //

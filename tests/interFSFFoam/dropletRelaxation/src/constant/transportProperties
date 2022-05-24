@@ -8,13 +8,30 @@
 FoamFile
 {
     format      ascii;
-    class       vectorField;
-    object      cloudPositions;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+phases (liquid gas);
 
-(
-(0 5e-5 5e-4)
-)
+liquid
+{
+    transportModel  Newtonian;
+    nu              1e-06;
+    rho             1000;
+}
+
+gas
+{
+    transportModel  Newtonian;
+    nu              1e-5;
+    rho             1.2527;
+}
+
+sigma           0.046;
+
+transportModel  Newtonian;
+
 
 // ************************************************************************* //

@@ -18,7 +18,9 @@ simulationType laminar;
 
 RAS
 {
-    model           realizableKE;
+    // Tested with kEpsilon, realizableKE, kOmega, kOmega2006, kOmegaSST, v2f,
+    // ShihQuadraticKE, LienCubicKE.
+    model           kEpsilon;
 
     turbulence      on;
 

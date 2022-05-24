@@ -16,47 +16,50 @@ FoamFile
 
 convertToMeters 1;
 
-boxHeight   1.0;
-boxWidth    20.0;
+boxWidth    2000.0;
+boxHeight   2000.0;
+boxDepth    2000.0;
 
-NH          40;
-NW          #calc "int($NH*$boxWidth / $boxHeight)";
+Nx          20;
+Ny          20;
+Nz          20;
 
-boxDepth    #calc "$boxHeight / $NH";
-// boxDepth    0.1;
+box0Nx      $Nx;
+box0Ny      $Ny;
+box0Nz      $Nz;
 
 //box0
-box0x0      #calc "-0.5*$boxWidth";
-box0y0      0;
-box0z0      0;
+box0x0      #calc "- 0.5 * $boxWidth";
+box0y0      #calc "- 0.5 * $boxHeight";
+box0z0      #calc "- 0.5 * $boxDepth";
 
-box0x1      #calc "0.5*$boxWidth";
-box0y1      0;
-box0z1      0;
+box0x1      #calc "0.5 * $boxWidth";
+box0y1      #calc "- 0.5 * $boxHeight";
+box0z1      #calc "- 0.5 * $boxDepth";
 
-box0x2      #calc "0.5*$boxWidth";
-box0y2      $boxDepth;
-box0z2      0;
+box0x2      #calc "0.5 * $boxWidth";
+box0y2      #calc "0.5 * $boxHeight";
+box0z2      #calc "- 0.5 * $boxDepth";
 
-box0x3      #calc "-0.5*$boxWidth";
-box0y3      $boxDepth;
-box0z3      0;
+box0x3      #calc "- 0.5 * $boxWidth";
+box0y3      #calc "0.5 * $boxHeight";
+box0z3      #calc "- 0.5 * $boxDepth";
 
-box0x4      #calc "-0.5*$boxWidth";
-box0y4      0;
-box0z4      $boxHeight;
+box0x4      #calc "- 0.5 * $boxWidth";
+box0y4      #calc "- 0.5 * $boxHeight";
+box0z4      #calc "0.5 * $boxDepth";
 
-box0x5      #calc "0.5*$boxWidth";
-box0y5      0;
-box0z5      $boxHeight;
+box0x5      #calc "0.5 * $boxWidth";
+box0y5      #calc "- 0.5 * $boxHeight";
+box0z5      #calc "0.5 * $boxDepth";
 
-box0x6      #calc "0.5*$boxWidth";
-box0y6      $boxDepth;
-box0z6      $boxHeight;
+box0x6      #calc "0.5 * $boxWidth";
+box0y6      #calc "0.5 * $boxHeight";
+box0z6      #calc "0.5 * $boxDepth";
 
-box0x7      #calc "-0.5*$boxWidth";
-box0y7      $boxDepth;
-box0z7      $boxHeight;
+box0x7      #calc "- 0.5 * $boxWidth";
+box0y7      #calc "0.5 * $boxHeight";
+box0z7      #calc "0.5 * $boxDepth";
 
 vertices
 (
@@ -73,9 +76,7 @@ vertices
 
 blocks
 (
-    hex (0 1 2 3 4 5 6 7)
-    ($NW 1 $NH)
-    simpleGrading (1 1 1)
+    hex (0 1 2 3 4 5 6 7) ($box0Nx $box0Ny $box0Nz) simpleGrading (1 1 1)
 );
 
 edges
@@ -84,57 +85,17 @@ edges
 
 boundary
 (
-    symmetryPlane1
-    {
-        type symmetryPlane;
-        faces
-        (
-            (3 2 6 7)
-        );
-    }
-
-    symmetryPlane2
-    {
-        type symmetryPlane;
-        faces
-        (
-            (0 4 5 1)
-        );
-    }
-
-    bottom
-    {
-        type wall;
-        faces
-        (
-            (0 1 2 3)
-        );
-    }
-
-    right
-    {
-        type wall;
-        faces
-        (
-            (1 5 6 2)
-        );
-    }
-
-    top
+    open
     {
         type patch;
         faces
         (
+            (0 1 2 3)
             (4 7 6 5)
-        );
-    }
-
-    left
-    {
-        type wall;
-        faces
-        (
             (0 3 7 4)
+            (0 4 5 1)
+            (1 5 6 2)
+            (3 2 6 7)
         );
     }
 );
