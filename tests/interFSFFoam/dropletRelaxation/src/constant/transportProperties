@@ -13,6 +13,7 @@ FoamFile
     object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 phases (liquid gas);
 
 liquid
@@ -25,13 +26,10 @@ liquid
 gas
 {
     transportModel  Newtonian;
-    nu              1e-5;
-    rho             1.2527;
+    nu              1e-06;
+    rho             800;
 }
 
 sigma           0.046;
-
-transportModel  Newtonian;
-
 
 // ************************************************************************* //

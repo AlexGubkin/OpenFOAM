@@ -1,8 +1,8 @@
 // const dictionary& alphaControls = mesh.solverDict(alpha1.name());
 
 const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 3));
-const scalar cSmoothingCoeff(alphaControls.lookupOrDefault<scalar>("cSmoothingCoeff", 0.5));
-const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpeningCoeff", 0.5));
+const scalar cSmCoeff(alphaControls.lookupOrDefault<scalar>("cSmCoeff", 0.5));
+const scalar cShCoeff(alphaControls.lookupOrDefault<scalar>("cShCoeff", 0.5));
 
 // Smoother loop for SSF
 alphaSm = alpha1;
@@ -12,8 +12,8 @@ for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
     Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
     alphaSm =
-        cSmoothingCoeff*fvc::average(fvc::interpolate(alphaSm))
-        + (1.0 - cSmoothingCoeff)*alphaSm;
+        cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
+        + (1.0 - cSmCoeff)*alphaSm;
 }
 
 
@@ -21,18 +21,18 @@ for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
 alphaC = min(1.0, max(alpha1, 0.0));
 
 alphaSh =
-    1.0/(1.0 - cSharpeningCoeff)
+    1.0/(1.0 - cShCoeff)
     *(
         min
         (
             max
             (
                 alpha1,
-                0.5*cSharpeningCoeff
+                0.5*cShCoeff
             ),
-            1.0 - 0.5*cSharpeningCoeff
+            1.0 - 0.5*cShCoeff
         )
-        - 0.5*cSharpeningCoeff
+        - 0.5*cShCoeff
     );
 
 alphaSh.correctBoundaryConditions();

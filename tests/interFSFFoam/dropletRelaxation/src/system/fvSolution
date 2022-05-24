@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.0                                 |
+|  \\    /   O peration     | Version:                                        |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -17,21 +17,25 @@ FoamFile
 
 solvers
 {
-    alpha.liquid
+    "alpha.liquid.*"
     {
         nAlphaCorr      2;
-        nAlphaSubCycles 1;
-        cAlpha          1;
-        nAlphaSmoothers 3;
-        cSmoothingCoeff 0.5;
-        cSharpeningCoeff    0.5;
-        nKSmoothers     2;
-        nCapillaryForceCorrectors   1;
-    }
+        nAlphaSubCycles 2;
 
-    ".*(rho|rhoFinal)"
-    {
-        solver          diagonal;
+        MULESCorr       yes;
+        nLimiterIter    5;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+
+        nAlphaSmoothers     3;
+        cSmCoeff            0.5;
+        cShCoeff            0.9;
+        nKappaSmoothers     2;
+        cPhicThresholdCoeff 0.01;
+        cPhicRelaxCoeff     0.7;
     }
 
     pcorr
@@ -82,22 +86,6 @@ solvers
         relTol          0;
     }
 
-//     "(h|e).*"
-//     {
-//         solver          PBiCGStab;
-//         preconditioner  DILU;
-//         tolerance       1e-10;
-//         relTol          0;
-//     }
-
-//     "(h|e)Final"
-//     {
-//         solver          PBiCGStab;
-//         preconditioner  DILU;
-//         tolerance       1e-10;
-//         relTol          0;
-//     }
-
     "U.*"
     {
         solver          PBiCGStab;
@@ -105,24 +93,15 @@ solvers
         tolerance       1e-8;
         relTol          0;
     }
-
-    "(T|k|epsilon|omega).*"
-    {
-        solver          PBiCGStab;
-        preconditioner  DILU;
-        tolerance       1e-12;
-        relTol          0;
-    }
 }
 
 PIMPLE
 {
     momentumPredictor           no;
-    transonic                   no;
-    nOuterCorrectors            1;
-    nCorrectors                 4;
+    nOuterCorrectors            2;
+    nCorrectors                 2;
     nNonOrthogonalCorrectors    2;
-    consistent                  yes;
+    consistent                  no;
 
     outerCorrectorResidualControl
     {
@@ -133,12 +112,6 @@ PIMPLE
         }
 
         U
-        {
-            tolerance           1e-5;
-            relTol              0;
-        }
-
-        T
         {
             tolerance           1e-5;
             relTol              0;
@@ -159,13 +132,14 @@ relaxationFactors
 {
     fields
     {
-        p_rgh                   0.5;
-        p_rghFinal              1;
+//         p_rgh                   0.5;
+//         p_rghFinal              1;
     }
     equations
     {
-        "(U|k|epsilon|omega).*" 1;
-        UFinal                  1;
+//         "(U|k|epsilon|omega).*" 1;
+//         UFinal                  1;
+        ".*" 1;
     }
 }
 

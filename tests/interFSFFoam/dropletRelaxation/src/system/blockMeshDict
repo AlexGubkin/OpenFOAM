@@ -16,13 +16,13 @@ FoamFile
 
 convertToMeters 1;
 
-boxWidth    2000.0;
-boxHeight   2000.0;
-boxDepth    2000.0;
+boxWidth    3.0;
+boxHeight   3.0;
+boxDepth    3.0;
 
-Nx          20;
-Ny          20;
-Nz          20;
+Nx          30;
+Ny          30;
+Nz          30;
 
 box0Nx      $Nx;
 box0Ny      $Ny;

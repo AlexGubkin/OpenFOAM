@@ -17,66 +17,19 @@ FoamFile
 
 defaultFieldValues
 (
-    volScalarFieldValue alpha.liquid 0
-    volScalarFieldValue p_rgh 1e5
-    volScalarFieldValue p 1e5
-    volScalarFieldValue T 300
+    volScalarFieldValue alpha.liquid 1
 );
 
 regions
 (
     boxToCell
     {
-        box (-1e6 -1e6 -1e6) (1e6 1e6 0.25); 
+        box (-0.5 -0.5 -0.5) (0.5 0.5 0.5); 
         fieldValues
         (
-            volScalarFieldValue alpha.liquid 1
-            volScalarFieldValue p_rgh 1e5
-            volScalarFieldValue p 1e5
-            volScalarFieldValue T 300
+            volScalarFieldValue alpha.liquid 0
         );
     }
-
-//     cylinderToCell
-//     {
-//         p1 (-5.0 -1e6 0);
-//         p2 (-5.0 1e6 0);
-//         radius 0.5;
-//         fieldValues
-//         (
-//             volScalarFieldValue alpha.liquid 1
-//             volScalarFieldValue p_rgh 1e5
-//             volScalarFieldValue p 1e5
-//             volScalarFieldValue T 300
-//         );
-//     }
-// 
-//     cylinderToCell
-//     {
-//         p1 (5.0 -1e6 0);
-//         p2 (5.0 1e6 0);
-//         radius 0.5;
-//         fieldValues
-//         (
-//             volScalarFieldValue alpha.liquid 1
-//             volScalarFieldValue p_rgh 1e5
-//             volScalarFieldValue p 1e5
-//             volScalarFieldValue T 300
-//         );
-//     }
-
-//     sphereToCell
-//     {
-//         centre (0 0 10);
-//         radius 9.825;
-//         fieldValues
-//         (
-//             volScalarFieldValue alpha.liquid 1
-//             volScalarFieldValue p_rgh 1e5
-//             volScalarFieldValue p 1e5
-//             volScalarFieldValue T 300
-//         );
-//     }
 );
 
 

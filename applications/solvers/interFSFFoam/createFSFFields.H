@@ -143,7 +143,7 @@ surfaceScalarField nHatf
 // Initialization fields for surface tension force calculation
 //- Surface tension
 const dictionary&
-    thermophysicalPropertiesDict = mesh.lookupObject<IOdictionary>("thermophysicalProperties");
+    thermophysicalPropertiesDict = mesh.lookupObject<IOdictionary>("transportProperties");
 
 autoPtr<surfaceTensionModel> sigmaPtr
 (

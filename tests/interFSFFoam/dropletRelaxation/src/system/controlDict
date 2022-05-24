@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.2                                 |
+|  \\    /   O peration     | Version:                                        |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -15,39 +15,15 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// oscillationNumber   100;
-// omega               3086896.454289302;
-// 
-// t_0                 #codeStream
-// {
-//     code
-//     #{
-//         scalar omega = readScalar(dict.lookup("omega"));
-// 
-//         os  << (2.0 * constant::mathematical::pi / omega);
-//     #};
-// };
 
-application         compressibleInterFoam;
+
+application         interFSFFoam;
 
 startFrom           latestTime;
 
 startTime           0;
 
 stopAt              endTime;
-
-// endTime             #codeStream
-// {
-//     code
-//     #{
-//         scalar
-//             oscillationNumber = readScalar(dict.lookup("oscillationNumber")),
-//             t_0 = readScalar(dict.lookup("t_0")),
-//             omega = readScalar(dict.lookup("omega"));
-// 
-//         os  << (2.0 * constant::mathematical::pi * oscillationNumber / omega + t_0);
-//     #};
-// };
 
 endTime             1.0;
 
@@ -56,16 +32,6 @@ deltaT              1e-8;
 writeControl        adjustableRunTime;
 
 // writeControl        timeStep;
-
-// writeInterval       #codeStream
-// {
-//     code
-//     #{
-//         scalar omega = readScalar(dict.lookup("omega"));
-// 
-//         os  << (0.05 * 2.0 * constant::mathematical::pi / omega);
-//     #};
-// };
 
 writeInterval       0.1;
 
@@ -77,7 +43,7 @@ writeFormat         ascii;
 
 writePrecision      10;
 
-writeCompression    compressed;
+writeCompression    uncompressed;
 
 timeFormat          general;
 
@@ -91,16 +57,17 @@ maxCo               0.1;
 maxAlphaCo          0.1;
 
 maxDeltaT           $writeInterval;
-// maxDeltaT           1e-6;
 
 libs (
     "libOpenFOAM.so"
-//     "libtwoPhaseProperties.so"
-//     "libinterfacePropertiesTangentialForceAddition.so"
 );
 
 functions
 {
+    #includeFunc    residuals(alpha.liquid, p_rgh, U)
+    #includeFunc    patchFlowRate(patch=open)
+    #includeFunc    cellMaxMag(U)
+
     processorField1
     {
         type            processorField;
@@ -108,90 +75,29 @@ functions
         writeControl    writeTime;
         writeInterval   1;
     }
-    /*CLI*/
-    #includeFunc    residuals
-//     #includeFunc    flowRatePatch(name=open)
+
+//     volFieldValue1
+//     {
+//         type            volFieldValue;
+//         libs            ("libfieldFunctionObjects.so");
+//         log             true;
+//         writeControl    writeTime;
+//         writeFields     true;
+//         regionType      cellZone;
+//         name            c0;
+//         operation       volAverage;
+//         weightField     alpha1;
+//         fields
+//         (
+//             p
+//             U
+//         );
+//     }
     /*CodeStream section*/
 //     #include        "inputOutputMassFlowLUFO"
 //     #include        "bubbleRadiusLUFO"
 //     #include        "bubbleMassConservationLUFO"
 //     #include        "centerOfMassLUFO"
-    /*timeVsFile*/
-//     controlDictFileUpdate
-//     {
-//         type                timeActivatedFileUpdate;
-//         functionObjectLibs  ("libutilityFunctionObjects.so");
-//         writeControl        timeStep;
-//         writeInterval       1;
-//         fileToUpdate        "$FOAM_CASE/system/controlDict";
-// 
-// //         timeVsFile
-// //         (
-// //             ($t_0   "$FOAM_CASE/system/src/controlDict.1")
-// //         );
-// 
-//         timeVsFile
-//         (
-//             (1.0    "$FOAM_CASE/system/src/controlDict.1")
-//         );
-//     }
-// 
-//     fvSolutionFileUpdate
-//     {
-//         type                timeActivatedFileUpdate;
-//         functionObjectLibs  ("libutilityFunctionObjects.so");
-//         writeControl        timeStep;
-//         writeInterval       1;
-//         fileToUpdate        "$FOAM_CASE/system/fvSolution";
-// 
-// //         timeVsFile
-// //         (
-// //             ($t_0   "$FOAM_CASE/system/src/fvSolution.1")
-// //         );
-// 
-//         timeVsFile
-//         (
-//             (1.0    "$FOAM_CASE/system/src/fvSolution.1")
-//         );
-//     }
-// 
-//     thermophysicalPropertiesGasFileUpdate
-//     {
-//         type                timeActivatedFileUpdate;
-//         functionObjectLibs  ("libutilityFunctionObjects.so");
-//         writeControl        timeStep;
-//         writeInterval       1;
-//         fileToUpdate        "$FOAM_CASE/constant/thermophysicalProperties.gas";
-// 
-// //         timeVsFile
-// //         (
-// //             ($t_0   "$FOAM_CASE/constant/src/thermophysicalProperties.gas.1")
-// //         );
-// 
-//         timeVsFile
-//         (
-//             (1.0    "$FOAM_CASE/constant/src/thermophysicalProperties.gas.1")
-//         );
-//     }
-// 
-//     thermophysicalPropertiesLiquidFileUpdate
-//     {
-//         type                timeActivatedFileUpdate;
-//         functionObjectLibs  ("libutilityFunctionObjects.so");
-//         writeControl        timeStep;
-//         writeInterval       1;
-//         fileToUpdate        "$FOAM_CASE/constant/thermophysicalProperties.liquid";
-// 
-// //         timeVsFile
-// //         (
-// //             ($t_0   "$FOAM_CASE/constant/src/thermophysicalProperties.liquid.1")
-// //         );
-// 
-//         timeVsFile
-//         (
-//             (1.0    "$FOAM_CASE/constant/src/thermophysicalProperties.liquid.1")
-//         );
-//     }
 };
 
 // ************************************************************************* //
