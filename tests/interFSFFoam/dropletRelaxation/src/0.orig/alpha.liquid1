@@ -8,28 +8,28 @@
 FoamFile
 {
     format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      transportProperties;
+    class       volScalarField;
+    location    "0";
+    object      alpha.liquid1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-phases (liquid1 liquid2);
+dimensions      [0 0 0 0 0 0 0];
 
-liquid1
+internalField   uniform 0;
+
+boundaryField
 {
-    transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    open
+    {
+        type            inletOutlet;
+        value           uniform 1;
+        inletValue      uniform 1;
+    }
 }
 
-liquid2
-{
-    transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
-}
-
-sigma           0.07;
 
 // ************************************************************************* //

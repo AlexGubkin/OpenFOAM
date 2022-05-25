@@ -64,7 +64,7 @@ libs (
 
 functions
 {
-    #includeFunc    residuals(alpha.liquid1, p_rgh, U)
+    #includeFunc    residuals(alpha.liquid, p_rgh, U)
     #includeFunc    patchFlowRate(patch=open)
     #includeFunc    cellMaxMag(U)
 

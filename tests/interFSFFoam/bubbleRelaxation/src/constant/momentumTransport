@@ -10,26 +10,22 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      transportProperties;
+    object      momentumTransport;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-phases (liquid1 liquid2);
+simulationType laminar;
 
-liquid1
+RAS
 {
-    transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
+    // Tested with kEpsilon, realizableKE, kOmega, kOmega2006, kOmegaSST, v2f,
+    // ShihQuadraticKE, LienCubicKE.
+    model           kEpsilon;
+
+    turbulence      on;
+
+    printCoeffs     on;
 }
 
-liquid2
-{
-    transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
-}
-
-sigma           0.07;
 
 // ************************************************************************* //

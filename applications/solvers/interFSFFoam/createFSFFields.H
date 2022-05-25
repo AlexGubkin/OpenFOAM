@@ -128,7 +128,7 @@ volScalarField pd
         IOobject::AUTO_WRITE
     ),
     mesh,
-    p_rgh
+    p_rgh - pc
 );
 
 // Face unit interface normal initialization

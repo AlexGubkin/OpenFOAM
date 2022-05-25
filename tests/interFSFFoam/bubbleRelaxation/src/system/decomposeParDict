@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:                                        |
+|  \\    /   O peration     | Version:  2.2.2                                 |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -11,26 +11,51 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      setFieldsDict;
+    object      decomposeParDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-defaultFieldValues
-(
-    volScalarFieldValue alpha.liquid1 1
-);
+numberOfSubdomains 18;
 
-regions
-(
-    boxToCell
-    {
-        box (-20 -20 -20) (20 20 20); 
-        fieldValues
-        (
-            volScalarFieldValue alpha.liquid1 0
-        );
-    }
-);
+method          scotch;
+
+// constraints
+// {
+//     // Decompose cells such that all cell originating from single cell
+//     // end up on same processor
+//     refinement
+//     {
+//         type    refinementHistory;
+//         enabled true;
+//     }
+// }
+
+simpleCoeffs
+{
+    n               ( 2 1 1 );
+    delta           0.001;
+}
+
+hierarchicalCoeffs
+{
+    n               ( 2 2 1 );
+    delta           0.001;
+    order           xyz;
+}
+
+manualCoeffs
+{
+    dataFile        "";
+}
+
+scotchCoeffs
+{
+    processorWeights ( );
+}
+
+distributed     no;
+
+roots           ( );
 
 
 // ************************************************************************* //

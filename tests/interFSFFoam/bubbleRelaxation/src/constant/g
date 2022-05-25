@@ -8,28 +8,14 @@
 FoamFile
 {
     format      ascii;
-    class       dictionary;
+    class       uniformDimensionedVectorField;
     location    "constant";
-    object      transportProperties;
+    object      g;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-phases (liquid1 liquid2);
+dimensions      [0 1 -2 0 0 0 0];
+value           (0 0 0);
 
-liquid1
-{
-    transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
-}
-
-liquid2
-{
-    transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
-}
-
-sigma           0.07;
 
 // ************************************************************************* //

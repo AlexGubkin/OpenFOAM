@@ -78,23 +78,5 @@ while (pimple.correctNonOrthogonal())
 
         phict =
             mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
-
-//         tangentGradSigmaf =
-//             mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf();
-
-//         surfaceTensionForce =
-//             (
-//                 phic
-//               - max
-//                 (
-//                     min
-//                     (
-//                         phic,
-//                         phicThreshold
-//                     ),
-//                   - phicThreshold
-//                 )
-//             )/mesh.magSf()
-//           + tangentGradSigmaf;
     }
 }

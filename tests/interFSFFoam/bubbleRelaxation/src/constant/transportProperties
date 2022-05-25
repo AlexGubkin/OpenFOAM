@@ -14,20 +14,20 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-phases (liquid1 liquid2);
+phases (liquid gas);
 
-liquid1
+liquid
 {
     transportModel  Newtonian;
     nu              1e-06;
     rho             1000;
 }
 
-liquid2
+gas
 {
     transportModel  Newtonian;
-    nu              1e-06;
-    rho             1000;
+    nu              1e-05;
+    rho             1;
 }
 
 sigma           0.07;

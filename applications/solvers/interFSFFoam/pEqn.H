@@ -44,7 +44,9 @@
     {
         fvScalarMatrix p_rghEqn
         (
-            fvc::div(phiHbyA) - fvm::laplacian(rAUf, p_rgh)
+            fvc::div(phiHbyA)
+          - fvm::laplacian(rAUf, p_rgh)
+          + fvc::laplacian(rAUf, pc)
          == Sp_rgh
         );
 
