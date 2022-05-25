@@ -100,6 +100,7 @@ volScalarField w2
     sqrt(w1*w1 + SMALL)
 );
 
+Info<< "Reading field pc\n" << endl;
 volScalarField pc
 (
     IOobject
@@ -107,15 +108,28 @@ volScalarField pc
         "pc",
         runTime.timeName(),
         mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar(dimPressure, 0)
+//     zeroGradientFvPatchField<scalar>::typeName
+//     zeroGradientFvPatchScalarField::typeName
+);
+
+volScalarField pd
+(
+    IOobject
+    (
+        "pd",
+        runTime.timeName(),
+        mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar(dimPressure, 0),
-    zeroGradientFvPatchField<scalar>::typeName
-//     zeroGradientFvPatchScalarField::typeName
+    p_rgh
 );
-
 
 // Face unit interface normal initialization
 // Interpolated face-gradient of alpha
