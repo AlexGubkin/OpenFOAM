@@ -60,11 +60,11 @@
 
         if (pimple.finalNonOrthogonalIter())
         {
-            phi = phiHbyA + p_rghEqn.flux();
+            phi = phiHbyA + p_rghEqn.flux() + rAUf*fvc::snGrad(pc)*mesh.magSf();
 
             p_rgh.relax();
 
-            U = HbyA + rAU()*fvc::reconstruct((phig + p_rghEqn.flux())/rAUf);
+            U = HbyA + rAU()*(fvc::reconstruct((phig + p_rghEqn.flux())/rAUf) + fvc::grad(pc));
             U.correctBoundaryConditions();
             fvConstraints.constrain(U);
         }
@@ -79,6 +79,7 @@
     fvc::makeRelative(phi, U);
 
     p == p_rgh + rho*gh;
+//     pd == p_rgh - pc;
 
     if (p_rgh.needReference())
     {

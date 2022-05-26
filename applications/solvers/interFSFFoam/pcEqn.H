@@ -17,6 +17,15 @@ phic =
 // phic -=
 //     (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
 
+const dimensionedScalar phicThreshold
+(
+    cPhicThresholdCoeff
+    *average(mag(phic))
+    /(average(pos(mag(phic))) + SMALL)
+);
+
+Info<< "phicThreshold = " << phicThreshold.value() << nl;
+
 phicFilt =
     cPhicRelaxCoeff*phicFilt
   + (1.0 - cPhicRelaxCoeff)
@@ -30,8 +39,7 @@ while (pimple.correctNonOrthogonal())
     fvScalarMatrix pcEqn
     (
         fvm::laplacian(pc)
-        ==
-        fvc::div(phic)
+     == fvc::div(phic)
     );
 
     pcEqn.setReference(pcRefCell, pcRefValue);
@@ -48,18 +56,8 @@ while (pimple.correctNonOrthogonal())
 //         phicFilt =
 //             cPhicRelaxCoeff*phicFilt + (1.0 - cPhicRelaxCoeff)*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
 
-        phic =
+        phic -=
             mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
-
-        const dimensionedScalar phicThreshold
-        (
-            dimForce/dimLength,
-            cPhicThresholdCoeff
-           *gSum(static_cast<surfaceScalarField>(mag(phic)*mesh.magSf()))
-           /(gSum(static_cast<surfaceScalarField>(pos(mag(phic))*mesh.magSf())) + SMALL)
-        );
-
-        Info<< "phicThreshold = " << phicThreshold.value() << nl;
 
         phic =
             phic

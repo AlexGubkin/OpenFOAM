@@ -111,25 +111,25 @@ volScalarField pc
         IOobject::MUST_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh,
-    dimensionedScalar(dimPressure, 0)
+    mesh
+//     dimensionedScalar(dimPressure, 0)
 //     zeroGradientFvPatchField<scalar>::typeName
 //     zeroGradientFvPatchScalarField::typeName
 );
 
-volScalarField pd
-(
-    IOobject
-    (
-        "pd",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    p_rgh - pc
-);
+// volScalarField pd
+// (
+//     IOobject
+//     (
+//         "pd",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     mesh,
+//     p_rgh - pc
+// );
 
 // Face unit interface normal initialization
 // Interpolated face-gradient of alpha
@@ -221,11 +221,3 @@ surfaceScalarField phict
     "phict",
     mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
 );
-
-// surfaceScalarField surfaceTensionForce
-// (
-//     "surfaceTensionForce",
-//     capillaryForceFlux/mesh.magSf() + tangentGradSigmaf
-// );
-// 
-// surfaceTensionForce.storeOldTime();
