@@ -27,8 +27,8 @@ runApplication  transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
 rm log.transformPoints
 runParallel     transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
 
-foamDictionary  -entry endTime -set $(echo "0.01" | bc -l) system/controlDict
-foamDictionary  -entry writeInterval -set $(echo "0.0001" | bc -l) system/controlDict
+foamDictionary  -entry endTime -set $(echo "0.0001" | bc -l) system/controlDict
+foamDictionary  -entry writeInterval -set $(echo "0.000001" | bc -l) system/controlDict
 
 runParallel     interFSFFoam
 

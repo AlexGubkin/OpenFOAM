@@ -98,9 +98,9 @@ solvers
 PIMPLE
 {
     momentumPredictor           no;
-    nOuterCorrectors            2;
-    nCorrectors                 2;
-    nNonOrthogonalCorrectors    2;
+    nOuterCorrectors            1;
+    nCorrectors                 4;
+    nNonOrthogonalCorrectors    4;
     consistent                  no;
 
     outerCorrectorResidualControl
