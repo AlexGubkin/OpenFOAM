@@ -29,7 +29,7 @@
     (
       - ghf*fvc::snGrad(rho)*rAUf*mesh.magSf()
       + rAUf*phic
-      + rAUf*phict
+//       + rAUf*phict
     );
 
     phiHbyA += phig;
@@ -46,7 +46,7 @@
         (
             fvc::div(phiHbyA)
           - fvm::laplacian(rAUf, p_rgh)
-          + fvc::laplacian(rAUf, pc)
+//           + fvc::laplacian(rAUf, pc)
          == Sp_rgh
         );
 
@@ -60,11 +60,11 @@
 
         if (pimple.finalNonOrthogonalIter())
         {
-            phi = phiHbyA + p_rghEqn.flux() + rAUf*fvc::snGrad(pc)*mesh.magSf();
+            phi = phiHbyA + p_rghEqn.flux();
 
             p_rgh.relax();
 
-            U = HbyA + rAU()*(fvc::reconstruct((phig + p_rghEqn.flux())/rAUf) + fvc::grad(pc));
+            U = HbyA + rAU()*(fvc::reconstruct((phig + p_rghEqn.flux())/rAUf));
             U.correctBoundaryConditions();
             fvConstraints.constrain(U);
         }

@@ -127,7 +127,6 @@ volScalarField pc
 //         IOobject::NO_READ,
 //         IOobject::AUTO_WRITE
 //     ),
-//     mesh,
 //     p_rgh - pc
 // );
 
@@ -196,7 +195,7 @@ surfaceScalarField tangentGradSigmaf
 surfaceVectorField gradPcf
 (
     "gradPcf",
-    deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
+    fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc))
 );
 
 // Surface tension force flux

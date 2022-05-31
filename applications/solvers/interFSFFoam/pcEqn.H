@@ -5,13 +5,21 @@ const scalar cPhicRelaxCoeff(alphaControls.lookupOrDefault<scalar>("cPhicRelaxCo
 const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThresholdCoeff", 0.01));
 
 gradPcf =
-    deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
+    fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
 
 phic =
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
    /fvc::interpolate(w2)*deltaf*mesh.magSf();
 
+// const dimensionedScalar fcAvg
+// (
+//     average(mag(phic/mesh.magSf()))
+//    /(average(pos(mag(phic))) + SMALL)
+// );
+// 
+// Info<< "fcAvg = " << fcAvg.value() << nl;
+   
 phicFilt =
     phicFilt.oldTime()
   + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
@@ -39,7 +47,7 @@ while (pimple.correctNonOrthogonal())
     if (pimple.finalNonOrthogonalIter())
     {
         gradPcf =
-            deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
+            fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
 
         phic =
             fvc::interpolate(sigmaPtr->sigma())
@@ -52,32 +60,24 @@ while (pimple.correctNonOrthogonal())
 
         phic -= phicFilt;
 
-        const dimensionedScalar fcAvg
-        (
-            average(mag(phic/mesh.magSf()))
-           /(average(pos(mag(phic))) + SMALL)
-        );
+//         phic -= fvc::snGrad(pc)*mesh.magSf();
 
-        Info<< "fcAvg = " << fcAvg.value() << nl;
+//         phic =
+//             phic
+//           - max
+//             (
+//                 min
+//                 (
+//                     phic,
+//                     cPhicThresholdCoeff*fcAvg*mesh.magSf()
+//                 ),
+//               - cPhicThresholdCoeff*fcAvg*mesh.magSf()
+//             );
 
-        phic -= fvc::snGrad(pc)*mesh.magSf();
-
-        phic =
-            phic
-          - max
-            (
-                min
-                (
-                    phic,
-                    cPhicThresholdCoeff*fcAvg*mesh.magSf()
-                ),
-              - cPhicThresholdCoeff*fcAvg*mesh.magSf()
-            );
-            
-        gradSigmaf =
-            fvc::interpolate(fvc::grad(sigmaPtr->sigma()));
-
-        phict =
-            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
+//         gradSigmaf =
+//             fvc::interpolate(fvc::grad(sigmaPtr->sigma()));
+// 
+//         phict =
+//             mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
     }
 }
