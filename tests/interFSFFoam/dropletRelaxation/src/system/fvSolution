@@ -34,6 +34,7 @@ solvers
         cSmCoeff            0.5;
         cShCoeff            0.9;
         nKappaSmoothers     2;
+        cPhicFilterCoeff    0;
         cPhicThresholdCoeff 0.01;
         cPhicRelaxCoeff     0.7;
     }
@@ -98,10 +99,9 @@ solvers
 PIMPLE
 {
     momentumPredictor           no;
-    nOuterCorrectors            1;
-    nCorrectors                 4;
-    nNonOrthogonalCorrectors    4;
-    consistent                  no;
+    nOuterCorrectors            5;
+    nCorrectors                 5;
+    nNonOrthogonalCorrectors    2;
 
     outerCorrectorResidualControl
     {
@@ -132,14 +132,17 @@ relaxationFactors
 {
     fields
     {
-//         p_rgh                   0.5;
-//         p_rghFinal              1;
+        p_rgh                   0.3;
+        p_rghFinal              1;
+        phic                    0.7;
+        phicFinal               1;
     }
     equations
     {
 //         "(U|k|epsilon|omega).*" 1;
-//         UFinal                  1;
-        ".*" 1;
+        U                       0.7;
+        UFinal                  1;
+//         ".*" 1;
     }
 }
 

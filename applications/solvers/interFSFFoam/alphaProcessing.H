@@ -15,10 +15,11 @@ for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
         cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
         + (1.0 - cSmCoeff)*alphaSm;
 }
-
+alphaSm.correctBoundaryConditions();
 
 // Sharpener for alpha
 alphaC = min(1.0, max(alpha1, 0.0));
+alphaC.correctBoundaryConditions();
 
 alphaSh =
     1.0/(1.0 - cShCoeff)
@@ -34,7 +35,6 @@ alphaSh =
         )
         - 0.5*cShCoeff
     );
-
 alphaSh.correctBoundaryConditions();
 
 w1 = sqrt(alphaC*(1.0 - alphaC));

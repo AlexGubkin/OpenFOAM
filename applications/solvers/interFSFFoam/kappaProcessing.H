@@ -13,4 +13,3 @@ for (int kappaSmoother=0; kappaSmoother<nKappaSmoothers; kappaSmoother++)
         + (1.0 - 2.0*w1)*fvc::average(fvc::interpolate(w2*kappa))
         /fvc::average(fvc::interpolate(w2));
 }
-

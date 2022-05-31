@@ -198,6 +198,12 @@ surfaceVectorField gradPcf
     fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc))
 );
 
+// surfaceVectorField gradPcf
+// (
+//     "gradPcf",
+//     deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
+// );
+
 // Surface tension force flux
 surfaceScalarField phic
 (
@@ -206,15 +212,16 @@ surfaceScalarField phic
    *fvc::interpolate(w2*kappa)
    /fvc::interpolate(w2)*deltaf*mesh.magSf()
 );
+phic.storePrevIter();
 
 // Surface tension force flux
-surfaceScalarField phicPrevIter
-(
-    "phicPrevIter",
-    fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf()
-);
+// surfaceScalarField phicPrevIter
+// (
+//     "phicPrevIter",
+//     fvc::interpolate(sigmaPtr->sigma())
+//    *fvc::interpolate(w2*kappa)
+//    /fvc::interpolate(w2)*deltaf*mesh.magSf()
+// );
 
 // Surface tension force flux
 surfaceScalarField phicFilt
@@ -222,7 +229,7 @@ surfaceScalarField phicFilt
     "phicFilt",
     (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
 );
-phicFilt.storeOldTime();
+// phicFilt.storeOldTime();
 
 // Surface tension force flux (tangent force flux)
 surfaceScalarField phict
