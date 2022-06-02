@@ -229,7 +229,7 @@ surfaceScalarField phicFilt
     "phicFilt",
     (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
 );
-// phicFilt.storeOldTime();
+phicFilt.storeOldTime();
 
 // Surface tension force flux (tangent force flux)
 surfaceScalarField phict
