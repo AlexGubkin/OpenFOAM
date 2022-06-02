@@ -1,5 +1,3 @@
-// const dictionary& alphaControls = mesh.solverDict(alpha1.name());
-
 const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 3));
 const scalar cSmCoeff(alphaControls.lookupOrDefault<scalar>("cSmCoeff", 0.5));
 const scalar cShCoeff(alphaControls.lookupOrDefault<scalar>("cShCoeff", 0.5));
@@ -11,9 +9,16 @@ for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
 {
     Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
-    alphaSm =
+//     alphaSm =
+//         cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
+//       + (1.0 - cSmCoeff)*alphaSm;
+
+    tmp<volScalarField> talphaSm
+    (
         cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
-        + (1.0 - cSmCoeff)*alphaSm;
+      + (1.0 - cSmCoeff)*alphaSm
+    );
+    alphaSm = talphaSm();
 }
 alphaSm.correctBoundaryConditions();
 

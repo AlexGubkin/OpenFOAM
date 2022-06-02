@@ -20,19 +20,19 @@ solvers
     "alpha.liquid.*"
     {
         nAlphaCorr      2;
-        nAlphaSubCycles 2;
+        nAlphaSubCycles 1;
 
         MULESCorr       yes;
-        nLimiterIter    5;
+        nLimiterIter    3;
 
         solver          smoothSolver;
         smoother        symGaussSeidel;
-        tolerance       1e-8;
+        tolerance       1e-12;
         relTol          0;
 
         nAlphaSmoothers     3;
         cSmCoeff            0.5;
-        cShCoeff            0.9;
+        cShCoeff            0.3;
         nKappaSmoothers     2;
         cPhicFilterCoeff    0;
         cPhicThresholdCoeff 0.01;
@@ -59,7 +59,7 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DIC;
-        tolerance       1e-8;
+        tolerance       1e-20;
         relTol          1e-2;
     }
 
@@ -67,7 +67,7 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DIC;
-        tolerance       1e-8;
+        tolerance       1e-20;
         relTol          0;
     }
 
@@ -75,7 +75,7 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DIC;
-        tolerance       1e-8;
+        tolerance       1e-20;
         relTol          1e-2;
     }
 
@@ -83,7 +83,7 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DIC;
-        tolerance       1e-8;
+        tolerance       1e-20;
         relTol          0;
     }
 
@@ -91,7 +91,7 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DILU;
-        tolerance       1e-8;
+        tolerance       1e-12;
         relTol          0;
     }
 }
@@ -99,21 +99,24 @@ solvers
 PIMPLE
 {
     momentumPredictor           no;
-    nOuterCorrectors            5;
-    nCorrectors                 5;
-    nNonOrthogonalCorrectors    2;
+    nOuterCorrectors            1;
+    nCorrectors                 3;
+    nNonOrthogonalCorrectors    0;
+
+    pRefCell                    0;
+    pRefValue                   0;
 
     outerCorrectorResidualControl
     {
         p_rgh
         {
-            tolerance           1e-5;
+            tolerance           1e-6;
             relTol              0;
         }
 
         U
         {
-            tolerance           1e-5;
+            tolerance           1e-6;
             relTol              0;
         }
     }
@@ -132,17 +135,16 @@ relaxationFactors
 {
     fields
     {
-        p_rgh                   0.3;
-        p_rghFinal              1;
-        phic                    0.7;
-        phicFinal               1;
+//         p_rgh                   0.3;
+//         p_rghFinal              1;
+//         phic                    0.7;
+//         phicFinal               1;
     }
     equations
     {
-//         "(U|k|epsilon|omega).*" 1;
-        U                       0.7;
-        UFinal                  1;
-//         ".*" 1;
+//         U                       0.7;
+//         UFinal                  1;
+        ".*" 1;
     }
 }
 

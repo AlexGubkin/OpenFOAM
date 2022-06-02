@@ -22,9 +22,19 @@ defaultFieldValues
 
 regions
 (
-    boxToCell
+//     boxToCell
+//     {
+//         box (-20 -20 -20) (20 20 20); 
+//         fieldValues
+//         (
+//             volScalarFieldValue alpha.liquid1 0
+//         );
+//     }
+
+    sphereToCell
     {
-        box (-20 -20 -20) (20 20 20); 
+        centre (0 0 0);
+        radius 2.5;
         fieldValues
         (
             volScalarFieldValue alpha.liquid1 0

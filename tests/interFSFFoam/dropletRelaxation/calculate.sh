@@ -5,7 +5,7 @@
 #Variables section
 caseName=case1
 
-scaleSize=$(echo "0.000001" | bc -l)
+scaleSize=$(echo "0.0001" | bc -l)
 
 cd ${caseName}
 
@@ -27,8 +27,12 @@ runApplication  transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
 rm log.transformPoints
 runParallel     transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
 
-foamDictionary  -entry endTime -set $(echo "0.0002" | bc -l) system/controlDict
-foamDictionary  -entry writeInterval -set $(echo "0.000001" | bc -l) system/controlDict
+foamDictionary  -entry endTime -set $(echo "0.05" | bc -l) system/controlDict
+foamDictionary  -entry deltaT -set $(echo "0.000001" | bc -l) system/controlDict
+foamDictionary  -entry writeInterval -set $(echo "0.0001" | bc -l) system/controlDict
+foamDictionary  -entry adjustTimeStep -set "yes" system/controlDict
+foamDictionary  -entry maxCo -set $(echo "0.01" | bc -l) system/controlDict
+foamDictionary  -entry maxAlphaCo -set $(echo "0.01" | bc -l) system/controlDict
 
 runParallel     interFSFFoam
 # runParallel     interFoam

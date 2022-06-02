@@ -25,9 +25,10 @@ boundaryField
 
     open
     {
-        type            inletOutlet;
-        value           uniform 1;
-        inletValue      uniform 1;
+        type            zeroGradient;
+//         type            inletOutlet;
+//         value           uniform 1;
+//         inletValue      uniform 1;
     }
 }
 

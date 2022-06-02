@@ -26,11 +26,11 @@ boundaryField
     open
     {
 //         type            fixedValue;
-//         value           uniform 1e-3;
-//         type            fixedValue;
 //         value           $internalField;
-        type            totalPressure;
-        p0              uniform 0;
+//         type            totalPressure;
+//         p0              uniform 0;
+        type            fixedFluxPressure;
+        value           uniform 0;
     }
 }
 

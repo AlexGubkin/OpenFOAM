@@ -26,14 +26,15 @@ boundaryField
     open
     {
 //         type            zeroGradient;
+        type            noSlip;
 //         type            pressureInletOutletVelocity;
 //         phi             phi;
 //         tangentialVelocity (0 0 0);
 //         value           uniform (0 0 0);
-        type            pressureNormalInletOutletVelocity;
-        phi             phi;
-        rho             rho;
-        value           uniform (0 0 0);
+//         type            pressureNormalInletOutletVelocity;
+//         phi             phi;
+//         rho             rho;
+//         value           uniform (0 0 0);
     }
 }
 
