@@ -30,11 +30,11 @@ solvers
         tolerance       1e-12;
         relTol          0;
 
-        nAlphaSmoothers     3;
+        nAlphaSmoothers     4;
         cSmCoeff            0.5;
-        cShCoeff            0.3;
-        nKappaSmoothers     2;
-        cPhicFilterCoeff    1.1;
+        cShCoeff            0.5;
+        nKappaSmoothers     3;
+        cPhicFilterCoeff    0.1;
         cPhicThresholdCoeff 0.01;
         cPhicRelaxCoeff     0.7;
     }
