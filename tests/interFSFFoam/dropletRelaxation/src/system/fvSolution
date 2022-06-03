@@ -34,7 +34,7 @@ solvers
         cSmCoeff            0.5;
         cShCoeff            0.3;
         nKappaSmoothers     2;
-        cPhicFilterCoeff    0;
+        cPhicFilterCoeff    1.1;
         cPhicThresholdCoeff 0.01;
         cPhicRelaxCoeff     0.7;
     }

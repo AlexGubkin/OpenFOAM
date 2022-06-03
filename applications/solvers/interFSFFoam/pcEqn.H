@@ -4,23 +4,25 @@ const scalar cPhicFilterCoeff(alphaControls.lookupOrDefault<scalar>("cPhicFilter
 // const scalar cPhicRelaxCoeff(alphaControls.lookupOrDefault<scalar>("cPhicRelaxCoeff", 0.7));
 const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThresholdCoeff", 0.01));
 
+// gradPcf =
+//     fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
+
 gradPcf =
-    deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
 
 phic =
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
    /fvc::interpolate(w2)*deltaf*mesh.magSf();
    
-phicFilt =
-    phicFilt.oldTime()
-  + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
-
 // phicFilt =
-//     cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
+//     phicFilt.oldTime()
+//   + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
 
-phic -=
-    phicFilt;
+phicFilt =
+    cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
+
+phic -= phicFilt;
 
 // phic =
 //     cPhicRelaxCoeff*phicPrevIter
@@ -54,17 +56,23 @@ while (pimple.correctNonOrthogonal())
 
     if (pimple.finalNonOrthogonalIter())
     {
+//         gradPcf =
+//             fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
+
         gradPcf =
-            fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
+            mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
 
         phic =
             fvc::interpolate(sigmaPtr->sigma())
            *fvc::interpolate(w2*kappa)
            /fvc::interpolate(w2)*deltaf*mesh.magSf();
 
+//         phicFilt =
+//             phicFilt.oldTime()
+//           + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
+
         phicFilt =
-            phicFilt.oldTime()
-          + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
+            cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
 
         phic -= phicFilt;
 

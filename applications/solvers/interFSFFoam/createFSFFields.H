@@ -192,17 +192,17 @@ surfaceScalarField tangentGradSigmaf
     mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf()
 );
 
-surfaceVectorField gradPcf
-(
-    "gradPcf",
-    fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc))
-);
-
 // surfaceVectorField gradPcf
 // (
 //     "gradPcf",
-//     deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
+//     fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc))
 // );
+
+surfaceVectorField gradPcf
+(
+    "gradPcf",
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
+);
 
 // Surface tension force flux
 surfaceScalarField phic
