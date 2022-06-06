@@ -1,0 +1,101 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+
+application         interFSFFoam;
+
+startFrom           latestTime;
+
+startTime           0;
+
+stopAt              endTime;
+
+endTime             1.0;
+
+deltaT              1e-8;
+
+writeControl        adjustableRunTime;
+
+// writeControl        timeStep;
+
+writeInterval       0.1;
+
+// writeInterval       1;
+
+purgeWrite          0;
+
+writeFormat         ascii;
+
+writePrecision      10;
+
+writeCompression    uncompressed;
+
+timeFormat          general;
+
+timePrecision       10;
+
+runTimeModifiable   yes;
+
+adjustTimeStep      yes;
+
+maxCo               0.1;
+maxAlphaCo          0.1;
+
+maxDeltaT           $writeInterval;
+
+libs (
+    "libOpenFOAM.so"
+);
+
+functions
+{
+    #includeFunc    residuals(alpha.phase1, p_rgh, U)
+    #includeFunc    patchFlowRate(patch=open)
+    #includeFunc    cellMaxMag(U)
+
+    processorField1
+    {
+        type            processorField;
+        libs            ("libfieldFunctionObjects.so");
+        writeControl    writeTime;
+        writeInterval   1;
+    }
+
+//     massOfGas
+//     {
+//         type            volFieldValue;
+//         libs            ("libfieldFunctionObjects.so");
+//         log             true;
+//         writeControl    writeTime;
+//         writeFields     false;
+//         regionType      all;
+//         operation       volIntegrate;
+// 
+//         fields
+//         (
+//             rho
+//         );
+//     }
+    /*CodeStream section*/
+//     #include        "inputOutputMassFlowLUFO"
+//     #include        "bubbleRadiusLUFO"
+//     #include        "bubbleMassConservationLUFO"
+//     #include        "centerOfMassLUFO"
+};
+
+// ************************************************************************* //

@@ -1,0 +1,151 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.phase1.*"
+    {
+        nAlphaCorr      1;
+        nAlphaSubCycles 2;
+
+        MULESCorr       yes;
+        nLimiterIter    3;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-12;
+        relTol          0;
+
+        nAlphaSmoothers     3;
+        cSmCoeff            0.5;
+        cShCoeff            0.3;
+        nKappaSmoothers     2;
+        cPhicFilterCoeff    0.1;
+        cPhicThresholdCoeff 0.01;
+    }
+
+    pcorr
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    pcorrFinal
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-20;
+        relTol          1e-2;
+    }
+
+    p_rghFinal
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-20;
+        relTol          0;
+    }
+
+    pc
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-20;
+        relTol          1e-2;
+    }
+
+    pcFinal
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-20;
+        relTol          0;
+    }
+
+    "U.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-12;
+        relTol          0;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor           no;
+    nOuterCorrectors            2;
+    nCorrectors                 2;
+    nNonOrthogonalCorrectors    0;
+
+    pRefCell                    0;
+    pRefValue                   0;
+
+    outerCorrectorResidualControl
+    {
+        p_rgh
+        {
+            tolerance           1e-6;
+            relTol              0;
+        }
+
+        U
+        {
+            tolerance           1e-6;
+            relTol              0;
+        }
+    }
+
+//     residualControl
+//     {
+//         p_rgh                   1e-4;
+//         U                       1e-4;
+//         T                       1e-4;
+//     }
+
+    turbOnFinalIterOnly on;
+}
+
+relaxationFactors
+{
+    fields
+    {
+//         p_rgh                   0.3;
+//         p_rghFinal              1;
+//         phic                    0.7;
+//         phicFinal               1;
+    }
+    equations
+    {
+//         U                       0.7;
+//         UFinal                  1;
+        ".*" 1;
+    }
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,107 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+boxWidth    10.0;
+boxHeight   10.0;
+boxDepth    10.0;
+
+Nx          40;
+Ny          40;
+Nz          40;
+
+box0Nx      $Nx;
+box0Ny      $Ny;
+box0Nz      $Nz;
+
+//box0
+box0x0      #calc "- 0.5 * $boxWidth";
+box0y0      #calc "- 0.5 * $boxHeight";
+box0z0      #calc "- 0.5 * $boxDepth";
+
+box0x1      #calc "0.5 * $boxWidth";
+box0y1      #calc "- 0.5 * $boxHeight";
+box0z1      #calc "- 0.5 * $boxDepth";
+
+box0x2      #calc "0.5 * $boxWidth";
+box0y2      #calc "0.5 * $boxHeight";
+box0z2      #calc "- 0.5 * $boxDepth";
+
+box0x3      #calc "- 0.5 * $boxWidth";
+box0y3      #calc "0.5 * $boxHeight";
+box0z3      #calc "- 0.5 * $boxDepth";
+
+box0x4      #calc "- 0.5 * $boxWidth";
+box0y4      #calc "- 0.5 * $boxHeight";
+box0z4      #calc "0.5 * $boxDepth";
+
+box0x5      #calc "0.5 * $boxWidth";
+box0y5      #calc "- 0.5 * $boxHeight";
+box0z5      #calc "0.5 * $boxDepth";
+
+box0x6      #calc "0.5 * $boxWidth";
+box0y6      #calc "0.5 * $boxHeight";
+box0z6      #calc "0.5 * $boxDepth";
+
+box0x7      #calc "- 0.5 * $boxWidth";
+box0y7      #calc "0.5 * $boxHeight";
+box0z7      #calc "0.5 * $boxDepth";
+
+vertices
+(
+    //box0
+    ($box0x0 $box0y0 $box0z0)
+    ($box0x1 $box0y1 $box0z1)
+    ($box0x2 $box0y2 $box0z2)
+    ($box0x3 $box0y3 $box0z3)
+    ($box0x4 $box0y4 $box0z4)
+    ($box0x5 $box0y5 $box0z5)
+    ($box0x6 $box0y6 $box0z6)
+    ($box0x7 $box0y7 $box0z7)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) ($box0Nx $box0Ny $box0Nz) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    open
+    {
+        type patch;
+        faces
+        (
+            (0 1 2 3)
+            (4 7 6 5)
+            (0 3 7 4)
+            (0 4 5 1)
+            (1 5 6 2)
+            (3 2 6 7)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //
