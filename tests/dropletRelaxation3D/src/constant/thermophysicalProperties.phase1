@@ -8,31 +8,24 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      p_rgh;
+    class       dictionary;
+    location    "constant";
+    object      thermophysicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -1 -2 0 0 0 0];
-
-internalField   uniform 1e5;
-
-boundaryField
+thermoType
 {
-    //- Set patchGroups for constraint patches
-    #includeEtc "caseDicts/setConstraintTypes"
+    type            heRhoThermo;
+    mixture         pureMixture;
+    properties      liquid;
+    energy          sensibleInternalEnergy;
+}
 
-    open
-    {
-//         type            fixedValue;
-//         value           $internalField;
-//         type            totalPressure;
-//         rho             thermo:rho;
-//         p0              uniform 0;
-        type            fixedFluxPressure;
-        value           $internalField;
-    }
+mixture
+{
+//     C2H5OH;
+    H2O;
 }
 
 

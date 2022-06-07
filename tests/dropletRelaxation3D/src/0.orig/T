@@ -10,13 +10,13 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      p_rgh;
+    object      T;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -1 -2 0 0 0 0];
+dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 1e5;
+internalField   uniform 300;
 
 boundaryField
 {
@@ -25,15 +25,9 @@ boundaryField
 
     open
     {
-//         type            fixedValue;
-//         value           $internalField;
-//         type            totalPressure;
-//         rho             thermo:rho;
-//         p0              uniform 0;
-        type            fixedFluxPressure;
-        value           $internalField;
+        type            fixedValue;
+        value           uniform 300;
     }
 }
-
 
 // ************************************************************************* //

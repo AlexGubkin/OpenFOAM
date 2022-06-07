@@ -14,7 +14,7 @@ cp -r\
     0
 
 #Preparation mesh
-foamDictionary  -entry numberOfSubdomains -set 20 system/decomposeParDict
+foamDictionary  -entry numberOfSubdomains -set 8 system/decomposeParDict
 foamDictionary  -entry method -set scotch system/decomposeParDict
 runApplication  blockMesh
 runApplication  decomposePar
@@ -35,7 +35,8 @@ foamDictionary  -entry maxCo -set $(echo "0.1" | bc -l) system/controlDict
 foamDictionary  -entry maxAlphaCo -set $(echo "0.1" | bc -l) system/controlDict
 
 # runParallel     interFoam
-runParallel     interSSFFoam
+# runParallel     interSSFFoam
 # runParallel     interFSFFoam
+runParallel     compressibleInterSSFFoam
 
 exit 0

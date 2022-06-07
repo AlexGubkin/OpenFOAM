@@ -1,0 +1,4 @@
+VoFSolidificationMeltingSource/VoFSolidificationMeltingSource.C
+compressibleInterSSFFoam.C
+
+EXE = $(FOAM_USER_APPBIN)/compressibleInterSSFFoam

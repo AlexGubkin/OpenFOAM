@@ -110,6 +110,12 @@ surfaceVectorField gradAlphaSmf
 );
 
 // Interpolated face-gradient of sharpened alpha
+surfaceVectorField gradAlphaShf
+(
+    "gradAlphaShf",
+    fvc::interpolate(fvc::grad(alphaSh))
+);
+
 surfaceScalarField deltaf
 (
     "deltaf",
@@ -134,13 +140,21 @@ surfaceScalarField nHatf
 // Initialization fields for surface tension force calculation
 //- Surface tension
 const dictionary&
-    transportPropertiesDict = mesh.lookupObject<IOdictionary>("transportProperties");
+    thermophysicalPropertiesDict = mesh.lookupObject<IOdictionary>("thermophysicalProperties");
 
 autoPtr<surfaceTensionModel> sigmaPtr
 (
-    surfaceTensionModel::New(transportPropertiesDict, mesh)
+    surfaceTensionModel::New(thermophysicalPropertiesDict, mesh)
 );
-sigmaPtr->readDict(transportPropertiesDict);
+sigmaPtr->readDict(thermophysicalPropertiesDict);
+
+
+// Interpolated face-gradient of sigma
+surfaceVectorField gradSigmaf
+(
+    "gradSigmaf",
+    fvc::interpolate(fvc::grad(sigmaPtr->sigma()))
+);
 
 
 // Surface tension force flux
@@ -150,4 +164,12 @@ surfaceScalarField phic
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
    /fvc::interpolate(w2)*deltaf*mesh.magSf()
+);
+
+
+// Surface tension force flux (tangent force flux)
+surfaceScalarField phict
+(
+    "phict",
+    mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
 );

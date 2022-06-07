@@ -32,7 +32,12 @@ divSchemes
 //     div(phi,alpha)  Gauss PLICU interfaceCompression vanLeer 1;
 //     div(phi,alpha)  Gauss MPLIC;
 //     div(phi,alpha)  Gauss MPLICU;
+    div(rhoPhi,T)   Gauss upwind;
+    div(rhoPhi,K)   Gauss upwind;
+    div(phi,p)      Gauss upwind;
+
     div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+    div(((thermo:rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
