@@ -23,6 +23,14 @@ boundaryField
     //- Set patchGroups for constraint patches
     #includeEtc "caseDicts/setConstraintTypes"
 
+    empty1
+    {
+        type            empty;
+    }
+    empty2
+    {
+        type            empty;
+    }
     open
     {
 //         type            fixedValue;

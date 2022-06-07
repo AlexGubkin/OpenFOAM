@@ -27,11 +27,11 @@ boundaryField
     {
 //         type            fixedValue;
 //         value           $internalField;
-//         type            totalPressure;
-//         rho             thermo:rho;
-//         p0              uniform 0;
-        type            fixedFluxPressure;
-        value           $internalField;
+        type            totalPressure;
+        rho             thermo:rho;
+        p0              $internalField;
+//         type            fixedFluxPressure;
+//         value           $internalField;
     }
 }
 

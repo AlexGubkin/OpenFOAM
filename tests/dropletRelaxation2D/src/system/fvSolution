@@ -38,6 +38,11 @@ solvers
         cPhicThresholdCoeff 0.01;
     }
 
+    ".*(rho|rhoFinal)"
+    {
+        solver          diagonal;
+    }
+
     pcorr
     {
         solver          PBiCGStab;
@@ -93,6 +98,14 @@ solvers
         tolerance       1e-12;
         relTol          0;
     }
+
+    "T.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-20;
+        relTol          0;
+    }
 }
 
 PIMPLE
@@ -103,7 +116,7 @@ PIMPLE
     nNonOrthogonalCorrectors    0;
 
     pRefCell                    0;
-    pRefValue                   0;
+    pRefValue                   1e5;
 
     outerCorrectorResidualControl
     {
@@ -114,6 +127,12 @@ PIMPLE
         }
 
         U
+        {
+            tolerance           1e-6;
+            relTol              0;
+        }
+
+        T
         {
             tolerance           1e-6;
             relTol              0;

@@ -8,31 +8,31 @@
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      p;
+    class       dictionary;
+    location    "constant";
+    object      thermophysicalProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+phases (phase1 phase2);
 
-dimensions      [1 -1 -2 0 0 0 0];
+pMin                pMin                [ 1 -1 -2 0 0 0 0 ] 10000;
 
-internalField   uniform 1e5;
+// sigma               sigma               [ 1 0 -2 0 0 0 0 ]  0.07;
 
-boundaryField
+sigma
 {
-    //- Set patchGroups for constraint patches
-    #includeEtc "caseDicts/setConstraintTypes"
-
-    open
-    {
-//         type            fixedValue;
-//         value           $internalField;
-        type            totalPressure;
-        rho             thermo:rho;
-        p0              $internalField;
-//         type            fixedFluxPressure;
-//         value           $internalField;
-    }
+    type    liquidProperties;
+    phase   phase1;
 }
+
+// sigma
+// {
+//     type    temperatureDependent;
+//     sigma   table
+//     (
+//         (273.15 0.02410053)
+//         (370.00 0.01562685)
+//     );
+// }
 
 // ************************************************************************* //
