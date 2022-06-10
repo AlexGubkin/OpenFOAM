@@ -12,20 +12,50 @@ volScalarField d
     mesh
 );
 
+const polyBoundaryMesh& pbm = mesh.boundaryMesh();
+
+// const labelHashSet patchIDs(mesh.boundary().getPatchIDs());
+const labelHashSet patchIDs;
+
+// Get patch ids of walls
+// const labelHashSet wallPatchIDs(wallUtils.getPatchIDs<wallPolyPatch>());
+
+wordList dTypes
+(
+    mesh.boundary().size(),
+    zeroGradientFvPatchField<vector>::typeName
+);
+
+forAllConstIter(labelHashSet, patchIDs, iter)
+{
+    dTypes[iter.key()] = fixedValueFvPatchField<vector>::typeName;
+}
+
+Info<< "Creation field nd\n" << endl;
 volVectorField nd
 (
     IOobject
     (
         "nd",
-        mesh.time().timeName(),
+        runTime.timeName(),
         mesh,
         IOobject::NO_READ,
-        IOobject::AUTO_WRITE,
+        IOobject::AUTO_WRITE
     ),
     mesh,
     dimensionedVector(dimless, Zero),
-    patchTypes<vector>(mesh, patchIDs)
+    dTypes
 );
+
+const fvPatchList& patches = mesh.boundary();
+volVectorField::Boundary& ndbf = nd.boundaryFieldRef();
+
+forAllConstIter(labelHashSet, patchIDs, iter)
+{
+    label patchi = iter.key();
+    ndbf[patchi] == -patches[patchi].nf();
+}
+ 
 
 // U = Zero;
 

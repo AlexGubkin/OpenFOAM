@@ -35,49 +35,19 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "nonOrthogonalSolutionControl.H"
+// #include "nonOrthogonalSolutionControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    argList::addOption
-    (
-        "pName",
-        "pName",
-        "Name of the pressure field"
-    );
-
-    argList::addBoolOption
-    (
-        "initialiseUBCs",
-        "Initialise U boundary conditions"
-    );
-
-    argList::addBoolOption
-    (
-        "writePhi",
-        "Write the velocity potential field"
-    );
-
-    argList::addBoolOption
-    (
-        "writep",
-        "Calculate and write the pressure field"
-    );
-
-    argList::addBoolOption
-    (
-        "withFunctionObjects",
-        "execute functionObjects"
-    );
-
     #include "setRootCaseLists.H"
     #include "createTime.H"
     #include "createMesh.H"
 
 //     nonOrthogonalSolutionControl eikonal(mesh, "eikonal");
 
+    #include "createControls.H"
     #include "createFields.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -93,132 +63,27 @@ int main(int argc, char *argv[])
 
     do
     {
-        ny = fvc::grad(y);
-        ny /= (mag(ny) + small);
+        nd = fvc::grad(d);
+        nd /= (mag(nd) + small);
 
-        surfaceVectorField nf(fvc::interpolate(ny));
+        surfaceVectorField nf(fvc::interpolate(nd));
         nf /= (mag(nf) + small);
 
-        surfaceScalarField yPhi("yPhi", nf & mesh.Sf());
+        surfaceScalarField dPhi("dPhi", nf & mesh.Sf());
 
-        fvScalarMatrix yEqn
+        fvScalarMatrix dEqn
         (
-            fvm::div(yPhi, y)
-          - fvm::Sp(fvc::div(yPhi), y)
-          - epsilon_*y*fvm::laplacian(y)
+            fvm::div(dPhi, d)
+          - fvm::Sp(fvc::div(dPhi), d)
+          - epsilon*d*fvm::laplacian(d)
         ==
             dimensionedScalar(dimless, 1.0)
         );
 
-        yEqn.relax();
-        initialResidual = yEqn.solve().initialResidual();
+        dEqn.relax();
+        initialResidual = dEqn.solve().initialResidual();
  
-    } while (initialResidual > tolerance_ && ++iter < maxIter_);
-
-
-
-
-
-    // Non-orthogonal velocity potential corrector loop
-    while (eikonal.correctNonOrthogonal())
-    {
-        fvc::grad(d);
-        fvScalarMatrix PhiEqn
-        (
-            fvm::laplacian(dimensionedScalar(dimless, 1), Phi)
-         ==
-            fvc::div(phi)
-        );
-
-        PhiEqn.setReference(PhiRefCell, PhiRefValue);
-        PhiEqn.solve();
-
-        if (eikonal.finalNonOrthogonalIter())
-        {
-            phi -= PhiEqn.flux();
-        }
-    }
-
-    Info<< "Continuity error = "
-        << mag(fvc::div(phi))().weightedAverage(mesh.V()).value()
-        << endl;
-
-    U = fvc::reconstruct(MRF.absolute(phi));
-    U.correctBoundaryConditions();
-
-    Info<< "Interpolated velocity error = "
-        << (
-                sqrt(sum(sqr(fvc::flux(U) - MRF.absolute(phi))))
-               /sum(mesh.magSf())
-           ).value()
-        << endl;
-
-    // Write U and phi
-    U.write();
-    phi.write();
-
-    // Optionally write Phi
-    if (args.optionFound("writePhi"))
-    {
-        Phi.write();
-    }
-
-    // Calculate the pressure field
-    if (args.optionFound("writep"))
-    {
-        Info<< nl << "Calculating approximate pressure field" << endl;
-
-        label pRefCell = 0;
-        scalar pRefValue = 0.0;
-        setRefCell
-        (
-            p,
-            potentialFlow.dict(),
-            pRefCell,
-            pRefValue
-        );
-
-        // Calculate the flow-direction filter tensor
-        volScalarField magSqrU(magSqr(U));
-        volSymmTensorField F(sqr(U)/(magSqrU + small*average(magSqrU)));
-
-        // Calculate the divergence of the flow-direction filtered div(U*U)
-        // Filtering with the flow-direction generates a more reasonable
-        // pressure distribution in regions of high velocity gradient in the
-        // direction of the flow
-        volScalarField divDivUU
-        (
-            fvc::div
-            (
-                F & fvc::div(phi, U),
-                "div(div(phi,U))"
-            )
-        );
-
-        // Solve a Poisson equation for the approximate pressure
-        while (potentialFlow.correctNonOrthogonal())
-        {
-            fvScalarMatrix pEqn
-            (
-                fvm::laplacian(p) + divDivUU
-            );
-
-            pEqn.setReference(pRefCell, pRefValue);
-            pEqn.solve();
-        }
-
-        p.write();
-    }
-
-    runTime.functionObjects().end();
-
-    Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-        << nl << endl;
-
-    Info<< "End\n" << endl;
-
-    return 0;
+    } while (initialResidual > tolerance && ++iter < maxIter);
 }
 
 
