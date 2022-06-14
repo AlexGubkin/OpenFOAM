@@ -1,5 +1,3 @@
-// const polyBoundaryMesh& pbm = mesh.boundaryMesh();
-
 // Get patch ids of walls
 const labelHashSet patchIDs(mesh.boundaryMesh().findPatchIDs<wallPolyPatch>());
 
@@ -9,16 +7,16 @@ wordList dTypes
     zeroGradientFvPatchField<scalar>::typeName
 );
 
-wordList ndTypes
-(
-    mesh.boundary().size(),
-    zeroGradientFvPatchField<vector>::typeName
-);
+// wordList ndTypes
+// (
+//     mesh.boundary().size(),
+//     zeroGradientFvPatchField<vector>::typeName
+// );
 
 forAllConstIter(labelHashSet, patchIDs, iter)
 {
     dTypes[iter.key()] = fixedValueFvPatchField<scalar>::typeName;
-    ndTypes[iter.key()] = fixedValueFvPatchField<vector>::typeName;
+//     ndTypes[iter.key()] = fixedValueFvPatchField<vector>::typeName;
 }
 
 Info<< "Creation distance field d\n" << endl;
@@ -35,45 +33,58 @@ volScalarField d
     dTypes
 );
 
-Info<< "Creation field nd\n" << endl;
-volVectorField nd
+d = dimensionedScalar(dimLength, 1.0);
+
+Info<< "Creation field dPsi\n" << endl;
+volScalarField dPsi
 (
     IOobject
     (
-        "nd",
+        "dPsi",
+        runTime.timeName(),
+        mesh
+    ),
+    mesh,
+    dimensionedScalar(sqr(dimLength), 0),
+    d.boundaryFieldRef().types()
+);
+
+Info<< "Creation field gradd\n" << endl;
+volVectorField gradd
+(
+    IOobject
+    (
+        "gradd",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedVector(dimless, Zero),
-    ndTypes
+    dimensionedVector(dimless, Zero)
 );
 
-const fvPatchList& patches = mesh.boundary();
-volVectorField::Boundary& ndbf = nd.boundaryFieldRef();
-
-forAllConstIter(labelHashSet, patchIDs, iter)
-{
-    label patchi = iter.key();
-    ndbf[patchi] == -patches[patchi].nf();
-}
-
-
-
-
-// // Infer the pressure BCs from the velocity
-// wordList dTypes
+// Info<< "Creation field nd\n" << endl;
+// volVectorField nd
 // (
-//     mesh.boundary().size(),
-//     zeroGradientFvPatchScalarField::typeName
+//     IOobject
+//     (
+//         "nd",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     mesh,
+//     dimensionedVector(dimless, Zero),
+//     ndTypes
 // );
+
+// const fvPatchList& patches = mesh.boundary();
+// volVectorField::Boundary& ndbf = nd.boundaryFieldRef();
 // 
-// forAll(U.boundaryField(), patchi)
+// forAllConstIter(labelHashSet, patchIDs, iter)
 // {
-//     if (U.boundaryField()[patchi].fixesValue())
-//     {
-//         pBCTypes[patchi] = zeroGradientFvPatchScalarField::typeName;
-//     }
+//     label patchi = iter.key();
+//     ndbf[patchi] == -patches[patchi].nf();
 // }

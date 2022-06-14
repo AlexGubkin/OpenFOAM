@@ -27,12 +27,13 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(dPhi,d)     bounded Gauss linear;
+    div(dPhi,d)     Gauss vanLeer;
 }
 
 laplacianSchemes
 {
-    default         Gauss linear corrected;
+    default         Gauss linear limited corrected 0.5;
+//     laplacian(dPsi) Gauss linear corrected;
 }
 
 interpolationSchemes
@@ -42,7 +43,7 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default         corrected;
+    default         limited corrected 0.5;
 }
 
 

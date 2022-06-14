@@ -22,20 +22,27 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    potentialFoam
+    eikonalFoam
 
 Description
-    Potential flow solver which solves for the velocity potential, to
-    calculate the flux-field, from which the velocity field is obtained by
-    reconstructing the flux.
+    Eikonal equation solver calculates distance field d.
 
-    This application is particularly useful to generate starting fields for
-    Navier-Stokes codes.
+    Convergence is accelerated by first generating an approximate solution
+    using one of the simpler methods, e.g. Poisson.
 
+    References:
+    \verbatim
+        P.G. Tucker, C.L. Rumsey, R.E. Bartels, R.T. Biedron,
+        "Transport equation based wall distance computations aimed at flows
+        with time-dependent geometry",
+        NASA/TM-2003-212680, December 2003.
+    \endverbatim
+    
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "wallPolyPatch.H"
+#include "simpleControl.H"
 #include "nonOrthogonalSolutionControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -46,6 +53,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
 
+    simpleControl simple(mesh);
     nonOrthogonalSolutionControl eikonal(mesh, "eikonal");
 
     #include "createControls.H"
@@ -59,43 +67,63 @@ int main(int argc, char *argv[])
     // function objects so do it ourselves
     runTime.functionObjects().start();
 
-//     int iter = 0;
-//     scalar initialResidual = 0;
+    label dPsiRefCell = 0;
+    scalar dPsiRefValue = 0.0;
+
+    // Non-orthogonal velocity potential corrector loop
+    while (simple.correctNonOrthogonal())
+    {
+        fvScalarMatrix dPsiEqn
+        (
+            fvm::laplacian(dPsi)
+         ==
+            dimensionedScalar(dimless, -1.0)
+        );
+
+//         dPsiEqn.relax();
+        dPsiEqn.setReference(dPsiRefCell, dPsiRefValue);
+        dPsiEqn.solve();
+
+        if (simple.finalNonOrthogonalIter())
+        {
+            volVectorField graddPsi(fvc::grad(dPsi));
+            volScalarField magGraddPsi(mag(graddPsi));
+
+            d = sqrt(magSqr(graddPsi) + 2*dPsi) - magGraddPsi;
+        }
+    }
+
+    // Write dPsi
+    dPsi.write();
 
     // Non-orthogonal eikonal corrector loop
     while (eikonal.correctNonOrthogonal())
     {
-        nd = fvc::grad(d);
-        nd /= (mag(nd) + small);
+        gradd = fvc::grad(d);
 
-        surfaceVectorField nf(fvc::interpolate(nd));
-        nf /= (mag(nf) + small);
+        surfaceVectorField graddf(fvc::interpolate(gradd));
 
-        surfaceScalarField dPhi("dPhi", nf & mesh.Sf());
+        surfaceScalarField dPhi("dPhi", graddf & mesh.Sf());
 
         fvScalarMatrix dEqn
         (
             fvm::div(dPhi, d)
           - fvm::Sp(fvc::div(dPhi), d)
           - epsilon*d*fvm::laplacian(d)
-        ==
+         ==
             dimensionedScalar(dimless, 1.0)
         );
 
-//         dEqn.relax();
-
-//         dEqn.setReference(PhiRefCell, PhiRefValue);
+        dEqn.relax();
         dEqn.solve();
-
-//         if (eikonal.finalNonOrthogonalIter())
-//         {
-//             phi -= PhiEqn.flux();
-//         }
     }
 
-    // Write d
+    // Write d and gradd
     d.write();
-    
+    gradd.write();
+
+//     int iter = 0;
+//     scalar initialResidual = 0;
 //     do
 //     {
 //         nd = fvc::grad(d);

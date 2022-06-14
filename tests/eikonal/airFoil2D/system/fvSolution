@@ -20,23 +20,31 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DILU;
-        tolerance       1e-06;
-        relTol          0.01;
-//         smoother        GaussSeidel;
+        tolerance       1e-08;
+        relTol          0;
+    }
+
+    dPsi
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.001;
     }
 }
 
 SIMPLE
 {
+    nNonOrthogonalCorrectors 20;
 }
 
 eikonal
 {
-    nNonOrthogonalCorrectors 500;
+    nNonOrthogonalCorrectors 150;
 
     eikonalCoeffs
     {
-        epsilon         0.1;
+        epsilon         1e-4;
     }
 }
 
@@ -47,6 +55,7 @@ relaxationFactors
     }
     equations
     {
+        d       0.5;
     }
 }
 
