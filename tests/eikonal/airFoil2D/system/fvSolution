@@ -16,42 +16,27 @@ FoamFile
 
 solvers
 {
-    p
+    d
     {
-        solver          GAMG;
+        solver          PBiCGStab;
+        preconditioner  DILU;
         tolerance       1e-06;
-        relTol          0.1;
-        smoother        GaussSeidel;
-    }
-
-    U
-    {
-        solver          smoothSolver;
-        smoother        GaussSeidel;
-        nSweeps         2;
-        tolerance       1e-08;
-        relTol          0.1;
-    }
-
-    nuTilda
-    {
-        solver          smoothSolver;
-        smoother        GaussSeidel;
-        nSweeps         2;
-        tolerance       1e-08;
-        relTol          0.1;
+        relTol          0.01;
+//         smoother        GaussSeidel;
     }
 }
 
 SIMPLE
 {
-    nNonOrthogonalCorrectors 0;
+}
 
-    residualControl
+eikonal
+{
+    nNonOrthogonalCorrectors 500;
+
+    eikonalCoeffs
     {
-        p               1e-5;
-        U               1e-5;
-        nuTilda         1e-5;
+        epsilon         0.1;
     }
 }
 
@@ -59,12 +44,9 @@ relaxationFactors
 {
     fields
     {
-        p               0.3;
     }
     equations
     {
-        U               0.7;
-        nuTilda         0.7;
     }
 }
 

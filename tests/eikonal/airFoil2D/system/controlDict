@@ -14,7 +14,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     simpleFoam;
+application     eikonalFoam;
 
 startFrom       startTime;
 
@@ -22,13 +22,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         500;
+endTime         1;
 
 deltaT          1;
 
 writeControl    timeStep;
 
-writeInterval   50;
+writeInterval   1;
 
 purgeWrite      0;
 

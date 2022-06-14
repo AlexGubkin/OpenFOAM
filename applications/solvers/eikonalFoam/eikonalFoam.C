@@ -35,7 +35,8 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-// #include "nonOrthogonalSolutionControl.H"
+#include "wallPolyPatch.H"
+#include "nonOrthogonalSolutionControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -45,7 +46,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
 
-//     nonOrthogonalSolutionControl eikonal(mesh, "eikonal");
+    nonOrthogonalSolutionControl eikonal(mesh, "eikonal");
 
     #include "createControls.H"
     #include "createFields.H"
@@ -58,10 +59,11 @@ int main(int argc, char *argv[])
     // function objects so do it ourselves
     runTime.functionObjects().start();
 
-    int iter = 0;
-    scalar initialResidual = 0;
+//     int iter = 0;
+//     scalar initialResidual = 0;
 
-    do
+    // Non-orthogonal eikonal corrector loop
+    while (eikonal.correctNonOrthogonal())
     {
         nd = fvc::grad(d);
         nd /= (mag(nd) + small);
@@ -80,10 +82,43 @@ int main(int argc, char *argv[])
             dimensionedScalar(dimless, 1.0)
         );
 
-        dEqn.relax();
-        initialResidual = dEqn.solve().initialResidual();
- 
-    } while (initialResidual > tolerance && ++iter < maxIter);
+//         dEqn.relax();
+
+//         dEqn.setReference(PhiRefCell, PhiRefValue);
+        dEqn.solve();
+
+//         if (eikonal.finalNonOrthogonalIter())
+//         {
+//             phi -= PhiEqn.flux();
+//         }
+    }
+
+    // Write d
+    d.write();
+    
+//     do
+//     {
+//         nd = fvc::grad(d);
+//         nd /= (mag(nd) + small);
+// 
+//         surfaceVectorField nf(fvc::interpolate(nd));
+//         nf /= (mag(nf) + small);
+// 
+//         surfaceScalarField dPhi("dPhi", nf & mesh.Sf());
+// 
+//         fvScalarMatrix dEqn
+//         (
+//             fvm::div(dPhi, d)
+//           - fvm::Sp(fvc::div(dPhi), d)
+//           - epsilon*d*fvm::laplacian(d)
+//         ==
+//             dimensionedScalar(dimless, 1.0)
+//         );
+// 
+//         dEqn.relax();
+//         initialResidual = dEqn.solve().initialResidual();
+//  
+//     } while (initialResidual > tolerance && ++iter < maxIter);
 }
 
 
