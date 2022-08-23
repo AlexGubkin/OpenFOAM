@@ -7,6 +7,12 @@ wordList dTypes
     zeroGradientFvPatchField<scalar>::typeName
 );
 
+wordList d2Types
+(
+    mesh.boundary().size(),
+    zeroGradientFvPatchField<scalar>::typeName
+);
+
 // wordList ndTypes
 // (
 //     mesh.boundary().size(),
@@ -35,6 +41,52 @@ volScalarField d
 
 d = dimensionedScalar(dimLength, 1.0);
 
+Info<< "Creation field gradd\n" << endl;
+volVectorField gradd
+(
+    IOobject
+    (
+        "gradd",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedVector(dimless, Zero)
+);
+
+Info<< "Creation distance field d2\n" << endl;
+volScalarField d2
+(
+    IOobject
+    (
+        "d2",
+        runTime.timeName(),
+        mesh
+    ),
+    mesh,
+    dimensionedScalar(dimLength, small),
+    d2Types
+);
+
+d2 = dimensionedScalar(dimLength, 1.0);
+
+Info<< "Creation field gradd2\n" << endl;
+volVectorField gradd2
+(
+    IOobject
+    (
+        "gradd2",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedVector(dimless, Zero)
+);
+
 Info<< "Creation field dPsi\n" << endl;
 volScalarField dPsi
 (
@@ -49,19 +101,19 @@ volScalarField dPsi
     d.boundaryFieldRef().types()
 );
 
-Info<< "Creation field gradd\n" << endl;
-volVectorField gradd
+Info<< "Creation field graddPsi\n" << endl;
+volVectorField graddPsi
 (
     IOobject
     (
-        "gradd",
+        "graddPsi",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedVector(dimless, Zero)
+    dimensionedVector(dimLength, Zero)
 );
 
 // Info<< "Creation field nd\n" << endl;

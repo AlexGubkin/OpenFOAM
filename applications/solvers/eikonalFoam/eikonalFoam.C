@@ -86,15 +86,16 @@ int main(int argc, char *argv[])
 
         if (simple.finalNonOrthogonalIter())
         {
-            volVectorField graddPsi(fvc::grad(dPsi));
-            volScalarField magGraddPsi(mag(graddPsi));
+            graddPsi = fvc::grad(dPsi);
+//             volScalarField magGraddPsi(mag(graddPsi));
 
-            d = sqrt(magSqr(graddPsi) + 2*dPsi) - magGraddPsi;
+            d = sqrt(magSqr(graddPsi) + 2*dPsi) - mag(graddPsi);
         }
     }
 
-    // Write dPsi
+    // Write dPsi and graddPsi
     dPsi.write();
+    graddPsi.write();
 
     // Non-orthogonal eikonal corrector loop
     while (eikonal.correctNonOrthogonal())
@@ -121,6 +122,37 @@ int main(int argc, char *argv[])
     // Write d and gradd
     d.write();
     gradd.write();
+
+    // Non-orthogonal eikonal corrector loop
+    while (eikonal.correctNonOrthogonal())
+    {
+        d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
+
+        gradd2 = fvc::grad(d2);
+
+        surfaceVectorField gradd2f(fvc::interpolate(gradd2));
+
+        surfaceScalarField d2Phi("d2Phi", gradd2f & mesh.Sf());
+
+        fvScalarMatrix d2Eqn
+        (
+            fvm::div(d2Phi, d2)
+          - fvm::Sp(fvc::div(d2Phi), d2)
+          - epsilon*d2*fvm::laplacian(d2)
+         ==
+            dimensionedScalar(dimless, 1.0)
+        );
+
+        d2Eqn.relax();
+        d2Eqn.solve();
+    }
+
+//     d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
+//     gradd2 = fvc::grad(d2);
+
+    // Write d and gradd
+    d2.write();
+    gradd2.write();
 
 //     int iter = 0;
 //     scalar initialResidual = 0;

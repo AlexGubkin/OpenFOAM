@@ -24,6 +24,14 @@ solvers
         relTol          0;
     }
 
+    d2
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0;
+    }
+
     dPsi
     {
         solver          PBiCGStab;
@@ -56,6 +64,7 @@ relaxationFactors
     equations
     {
         d       0.5;
+        d2      0.5;
     }
 }
 

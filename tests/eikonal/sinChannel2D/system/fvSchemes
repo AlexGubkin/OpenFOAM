@@ -28,6 +28,7 @@ divSchemes
 {
     default         none;
     div(dPhi,d)     Gauss vanLeer;
+    div(d2Phi,d2)   Gauss vanLeer;
 }
 
 laplacianSchemes
