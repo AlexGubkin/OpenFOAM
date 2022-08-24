@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
     // function objects so do it ourselves
     runTime.functionObjects().start();
 
+    // Non-orthogonal velocity potential corrector loop
     label dPsiRefCell = 0;
     scalar dPsiRefValue = 0.0;
 
-    // Non-orthogonal velocity potential corrector loop
     while (simple.correctNonOrthogonal())
     {
         fvScalarMatrix dPsiEqn
@@ -124,9 +124,12 @@ int main(int argc, char *argv[])
     gradd.write();
 
     // Non-orthogonal eikonal corrector loop
+//     label d2RefCell = 0;
+//     scalar d2RefValue = 0.0;
+
     while (eikonal.correctNonOrthogonal())
     {
-        d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
+//         d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
 
         gradd2 = fvc::grad(d2);
 
@@ -140,11 +143,18 @@ int main(int argc, char *argv[])
           - fvm::Sp(fvc::div(d2Phi), d2)
           - epsilon*d2*fvm::laplacian(d2)
          ==
-            dimensionedScalar(dimless, 1.0)
+            (
+                pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
+              + dimensionedScalar(dimless, small)*neg0(mag(gradd) - dimensionedScalar(dimless, 0.8))
+            )
+//             dimensionedScalar(dimless, 1.0)
         );
 
         d2Eqn.relax();
+//         d2Eqn.setReference(d2RefCell, d2RefValue);
         d2Eqn.solve();
+        d2 -= dimensionedScalar(dimLength, gMin(d2));
+        d2 += dimensionedScalar(dimLength, small);
     }
 
 //     d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));

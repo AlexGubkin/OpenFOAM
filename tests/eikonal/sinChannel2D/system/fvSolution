@@ -52,7 +52,7 @@ eikonal
 
     eikonalCoeffs
     {
-        epsilon         1e-4;
+        epsilon         1e-3;
     }
 }
 
@@ -63,8 +63,8 @@ relaxationFactors
     }
     equations
     {
-        d       0.5;
-        d2      0.5;
+        d       0.2;
+        d2      0.2;
     }
 }
 
