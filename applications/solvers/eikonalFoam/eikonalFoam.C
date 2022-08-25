@@ -123,6 +123,37 @@ int main(int argc, char *argv[])
     d.write();
     gradd.write();
 
+    // Non-orthogonal velocity potential corrector loop
+    label d2PsiRefCell = 0;
+    scalar d2PsiRefValue = 0.0;
+
+    while (simple.correctNonOrthogonal())
+    {
+        fvScalarMatrix d2PsiEqn
+        (
+            fvm::laplacian(d2Psi)
+         ==
+          - pos(mag(graddPsi) - dimensionedScalar(dimless, 0.05))
+          - dimensionedScalar(dimless, small)*neg0(mag(graddPsi) - dimensionedScalar(dimless, 0.05))
+        );
+
+//         dPsiEqn.relax();
+        d2PsiEqn.setReference(d2PsiRefCell, d2PsiRefValue);
+        d2PsiEqn.solve();
+
+        if (simple.finalNonOrthogonalIter())
+        {
+            gradd2Psi = fvc::grad(d2Psi);
+//             volScalarField magGraddPsi(mag(graddPsi));
+
+            d2 = sqrt(magSqr(gradd2Psi) + 2*d2Psi) - mag(gradd2Psi);
+        }
+    }
+
+    // Write dPsi and graddPsi
+    d2Psi.write();
+    gradd2Psi.write();
+
     // Non-orthogonal eikonal corrector loop
 //     label d2RefCell = 0;
 //     scalar d2RefValue = 0.0;
@@ -143,23 +174,20 @@ int main(int argc, char *argv[])
           - fvm::Sp(fvc::div(d2Phi), d2)
           - epsilon*d2*fvm::laplacian(d2)
          ==
-            (
-                pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
-              + dimensionedScalar(dimless, small)*neg0(mag(gradd) - dimensionedScalar(dimless, 0.8))
-            )
-//             dimensionedScalar(dimless, 1.0)
+            pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
+          + dimensionedScalar(dimless, small)*neg0(mag(gradd) - dimensionedScalar(dimless, 0.8))
         );
 
         d2Eqn.relax();
 //         d2Eqn.setReference(d2RefCell, d2RefValue);
         d2Eqn.solve();
-        d2 -= dimensionedScalar(dimLength, gMin(d2));
-        d2 += dimensionedScalar(dimLength, small);
     }
 
 //     d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
 //     gradd2 = fvc::grad(d2);
 
+    d2 -= dimensionedScalar(dimLength, gMin(d2));
+//     d2 += dimensionedScalar(dimLength, small);
     // Write d and gradd
     d2.write();
     gradd2.write();

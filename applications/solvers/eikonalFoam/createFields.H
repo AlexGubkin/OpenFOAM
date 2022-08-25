@@ -116,6 +116,35 @@ volVectorField graddPsi
     dimensionedVector(dimLength, Zero)
 );
 
+Info<< "Creation field d2Psi\n" << endl;
+volScalarField d2Psi
+(
+    IOobject
+    (
+        "d2Psi",
+        runTime.timeName(),
+        mesh
+    ),
+    mesh,
+    dimensionedScalar(sqr(dimLength), 0),
+    d2.boundaryFieldRef().types()
+);
+
+Info<< "Creation field gradd2Psi\n" << endl;
+volVectorField gradd2Psi
+(
+    IOobject
+    (
+        "gradd2Psi",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedVector(dimLength, Zero)
+);
+
 // Info<< "Creation field nd\n" << endl;
 // volVectorField nd
 // (
