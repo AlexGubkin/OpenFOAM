@@ -21,7 +21,7 @@ solvers
         solver          PBiCGStab;
         preconditioner  DILU;
         tolerance       1e-08;
-        relTol          0;
+        relTol          0.0;
     }
 
     d2
@@ -29,10 +29,18 @@ solvers
         solver          PBiCGStab;
         preconditioner  DILU;
         tolerance       1e-08;
-        relTol          0;
+        relTol          0.0;
     }
 
     dPsi
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.001;
+    }
+
+    d2Psi
     {
         solver          PBiCGStab;
         preconditioner  DIC;
@@ -48,11 +56,11 @@ SIMPLE
 
 eikonal
 {
-    nNonOrthogonalCorrectors 50;
+    nNonOrthogonalCorrectors 100;
 
     eikonalCoeffs
     {
-        epsilon         1e-2;
+        epsilon         1e-3;
     }
 }
 
@@ -63,8 +71,9 @@ relaxationFactors
     }
     equations
     {
-        d       0.25;
-        d2      0.25;
+        d       0.5;
+        d2      0.5;
+        d2Psi   0.1;
     }
 }
 

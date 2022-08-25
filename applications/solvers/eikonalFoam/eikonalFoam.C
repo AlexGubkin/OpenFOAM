@@ -133,16 +133,16 @@ int main(int argc, char *argv[])
         (
             fvm::laplacian(d2Psi)
          ==
-          - pos(mag(graddPsi) - dimensionedScalar(dimless, 0.05))
-          - dimensionedScalar(dimless, small)*neg0(mag(graddPsi) - dimensionedScalar(dimless, 0.05))
+          - neg0(mag(graddPsi)/dimensionedScalar(dimLength, 1.0) - dimensionedScalar(dimless, 0.05))
         );
 
-//         dPsiEqn.relax();
+        d2PsiEqn.relax();
         d2PsiEqn.setReference(d2PsiRefCell, d2PsiRefValue);
         d2PsiEqn.solve();
 
         if (simple.finalNonOrthogonalIter())
         {
+//             d2Psi -= dimensionedScalar(sqr(dimLength), gMin(d2Psi));
             gradd2Psi = fvc::grad(d2Psi);
 //             volScalarField magGraddPsi(mag(graddPsi));
 
@@ -157,6 +157,13 @@ int main(int argc, char *argv[])
     // Non-orthogonal eikonal corrector loop
 //     label d2RefCell = 0;
 //     scalar d2RefValue = 0.0;
+
+//     d2 =
+//         - dPsi/dimensionedScalar(dimLength, 1.0)
+//         + dimensionedScalar(dimLength, gMax(dPsi))
+//         + dimensionedScalar(dimLength, small);
+
+    d2 = d2Psi/dimensionedScalar(dimLength, 1.0);
 
     while (eikonal.correctNonOrthogonal())
     {
