@@ -1,0 +1,146 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+dx              10;
+dy              10;
+dz              0.1;
+
+ox              0;
+oy              0;
+oz              0;
+
+nz              1;
+nx              500;
+ny              #calc "int($nx * $dy / $dx)";
+
+box0nx      $nx;
+box0ny      $ny;
+box0nz      $nz;
+
+//box0
+box0x0      #calc "- 0.5 * $dx + $ox";
+box0y0      #calc "- 0.5 * $dy + $oy";
+box0z0      #calc "- 0.5 * $dz + $oz";
+
+box0x1      #calc "0.5 * $dx + $ox";
+box0y1      #calc "- 0.5 * $dy + $oy";
+box0z1      #calc "- 0.5 * $dz + $oz";
+
+box0x2      #calc "0.5 * $dx + $ox";
+box0y2      #calc "0.5 * $dy + $oy";
+box0z2      #calc "- 0.5 * $dz + $oz";
+
+box0x3      #calc "- 0.5 * $dx + $ox";
+box0y3      #calc "0.5 * $dy + $oy";
+box0z3      #calc "- 0.5 * $dz + $oz";
+
+box0x4      #calc "- 0.5 * $dx + $ox";
+box0y4      #calc "- 0.5 * $dy + $oy";
+box0z4      #calc "0.5 * $dz + $oz";
+
+box0x5      #calc "0.5 * $dx + $ox";
+box0y5      #calc "- 0.5 * $dy + $oy";
+box0z5      #calc "0.5 * $dz + $oz";
+
+box0x6      #calc "0.5 * $dx + $ox";
+box0y6      #calc "0.5 * $dy + $oy";
+box0z6      #calc "0.5 * $dz + $oz";
+
+box0x7      #calc "- 0.5 * $dx + $ox";
+box0y7      #calc "0.5 * $dy + $oy";
+box0z7      #calc "0.5 * $dz + $oz";
+
+vertices
+(
+    //box0
+    ($box0x0 $box0y0 $box0z0)
+    ($box0x1 $box0y1 $box0z1)
+    ($box0x2 $box0y2 $box0z2)
+    ($box0x3 $box0y3 $box0z3)
+    ($box0x4 $box0y4 $box0z4)
+    ($box0x5 $box0y5 $box0z5)
+    ($box0x6 $box0y6 $box0z6)
+    ($box0x7 $box0y7 $box0z7)
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) ($box0nx $box0ny $box0nz) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    back
+    {
+        type patch;
+        faces
+        (
+            (0 1 2 3)
+        );
+    }
+    front
+    {
+        type patch;
+        faces
+        (
+            (4 7 6 5)
+        );
+    }
+    left
+    {
+        type patch;
+        faces
+        (
+            (0 3 7 4)
+        );
+    }
+    bottom
+    {
+        type patch;
+        faces
+        (
+            (0 4 5 1)
+        );
+    }
+    right
+    {
+        type patch;
+        faces
+        (
+            (1 5 6 2)
+        );
+    }
+    top
+    {
+        type patch;
+        faces
+        (
+            (3 2 6 7)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

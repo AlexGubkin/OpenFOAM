@@ -123,47 +123,47 @@ int main(int argc, char *argv[])
     d.write();
     gradd.write();
 
-    // Non-orthogonal velocity potential corrector loop
-    label d2PsiRefCell = 0;
-    scalar d2PsiRefValue = 0.0;
-
-    while (simple.correctNonOrthogonal())
-    {
-        fvScalarMatrix d2PsiEqn
-        (
-            fvm::laplacian(d2Psi)
-         ==
-          - neg0(mag(graddPsi)/dimensionedScalar(dimLength, 1.0) - dimensionedScalar(dimless, 0.05))
-        );
-
-        d2PsiEqn.relax();
-        d2PsiEqn.setReference(d2PsiRefCell, d2PsiRefValue);
-        d2PsiEqn.solve();
-
-        if (simple.finalNonOrthogonalIter())
-        {
-//             d2Psi -= dimensionedScalar(sqr(dimLength), gMin(d2Psi));
-            gradd2Psi = fvc::grad(d2Psi);
-//             volScalarField magGraddPsi(mag(graddPsi));
-
-            d2 = sqrt(magSqr(gradd2Psi) + 2*d2Psi) - mag(gradd2Psi);
-        }
-    }
-
-    // Write dPsi and graddPsi
-    d2Psi.write();
-    gradd2Psi.write();
-
-    // Non-orthogonal eikonal corrector loop
-//     label d2RefCell = 0;
-//     scalar d2RefValue = 0.0;
-
-//     d2 =
-//         - dPsi/dimensionedScalar(dimLength, 1.0)
-//         + dimensionedScalar(dimLength, gMax(dPsi))
-//         + dimensionedScalar(dimLength, small);
-
-    d2 = d2Psi/dimensionedScalar(dimLength, 1.0);
+//     // Non-orthogonal velocity potential corrector loop
+//     label d2PsiRefCell = 0;
+//     scalar d2PsiRefValue = 0.0;
+//
+//     while (simple.correctNonOrthogonal())
+//     {
+//         fvScalarMatrix d2PsiEqn
+//         (
+//             fvm::laplacian(d2Psi)
+//          ==
+//           - neg0(mag(graddPsi)/dimensionedScalar(dimLength, 1.0) - dimensionedScalar(dimless, 0.05))
+//         );
+//
+//         d2PsiEqn.relax();
+//         d2PsiEqn.setReference(d2PsiRefCell, d2PsiRefValue);
+//         d2PsiEqn.solve();
+//
+//         if (simple.finalNonOrthogonalIter())
+//         {
+// //             d2Psi -= dimensionedScalar(sqr(dimLength), gMin(d2Psi));
+//             gradd2Psi = fvc::grad(d2Psi);
+// //             volScalarField magGraddPsi(mag(graddPsi));
+//
+//             d2 = sqrt(magSqr(gradd2Psi) + 2*d2Psi) - mag(gradd2Psi);
+//         }
+//     }
+//
+//     // Write dPsi and graddPsi
+//     d2Psi.write();
+//     gradd2Psi.write();
+//
+//     // Non-orthogonal eikonal corrector loop
+// //     label d2RefCell = 0;
+// //     scalar d2RefValue = 0.0;
+//
+// //     d2 =
+// //         - dPsi/dimensionedScalar(dimLength, 1.0)
+// //         + dimensionedScalar(dimLength, gMax(dPsi))
+// //         + dimensionedScalar(dimLength, small);
+//
+//     d2 = d2Psi/dimensionedScalar(dimLength, 1.0);
 
     while (eikonal.correctNonOrthogonal())
     {
@@ -181,8 +181,9 @@ int main(int argc, char *argv[])
           - fvm::Sp(fvc::div(d2Phi), d2)
           - epsilon*d2*fvm::laplacian(d2)
          ==
-            pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
-          + dimensionedScalar(dimless, small)*neg0(mag(gradd) - dimensionedScalar(dimless, 0.8))
+            dimensionedScalar(dimless, 1.0)
+//             pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
+          + dimensionedScalar(dimless, 1.0)*neg(mag(gradd) - dimensionedScalar(dimless, 0.8))
         );
 
         d2Eqn.relax();
