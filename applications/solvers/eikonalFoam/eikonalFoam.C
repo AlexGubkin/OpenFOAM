@@ -165,6 +165,22 @@ int main(int argc, char *argv[])
 //
 //     d2 = d2Psi/dimensionedScalar(dimLength, 1.0);
 
+    DynamicList<label>  removedCellsFromMatrix;
+    DynamicList<scalar> valuesToImpose;
+
+    forAll(d2, celli)
+    {
+        if (neg(mag(gradd[celli]) - 0.8))
+        {
+            removedCellsFromMatrix.append(celli);
+        }
+    }
+
+    forAll(removedCellsFromMatrix, celli)
+    {
+        valuesToImpose.append(small);
+    }
+
     while (eikonal.correctNonOrthogonal())
     {
 //         d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
@@ -183,8 +199,10 @@ int main(int argc, char *argv[])
          ==
             dimensionedScalar(dimless, 1.0)
 //             pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
-          + dimensionedScalar(dimless, 1.0)*neg(mag(gradd) - dimensionedScalar(dimless, 0.8))
+//           + dimensionedScalar(dimless, 1.0)*neg(mag(gradd) - dimensionedScalar(dimless, 0.8))
         );
+
+        d2Eqn.setValues(removedCellsFromMatrix, valuesToImpose);
 
         d2Eqn.relax();
 //         d2Eqn.setReference(d2RefCell, d2RefValue);
