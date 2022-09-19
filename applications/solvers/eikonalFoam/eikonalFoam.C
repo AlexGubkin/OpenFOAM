@@ -165,8 +165,10 @@ int main(int argc, char *argv[])
 //
 //     d2 = d2Psi/dimensionedScalar(dimLength, 1.0);
 
-    DynamicList<label>  removedCellsFromMatrix;
-    DynamicList<scalar> valuesToImpose;
+//     DynamicList<label>  removedCellsFromMatrix;
+//     DynamicList<scalar> valuesToImpose;
+    List<label>  removedCellsFromMatrix;
+    List<scalar> valuesToImpose;
 
     forAll(d2, celli)
     {

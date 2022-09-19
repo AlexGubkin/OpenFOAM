@@ -1,5 +1,5 @@
 {
-    if (correctPhi)
+    if (rAU.valid())
     {
         rAU.ref() = 1.0/UEqn.A();
     }
@@ -43,8 +43,7 @@
     {
         fvScalarMatrix p_rghEqn
         (
-            fvc::div(phiHbyA)
-          - fvm::laplacian(rAUf, p_rgh)
+            fvc::div(phiHbyA) - fvm::laplacian(rAUf, p_rgh)
          == Sp_rgh
         );
 
@@ -62,7 +61,7 @@
 
             p_rgh.relax();
 
-            U = HbyA + rAU()*(fvc::reconstruct((phig + p_rghEqn.flux())/rAUf));
+            U = HbyA + rAU()*fvc::reconstruct((phig + p_rghEqn.flux())/rAUf);
             U.correctBoundaryConditions();
             fvConstraints.constrain(U);
         }
@@ -71,7 +70,7 @@
     #include "continuityErrs.H"
 
     // Correct Uf if the mesh is moving
-    fvc::correctUf(Uf, U, phi);
+    fvc::correctUf(Uf, U, phi, MRF);
 
     // Make the fluxes relative to the mesh motion
     fvc::makeRelative(phi, U);

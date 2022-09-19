@@ -1,6 +1,7 @@
 const dictionary& eikonalDict
 (
-    mesh.solutionDict().subDict("eikonal")
+//     mesh.solutionDict().subDict("eikonal")
+    mesh.solution().dict().subDict("eikonal")
 );
 
 // const int nNonOrthCorr
