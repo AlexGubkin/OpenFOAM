@@ -134,13 +134,13 @@ surfaceScalarField nHatf
 // Initialization fields for surface tension force calculation
 //- Surface tension
 const dictionary&
-    transportPropertiesDict = mesh.lookupObject<IOdictionary>("transportProperties");
+    phasePropertiesDict = mesh.lookupObject<IOdictionary>("phaseProperties");
 
 autoPtr<surfaceTensionModel> sigmaPtr
 (
-    surfaceTensionModel::New(transportPropertiesDict, mesh)
+    surfaceTensionModel::New(phasePropertiesDict, mesh)
 );
-sigmaPtr->readDict(transportPropertiesDict);
+sigmaPtr->readDict(phasePropertiesDict);
 
 
 // Surface tension force flux
