@@ -35,8 +35,10 @@ if (adjustTimeStep)
 {
     const volScalarField mu(mixture.mu());
     const volScalarField sigma(sigmaPtr->sigma());
+    const scalarField V(mesh.V());
 
-    scalar VMin = gMin(mesh.V());
+    scalar VMin = gMin(V);
+    scalar VAvg =gSum(V*V)/gSum(V);
     scalar rhoMax = gMax(rho);
     scalar rhoMin = gMin(rho);
     scalar muMax = gMax(mu);
@@ -44,8 +46,8 @@ if (adjustTimeStep)
     scalar rhoAvg = 0.5*(rhoMin + rhoMax);
     scalar muAvg = 0.5*(muMin + muMax);
     scalar sigmaMin = gMin(sigma);
-    scalar tauMu = muAvg*Foam::pow(VMin, 1.0/3.0)/sigmaMin;
-    scalar tauRho = Foam::sqrt(rhoAvg*VMin/sigmaMin);
+    scalar tauMu = muAvg*Foam::pow(VAvg, 1.0/3.0)/sigmaMin;
+    scalar tauRho = Foam::sqrt(rhoAvg*VAvg/sigmaMin);
     scalar C1 = 0.01;
     scalar C2 = 10.0;
     scalar deltaTFact = 0.9;
@@ -70,6 +72,7 @@ if (adjustTimeStep)
 
     Info<<
         "VMin = " << VMin << endl <<
+        "VAvg = " << VAvg << endl <<
         "rhoMax = " << rhoMax << endl <<
         "rhoMin = " << rhoMin << endl <<
         "muMax = " << muMax << endl <<

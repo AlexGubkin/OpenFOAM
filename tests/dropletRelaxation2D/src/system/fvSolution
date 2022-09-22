@@ -80,7 +80,7 @@ solvers
         solver          PBiCGStab;
         preconditioner  DIC;
         tolerance       1e-20;
-        relTol          1e-2;
+        relTol          0;
     }
 
     pcFinal
@@ -113,7 +113,7 @@ PIMPLE
     momentumPredictor           no;
     nOuterCorrectors            2;
     nCorrectors                 2;
-    nNonOrthogonalCorrectors    0;
+    nNonOrthogonalCorrectors    4;
 
     pRefCell                    0;
     pRefValue                   1e5;
@@ -155,7 +155,7 @@ relaxationFactors
     {
 //         p_rgh                   0.3;
 //         p_rghFinal              1;
-//         phic                    0.7;
+        phic                    0.7;
 //         phicFinal               1;
     }
     equations

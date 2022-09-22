@@ -35,8 +35,8 @@ foamDictionary  -entry maxCo -set $(echo "0.1" | bc -l) system/controlDict
 foamDictionary  -entry maxAlphaCo -set $(echo "0.1" | bc -l) system/controlDict
 
 # runParallel     interFoam
-runParallel     interSSFFoam
-# runParallel     interFSFFoam
+# runParallel     interSSFFoam
+runParallel     interFSFFoam
 # runParallel     compressibleInterSSFFoam
 
 exit 0

@@ -49,8 +49,6 @@ w2 = sqrt(w1*w1 + SMALL);
 // Interpolated face-gradient of alpha
 gradAlphaSmf = fvc::interpolate(fvc::grad(alphaSm));
 
-gradAlphaShf = fvc::interpolate(fvc::grad(alphaSh));
-
 deltaf = fvc::snGrad(alphaSh);
 
 // Face unit interface normal
