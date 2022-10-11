@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2017-2022 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2021-2022 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,67 +22,31 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::fv::VoFSolidificationMeltingSource
+    Foam::fv::VoFSurfaceFilm
 
 Description
-    Solidification and melting model for VoF simulations.
-
-    The presence of the solid phase in the flow field is incorporated into the
-    model as a momentum porosity contribution; the energy associated with the
-    phase change is added as an enthalpy contribution.  The solid fraction as a
-    function of temperature \c alphaSolidT is specified as a Foam::Function1.
-
-    The model writes the field \c alpha[01].solid which can be visualised to to
-    show the solid distribution.
+    Surface film model for VoF simulations.
 
 Usage
     Example usage:
     \verbatim
-    VoFSolidificationMeltingSource1
+    VoFSurfaceFilm
     {
-        type            VoFSolidificationMeltingSource;
-
-        selectionMode   cellZone;
-        cellZone        solidZone;
-
-        alphaSolidT     table
-        (
-            (330 1)
-            (335 0)
-        );
-
-        L               334000;
+        type    VoFSurfaceFilm;
+        phase   water;
     }
     \endverbatim
 
-    Where:
-    \table
-        Property     | Description             | Required    | Default value
-        alphaSolidT  | Solid fraction as function of temperature | yes |
-        L            | Latent heat of fusion [J/kg] | yes    |
-        relax        | Relaxation coefficient [0-1] | no     | 0.9
-        Cu           | Model coefficient       | no          | 100000
-        q            | Model coefficient       | no          | 0.001
-    \endtable
-
-See also
-    Foam::fv::solidificationMeltingSource
-    Foam::Function1
-
 SourceFiles
-    VoFSolidificationMeltingSource.C
-    VoFSolidificationMeltingSourceIO.C
+    VoFSurfaceFilm.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef VoFSolidificationMeltingSource_H
-#define VoFSolidificationMeltingSource_H
+#ifndef VoFSurfaceFilm_H
+#define VoFSurfaceFilm_H
 
 #include "fvModel.H"
-#include "fvCellSet.H"
-#include "fvMesh.H"
-#include "volFields.H"
-#include "Function1.H"
+#include "thermoSingleLayer.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -92,71 +56,43 @@ namespace fv
 {
 
 /*---------------------------------------------------------------------------*\
-               Class VoFSolidificationMeltingSource Declaration
+                       Class VoFSurfaceFilm Declaration
 \*---------------------------------------------------------------------------*/
 
-class VoFSolidificationMeltingSource
+class VoFSurfaceFilm
 :
     public fvModel
 {
     // Private Data
 
-        //- The set of cells the fvConstraint applies to
-        fvCellSet set_;
+        //- The surface film model
+        regionModels::surfaceFilmModels::thermoSingleLayer surfaceFilm_;
 
-        //- Solid fraction as a function of temperature
-        autoPtr<Function1<scalar>> alphaSolidT_;
-
-        //- Latent heat of fusion [J/kg]
-        dimensionedScalar L_;
-
-        //- Phase fraction under-relaxation coefficient
-        scalar relax_;
-
-        //- Mushy region momentum sink coefficient [1/s]; default = 10^5
-        scalar Cu_;
-
-        //- Coefficient used in porosity calc - default = 0.001
-        scalar q_;
-
-        //- Solid phase fraction
-        mutable volScalarField alphaSolid_;
-
-
-    // Private Member Functions
-
-        //- Non-virtual read
-        void readCoeffs();
-
-        //- Return the name of the solid phase fraction
-        word alphaSolidName() const;
-
-        //- Helper function to apply to the energy equation
-        template<class RhoFieldType>
-        void apply(const RhoFieldType& rho, fvMatrix<scalar>& eqn) const;
+        //- Current time index (used for updating)
+        mutable label curTimeIndex_;
 
 
 public:
 
     //- Runtime type information
-    TypeName("VoFSolidificationMeltingSource");
+    TypeName("VoFSurfaceFilm");
 
 
     // Constructors
 
         //- Construct from explicit source name and mesh
-        VoFSolidificationMeltingSource
+        VoFSurfaceFilm
         (
-            const word& name,
+            const word& sourceName,
             const word& modelType,
             const dictionary& dict,
             const fvMesh& mesh
         );
 
         //- Disallow default bitwise copy construction
-        VoFSolidificationMeltingSource
+        VoFSurfaceFilm
         (
-            const VoFSolidificationMeltingSource&
+            const VoFSurfaceFilm&
         ) = delete;
 
 
@@ -167,6 +103,15 @@ public:
             //- Return the list of fields for which the option adds source term
             //  to the transport equation
             virtual wordList addSupFields() const;
+
+            //- Return the maximum time-step for stable operation
+            virtual scalar maxDeltaT() const;
+
+
+        // Correct
+
+            //- Solve the film and update the sources
+            virtual void correct();
 
 
         // Add explicit and implicit contributions to compressible equation
@@ -188,7 +133,7 @@ public:
             ) const;
 
 
-        // Mesh motion
+        // Mesh changes
 
             //- Update topology using the given map
             virtual void topoChange(const polyTopoChangeMap&);
@@ -203,20 +148,10 @@ public:
             virtual bool movePoints();
 
 
-        //- Correct the model
-        virtual void correct();
-
-
-        // IO
-
-            //- Read source dictionary
-            virtual bool read(const dictionary& dict);
-
-
     // Member Operators
 
         //- Disallow default bitwise assignment
-        void operator=(const VoFSolidificationMeltingSource&) = delete;
+        void operator=(const VoFSurfaceFilm&) = delete;
 };
 
 
