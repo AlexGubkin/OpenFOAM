@@ -1,5 +1,5 @@
 {
-    if (correctPhi)
+    if (rAU.valid())
     {
         rAU.ref() = 1.0/UEqn.A();
     }
@@ -128,9 +128,6 @@
 
         if (pimple.finalNonOrthogonalIter())
         {
-            p = max(p_rgh + (alpha1*rho1 + alpha2*rho2)*gh, pMin);
-            p_rgh = p - (alpha1*rho1 + alpha2*rho2)*gh;
-
             dgdt =
             (
                 alpha1*(p_rghEqnComp2 & p_rgh)
@@ -138,6 +135,10 @@
             );
 
             phi = phiHbyA + p_rghEqnIncomp.flux();
+
+            p = max(p_rgh + (alpha1*rho1 + alpha2*rho2)*gh, pMin);
+            p_rgh = p - (alpha1*rho1 + alpha2*rho2)*gh;
+            p_rgh.correctBoundaryConditions();
 
             U = HbyA
               + rAU()*fvc::reconstruct((phig + p_rghEqnIncomp.flux())/rAUf);
@@ -147,7 +148,7 @@
     }
 
     // Correct Uf if the mesh is moving
-    fvc::correctUf(Uf, U, fvc::absolute(phi, U));
+    fvc::correctUf(Uf, U, fvc::absolute(phi, U), MRF);
 
     // Update densities from change in p_rgh
     mixture.thermo1().correctRho(psi1*(p_rgh - p_rgh_0));

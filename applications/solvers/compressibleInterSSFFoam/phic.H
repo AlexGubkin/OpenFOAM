@@ -7,4 +7,4 @@ gradSigmaf =
     fvc::interpolate(fvc::grad(sigmaPtr->sigma()));
 
 phict =
-    mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
+    mag(deltaf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
