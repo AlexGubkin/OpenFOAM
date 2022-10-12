@@ -12,8 +12,8 @@ while (pimple.correctNonOrthogonal())
     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
 
-    if (pimple.finalNonOrthogonalIter())
-    {
-        phic -= pcEqn.flux();
-    }
+//     if (pimple.finalNonOrthogonalIter())
+//     {
+//         phic = pcEqn.flux();
+//     }
 }

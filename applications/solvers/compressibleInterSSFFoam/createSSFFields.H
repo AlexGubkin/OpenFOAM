@@ -165,5 +165,5 @@ surfaceVectorField gradSigmaf
 surfaceScalarField phict
 (
     "phict",
-    mag(deltaf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
+    deltaf*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
 );

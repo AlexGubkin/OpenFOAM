@@ -20,6 +20,8 @@ Info<< "fcAvg = " << fcAvg.value() << nl;
 gradPcf =
     fvc::interpolate(fvc::grad(pc));
 
+phic -= gradPcf & mesh.Sf();
+
 phicFilt =
     deltaf/(mag(deltaf) + mixture.deltaN())
    *(

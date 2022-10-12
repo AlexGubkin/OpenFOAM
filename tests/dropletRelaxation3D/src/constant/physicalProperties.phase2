@@ -2,32 +2,36 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  10
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      p;
+    class       dictionary;
+    location    "constant";
+    object      physicalProperties.phase2;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -1 -2 0 0 0 0];
+viscosityModel  constant;
 
-internalField   uniform 1e5;
+nu              1e-06;
 
-boundaryField
-{
-    //- Set patchGroups for constraint patches
-    #includeEtc "caseDicts/setConstraintTypes"
+rho             1000;
 
-    open
-    {
-        type            totalPressure;
-        p0              $internalField;
-    }
-}
+// thermoType
+// {
+//     type            heRhoThermo;
+//     mixture         pureMixture;
+//     properties      liquid;
+//     energy          sensibleInternalEnergy;
+// }
+// 
+// mixture
+// {
+//     H2O;
+// }
+
 
 // ************************************************************************* //

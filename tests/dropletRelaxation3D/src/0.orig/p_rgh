@@ -25,13 +25,8 @@ boundaryField
 
     open
     {
-//         type            fixedValue;
-//         value           $internalField;
         type            totalPressure;
-        rho             thermo:rho;
         p0              $internalField;
-//         type            fixedFluxPressure;
-//         value           $internalField;
     }
 }
 
