@@ -20,7 +20,7 @@ Info<< "fcAvg = " << fcAvg.value() << nl;
 gradPcf =
     fvc::interpolate(fvc::grad(pc));
 
-phic -= gradPcf & mesh.Sf();
+// phic -= gradPcf & mesh.Sf();
 
 phicFilt =
     deltaf/(mag(deltaf) + mixture.deltaN())
@@ -30,17 +30,5 @@ phicFilt =
     );
 
 phic -= phicFilt;
-
-phic =
-    phic
-  - max
-    (
-        min
-        (
-            phic,
-            cPhicThresholdCoeff*fcAvg*mesh.magSf()
-        ),
-      - cPhicThresholdCoeff*fcAvg*mesh.magSf()
-    );
 
 phic.relax();

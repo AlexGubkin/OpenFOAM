@@ -179,6 +179,48 @@ phic.storePrevIter();
 surfaceScalarField phicFilt
 (
     "phicFilt",
-    (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
+    deltaf/(mag(deltaf) + mixture.deltaN())*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
 );
 phicFilt.storeOldTime();
+
+
+Info<< "Creation field fc\n" << endl;
+volScalarField fc
+(
+    IOobject
+    (
+        "fc",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(phic)
+);
+
+Info<< "Creation field fc\n" << endl;
+volScalarField fcFilt
+(
+    IOobject
+    (
+        "fcFilt",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(phicFilt)
+);
+
+surfaceScalarField fcf
+(
+    "fcf",
+    phic
+);
+fcf.storeOldTime();
+
+surfaceScalarField fcfFilt
+(
+    "fcf",
+    phicFilt
+);
