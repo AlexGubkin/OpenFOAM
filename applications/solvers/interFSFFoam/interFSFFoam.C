@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
 
     while (pimple.run(runTime))
     {
+        fcf.storeOldTime();
+
         #include "readDyMControls.H"
 
         if (LTS)
@@ -198,7 +200,7 @@ int main(int argc, char *argv[])
 
             #include "alphaProcessing.H"
             #include "kappaProcessing.H"
-            #include "phic.H"
+//             #include "phic.H"
             #include "pcEqn.H"
 
             #include "UEqn.H"

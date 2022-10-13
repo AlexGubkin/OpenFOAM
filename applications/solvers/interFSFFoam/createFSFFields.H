@@ -100,20 +100,6 @@ volScalarField w2
     sqrt(w1*w1 + SMALL)
 );
 
-Info<< "Reading field pc\n" << endl;
-volScalarField pc
-(
-    IOobject
-    (
-        "pc",
-        runTime.timeName(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh
-);
-
 
 // Face unit interface normal initialization
 // Interpolated face-gradient of alpha
@@ -145,14 +131,6 @@ surfaceScalarField nHatf
 );
 
 
-// Interpolated face-gradient of capillary pressure on the interface
-surfaceVectorField gradPcf
-(
-    "gradPcf",
-    mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
-);
-
-
 // Initialization fields for surface tension force calculation
 //- Surface tension
 const dictionary&
@@ -165,27 +143,54 @@ autoPtr<surfaceTensionModel> sigmaPtr
 sigmaPtr->readDict(phasePropertiesDict);
 
 
+// Capillary pressure field
+Info<< "Reading field pc\n" << endl;
+volScalarField pc
+(
+    IOobject
+    (
+        "pc",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+// Interpolated face-gradient of capillary pressure
+surfaceVectorField gradPcf
+(
+    "gradPcf",
+    fvc::interpolate(fvc::grad(pc))
+);
+
+
+surfaceScalarField fcf
+(
+    "fcf",
+    fvc::interpolate(sigmaPtr->sigma())
+   *fvc::interpolate(w2*kappa)
+   /fvc::interpolate(w2)*deltaf
+);
+
+surfaceScalarField fcfFilt
+(
+    "fcfFilt",
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf()
+);
+
+
 // Surface tension force flux
 surfaceScalarField phic
 (
     "phic",
-    fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf()
+    fcf*mesh.magSf()
 );
-phic.storePrevIter();
-
-// Surface tension force flux
-surfaceScalarField phicFilt
-(
-    "phicFilt",
-    deltaf/(mag(deltaf) + mixture.deltaN())*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
-);
-phicFilt.storeOldTime();
 
 
 Info<< "Creation field fc\n" << endl;
-volScalarField fc
+volVectorField fc
 (
     IOobject
     (
@@ -195,11 +200,11 @@ volScalarField fc
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    fvc::reconstruct(phic)
+    fvc::reconstruct(fcf*mesh.magSf())
 );
 
-Info<< "Creation field fc\n" << endl;
-volScalarField fcFilt
+Info<< "Creation field fcFilt\n" << endl;
+volVectorField fcFilt
 (
     IOobject
     (
@@ -209,18 +214,6 @@ volScalarField fcFilt
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    fvc::reconstruct(phicFilt)
+    fvc::reconstruct(fcfFilt*mesh.magSf())
 );
 
-surfaceScalarField fcf
-(
-    "fcf",
-    phic
-);
-fcf.storeOldTime();
-
-surfaceScalarField fcfFilt
-(
-    "fcf",
-    phicFilt
-);

@@ -155,13 +155,15 @@ relaxationFactors
     {
 //         p_rgh                   0.3;
 //         p_rghFinal              1;
-        phic                    0.7;
+//         phic                    0.7;
 //         phicFinal               1;
+        fcf                     0.7;
+        fcfFinal                1;
     }
     equations
     {
-//         U                       0.7;
-//         UFinal                  1;
+        U                       0.7;
+        UFinal                  1;
         ".*" 1;
     }
 }
