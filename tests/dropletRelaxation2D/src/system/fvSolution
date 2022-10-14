@@ -27,12 +27,12 @@ solvers
 
         solver          smoothSolver;
         smoother        symGaussSeidel;
-        tolerance       1e-12;
+        tolerance       1e-10;
         relTol          0;
 
         nAlphaSmoothers     3;
         cSmCoeff            0.5;
-        cShCoeff            0.3;
+        cShCoeff            0.98;
         nKappaSmoothers     2;
         cPhicFilterCoeff    0.1;
         cPhicThresholdCoeff 0.01;
@@ -95,7 +95,7 @@ solvers
     {
         solver          PBiCGStab;
         preconditioner  DILU;
-        tolerance       1e-12;
+        tolerance       1e-10;
         relTol          0;
     }
 

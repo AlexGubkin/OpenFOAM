@@ -22,7 +22,7 @@ fc = fvc::reconstruct(fcf*mesh.magSf());
 fcfFilt =
     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
    *(
-        fcf.oldTime()
+        fcfFilt.oldTime()
       + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf())
     );
 
@@ -42,13 +42,14 @@ while (pimple.correctNonOrthogonal())
 
     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
+    pc.correctBoundaryConditions();
 
     if (pimple.finalNonOrthogonalIter())
     {
         const dimensionedScalar fcAvg
         (
+//             average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
             average(mag(fcf))
-           /(average(pos(mag(fcf))) + SMALL)
         );
 
         Info<< "fcAvg = " << fcAvg.value() << nl;

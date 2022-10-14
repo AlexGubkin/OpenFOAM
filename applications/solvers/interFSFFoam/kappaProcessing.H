@@ -20,4 +20,5 @@ for (int kappaSmoother=0; kappaSmoother<nKappaSmoothers; kappaSmoother++)
        /fvc::average(fvc::interpolate(w2))
     );
     kappa = tKappa();
+    kappa.correctBoundaryConditions();
 }

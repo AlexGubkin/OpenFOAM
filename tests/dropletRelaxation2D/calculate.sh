@@ -29,7 +29,7 @@ runParallel     transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
 
 foamDictionary  -entry endTime -set $(echo "0.05" | bc -l) system/controlDict
 foamDictionary  -entry deltaT -set $(echo "0.000001" | bc -l) system/controlDict
-foamDictionary  -entry writeInterval -set $(echo "0.000001" | bc -l) system/controlDict
+foamDictionary  -entry writeInterval -set $(echo "0.0001" | bc -l) system/controlDict
 foamDictionary  -entry adjustTimeStep -set "yes" system/controlDict
 foamDictionary  -entry maxCo -set $(echo "0.1" | bc -l) system/controlDict
 foamDictionary  -entry maxAlphaCo -set $(echo "0.1" | bc -l) system/controlDict
