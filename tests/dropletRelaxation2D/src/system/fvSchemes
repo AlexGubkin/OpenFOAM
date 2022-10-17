@@ -26,8 +26,8 @@ gradSchemes
 
 divSchemes
 {
-    div(rhoPhi,U)   Gauss linearUpwind grad(U);
-//     div(rhoPhi,U)   Gauss vanLeerV;
+//     div(rhoPhi,U)   Gauss linearUpwind grad(U);
+    div(rhoPhi,U)   Gauss vanLeerV;
     div(phi,alpha)  Gauss interfaceCompression vanLeer 1.2;
 //     div(phi,alpha)  Gauss PLICU interfaceCompression vanLeer 1;
 //     div(phi,alpha)  Gauss MPLIC;
@@ -43,6 +43,7 @@ divSchemes
 laplacianSchemes
 {
     default         Gauss linear corrected;
+//     default         Gauss linear limited 0.5;
 }
 
 interpolationSchemes
@@ -53,12 +54,13 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
+//     default         limited 0.5;
 }
 
 fluxRequired
 {
     default         no;
-    pc;
+//     pc;
     p_rgh;
 }
 

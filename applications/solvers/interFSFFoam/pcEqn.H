@@ -1,10 +1,11 @@
-fcf.storePrevIter();
+// fcf.storePrevIter();
+fcfFilt.storePrevIter();
 
 const scalar cPhicFilterCoeff(alphaControls.lookupOrDefault<scalar>("cPhicFilterCoeff", 0.1));
 const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThresholdCoeff", 0.01));
 
-label pcRefCell = 0;
-scalar pcRefValue = 0.0;
+// label pcRefCell = 0;
+// scalar pcRefValue = 0.0;
 
 // gradPcf =
 //     fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
@@ -20,15 +21,20 @@ fcf =
 fc = fvc::reconstruct(fcf*mesh.magSf());
 
 // fcfFilt =
-//     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+//     deltaf/(mag(deltaf) + mixture.deltaN())
 //    *(
 //         fcfFilt.oldTime()
 //       + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf())
 //     );
-// 
-// fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
-// 
-// fcf -= fcfFilt;
+
+fcfFilt =
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf());
+
+fcfFilt.relax();
+
+fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
+
+fcf -= fcfFilt;
 
 // fcf.relax();
 
@@ -40,32 +46,42 @@ while (pimple.correctNonOrthogonal())
      == fvc::div(fcf*mesh.magSf())
     );
 
-    pcEqn.setReference(pcRefCell, pcRefValue);
+    pcEqn.setReference
+    (
+        pressureReference.refCell(),
+        getRefCellValue(pc, pressureReference.refCell())
+    );
+
+//     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
-    pc.correctBoundaryConditions();
+//     pc.correctBoundaryConditions();
 
     if (pimple.finalNonOrthogonalIter())
     {
-        const dimensionedScalar fcAvg
-        (
-            average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
-//             average(mag(fcf))
-        );
-
-        Info<< "fcAvg = " << fcAvg.value() << nl;
-
 //         phic = pcEqn.flux();
 //         phic = (fcf - fvc::snGrad(pc))*mesh.magSf();
         phic = mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
-//         phic -=
-//             max
-//             (
-//                 min
-//                 (
-//                     phic,
-//                     cPhicThresholdCoeff*fcAvg*mesh.magSf()
-//                 ),
-//               - cPhicThresholdCoeff*fcAvg*mesh.magSf()
-//             );
+
+        const dimensionedScalar phicAvg
+        (
+            dimensionSet(dimForce/dimLength),
+//             average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
+//             average(mag(fcf))
+            cPhicThresholdCoeff*gSum(mag(phic.field()))
+           /gSum(SMALL + pos(mag(phic.field()) - SMALL))
+        );
+
+        Info<< "phicAvg = " << phicAvg.value() << nl;
+
+        phic -=
+            max
+            (
+                min
+                (
+                    phic,
+                    phicAvg
+                ),
+              - phicAvg
+            );
     }
 }

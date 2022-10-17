@@ -25,8 +25,9 @@
                 (
                   - ghf*fvc::snGrad(rho)
                   - fvc::snGrad(p_rgh)
-                  + fvc::snGrad(pc)
+//                   + fvc::snGrad(pc)
                 ) * mesh.magSf()
+                + phic
             )
         );
 
