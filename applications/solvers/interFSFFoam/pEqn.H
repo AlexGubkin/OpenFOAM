@@ -27,8 +27,8 @@
 
     surfaceScalarField phig
     (
-      - (ghf*fvc::snGrad(rho) - fvc::snGrad(pc))*rAUf*mesh.magSf()
-      + rAUf*phic
+        phic*rAUf
+      - ghf*fvc::snGrad(rho)*rAUf*mesh.magSf()
     );
 
     phiHbyA += phig;

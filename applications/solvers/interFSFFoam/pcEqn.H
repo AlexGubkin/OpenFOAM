@@ -19,18 +19,18 @@ fcf =
 
 fc = fvc::reconstruct(fcf*mesh.magSf());
 
-fcfFilt =
-    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-   *(
-        fcfFilt.oldTime()
-      + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf())
-    );
+// fcfFilt =
+//     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+//    *(
+//         fcfFilt.oldTime()
+//       + cPhicFilterCoeff*((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf())
+//     );
+// 
+// fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
+// 
+// fcf -= fcfFilt;
 
-fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
-
-fcf -= fcfFilt;
-
-fcf.relax();
+// fcf.relax();
 
 while (pimple.correctNonOrthogonal())
 {
@@ -48,23 +48,24 @@ while (pimple.correctNonOrthogonal())
     {
         const dimensionedScalar fcAvg
         (
-//             average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
-            average(mag(fcf))
+            average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
+//             average(mag(fcf))
         );
 
         Info<< "fcAvg = " << fcAvg.value() << nl;
 
-//         phic = fcf*mesh.magSf() - pcEqn.flux();
-        phic = (fcf - fvc::snGrad(pc))*mesh.magSf();
-        phic -=
-            max
-            (
-                min
-                (
-                    phic,
-                    cPhicThresholdCoeff*fcAvg*mesh.magSf()
-                ),
-              - cPhicThresholdCoeff*fcAvg*mesh.magSf()
-            );
+//         phic = pcEqn.flux();
+//         phic = (fcf - fvc::snGrad(pc))*mesh.magSf();
+        phic = mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
+//         phic -=
+//             max
+//             (
+//                 min
+//                 (
+//                     phic,
+//                     cPhicThresholdCoeff*fcAvg*mesh.magSf()
+//                 ),
+//               - cPhicThresholdCoeff*fcAvg*mesh.magSf()
+//             );
     }
 }
