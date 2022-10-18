@@ -33,8 +33,9 @@ boundaryField
     }
     open
     {
-        type            totalPressure;
-        p0              $internalField;
+        type            fixedFluxPressure;
+//         type            totalPressure;
+//         p0              $internalField;
     }
 }
 

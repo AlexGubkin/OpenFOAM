@@ -33,8 +33,8 @@ boundaryField
     }
     open
     {
-        type            zeroGradient;
-//         type            noSlip;
+//         type            zeroGradient;
+        type            noSlip;
 //         type            pressureInletOutletVelocity;
 //         phi             phi;
 //         tangentialVelocity (0 0 0);

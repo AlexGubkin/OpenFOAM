@@ -102,11 +102,17 @@ volScalarField w2
 
 
 // Face unit interface normal initialization
-// Interpolated face-gradient of alpha
+// Gradient of alpha
+volVectorField gradAlphaSm
+(
+    "gradAlphaSm",
+    fvc::grad(alphaSm)
+);
+// Interpolated gradient of alpha
 surfaceVectorField gradAlphaSmf
 (
     "gradAlphaSmf",
-    fvc::interpolate(fvc::grad(alphaSm))
+    fvc::interpolate(gradAlphaSm)
 );
 
 // Interpolated face-gradient of sharpened alpha
@@ -114,6 +120,13 @@ surfaceScalarField deltaf
 (
     "deltaf",
     fvc::snGrad(alphaSh)
+);
+
+// Face unit interface normal
+volVectorField nHatv
+(
+    "nHatv",
+    gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN())
 );
 
 // Face unit interface normal
@@ -159,10 +172,16 @@ volScalarField pc
 );
 
 // Interpolated face-gradient of capillary pressure
-surfaceVectorField gradPcf
+// surfaceVectorField gradPcf
+// (
+//     "gradPcf",
+//     fvc::interpolate(fvc::grad(pc))
+// );
+
+volVectorField gradPc
 (
-    "gradPcf",
-    fvc::interpolate(fvc::grad(pc))
+    "gradPc",
+    fvc::grad(pc)
 );
 
 
@@ -177,7 +196,8 @@ surfaceScalarField fcf
 surfaceScalarField fcfFilt
 (
     "fcfFilt",
-    mag(deltaf)/(mag(deltaf) + mixture.deltaN())*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf()
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+   *fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf())
 );
 
 

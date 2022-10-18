@@ -49,12 +49,14 @@ w2.correctBoundaryConditions();
 
 
 // Interpolated face-gradient of alpha
-gradAlphaSmf = fvc::interpolate(fvc::grad(alphaSm));
+gradAlphaSm = fvc::grad(alphaSm);
+gradAlphaSmf = fvc::interpolate(gradAlphaSm);
 
 deltaf = fvc::snGrad(alphaSh);
 
 // Face unit interface normal
 nHatfv = gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN());
+nHatv = gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN());
 
 
 // Correction for the boundary condition on the unit normal nHat on
