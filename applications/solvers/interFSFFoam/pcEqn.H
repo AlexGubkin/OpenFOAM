@@ -58,7 +58,7 @@ while (pimple.correctNonOrthogonal())
 
 //     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
-//     pc.correctBoundaryConditions();
+    pc.correctBoundaryConditions();
 
     if (pimple.finalNonOrthogonalIter())
     {

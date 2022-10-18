@@ -22,24 +22,24 @@ defaultFieldValues
 
 regions
 (
-//     boxToCell
-//     {
-//         box (-20 -20 -20) (20 20 20); 
-//         fieldValues
-//         (
-//             volScalarFieldValue alpha.phase1 0
-//         );
-//     }
-
-    sphereToCell
+    boxToCell
     {
-        centre (0 0 0);
-        radius 2.5;
+        box (-2 -2 -2) (2 2 2);
         fieldValues
         (
             volScalarFieldValue alpha.phase1 0
         );
     }
+
+//     sphereToCell
+//     {
+//         centre (0 0 0);
+//         radius 2.5;
+//         fieldValues
+//         (
+//             volScalarFieldValue alpha.phase1 0
+//         );
+//     }
 );
 
 
