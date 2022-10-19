@@ -76,7 +76,7 @@
     // Make the fluxes relative to the mesh motion
     fvc::makeRelative(phi, U);
 
-    p == p_rgh + rho*gh;
+    p == p_rgh + rho*gh + pc;
 
     if (p_rgh.needReference())
     {
@@ -87,7 +87,7 @@
             pressureReference.refValue()
           - getRefCellValue(p, pressureReference.refCell())
         );
-        p_rgh = p - rho*gh;
+        p_rgh = p - rho*gh - pc;
     }
 
     if (!correctPhi)

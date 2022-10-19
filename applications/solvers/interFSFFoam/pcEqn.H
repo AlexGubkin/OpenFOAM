@@ -62,31 +62,41 @@ while (pimple.correctNonOrthogonal())
 
     if (pimple.finalNonOrthogonalIter())
     {
-//         phic = pcEqn.flux();
-//         phic = (fcf - fvc::snGrad(pc))*mesh.magSf();
-//         phic = mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
-        phic = fvc::snGrad(pc)*mesh.magSf();
-
-        const dimensionedScalar phicAvg
+        const dimensionedScalar dimFactor
         (
             dimensionSet(dimForce/dimLength),
-//             average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
-//             average(mag(fcf))
-            cPhicThresholdCoeff*gSum(mag(phic.field()))
-           /gSum(SMALL + pos(mag(phic.field()) - SMALL))
+            1.0
         );
+//         phic = pcEqn.flux();
+        phic = fcf*mesh.magSf();
+        phicFilt =
+            pos(phic)*mag(phic - fvc::snGrad(pc)*mesh.magSf())
+          - (1.0 - pos(phic))*mag(phic - fvc::snGrad(pc)*mesh.magSf());
+//         phic = mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
+//         phic = fvc::snGrad(pc)*mesh.magSf();
 
-        Info<< "phicAvg = " << phicAvg.value() << nl;
+//         const dimensionedScalar phicAvg
+//         (
+//             dimensionSet(dimForce/dimLength),
+// //             average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
+// //             average(mag(fcf))
+//             cPhicThresholdCoeff*gSum(mag(phic.field()))
+//            /gSum(SMALL + pos(mag(phic.field()) - SMALL))
+//         );
+//
+//         Info<< "phicAvg = " << phicAvg.value() << nl;
 
-        phic -=
-            max
-            (
-                min
-                (
-                    phic,
-                    phicAvg
-                ),
-              - phicAvg
-            );
+//         phic -=
+//             max
+//             (
+//                 min
+//                 (
+//                     phic,
+//                     phicAvg
+//                 ),
+//               - phicAvg
+//             );
+
+        phic -= cPhicThresholdCoeff*phicFilt;
     }
 }

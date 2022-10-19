@@ -208,6 +208,13 @@ surfaceScalarField phic
     fcf*mesh.magSf()
 );
 
+// Surface tension force flux
+surfaceScalarField phicFilt
+(
+    "phicFilt",
+    fcfFilt*mesh.magSf()
+);
+
 
 Info<< "Creation field fc\n" << endl;
 volVectorField fc
