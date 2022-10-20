@@ -35,7 +35,7 @@ solvers
         cShCoeff            0.98;
         nKappaSmoothers     2;
 //         cPhicFilterCoeff    0.1;
-        cPhicThresholdCoeff 0.01;
+        cPhicThresholdCoeff 0.05;
     }
 
     ".*(rho|rhoFinal)"
@@ -112,7 +112,7 @@ PIMPLE
 {
     momentumPredictor           no;
     nOuterCorrectors            2;
-    nCorrectors                 2;
+    nCorrectors                 5;
     nNonOrthogonalCorrectors    0;
 
     pRefCell                    0;
@@ -159,7 +159,7 @@ relaxationFactors
 //         phicFinal               1;
 //         fcf                     0.7;
 //         fcfFinal                1;
-        fcfFilt                 0.5;
+        fcfFilt                 0.7;
         fcfFiltFinal            1;
     }
     equations

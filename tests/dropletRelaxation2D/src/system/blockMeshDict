@@ -20,8 +20,8 @@ boxWidth    10.0;
 boxHeight   10.0;
 boxDepth    1.0;
 
-Nx          40;
-Ny          40;
+Nx          80;
+Ny          80;
 Nz          1;
 
 box0Nx      $Nx;
