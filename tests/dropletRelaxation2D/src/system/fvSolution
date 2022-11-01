@@ -30,12 +30,12 @@ solvers
         tolerance       1e-12;
         relTol          0;
 
-        nAlphaSmoothers     3;
+        nAlphaSmoothers     7;
         cSmCoeff            0.5;
-        cShCoeff            0.98;
+        cShCoeff            0.1;
         nKappaSmoothers     2;
-//         cPhicFilterCoeff    0.1;
-        cPhicThresholdCoeff 0.01;
+        cPhicFilterCoeff    0.9;
+        cPhicThresholdCoeff 0.05;
     }
 
     ".*(rho|rhoFinal)"
@@ -157,8 +157,8 @@ relaxationFactors
 //         p_rghFinal              1;
 //         phic                    0.7;
 //         phicFinal               1;
-//         fcf                     0.7;
-//         fcfFinal                1;
+        fcf                     0.7;
+        fcfFinal                1;
         fcfFilt                 0.7;
         fcfFiltFinal            1;
     }
