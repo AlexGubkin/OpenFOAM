@@ -33,7 +33,8 @@ fc = fvc::reconstruct(fcf*mesh.magSf());
 //     );
 
 fcfFilt =
-    cPhicFilterCoeff*fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf());
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+   *cPhicFilterCoeff*fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf());
 
 fcfFilt.relax();
 
@@ -48,7 +49,7 @@ while (pimple.correctNonOrthogonal())
     fvScalarMatrix pcEqn
     (
         fvm::laplacian(pc)
-     == fvc::div((fcf)*mesh.magSf())
+     == fvc::div((fcf - fcfFilt)*mesh.magSf())
     );
 
     pcEqn.setReference
@@ -63,18 +64,9 @@ while (pimple.correctNonOrthogonal())
 
     if (pimple.finalNonOrthogonalIter())
     {
-//         const dimensionedScalar dimFactor
-//         (
-//             dimensionSet(dimForce/dimLength),
-//             1.0
-//         );
+
 //         phic = pcEqn.flux();
-        phic = (fcf - fvc::snGrad(pc))*mesh.magSf();
-//         phicFilt =
-//             pos(phic)*mag(phic)
-//           - (1.0 - pos(phic))*mag(phic);
-//         phic = mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
-//         phic = fvc::snGrad(pc)*mesh.magSf();
+        phic = (fcf - fcfFilt - fvc::snGrad(pc))*mesh.magSf();
 
         const dimensionedScalar fcfAvg
         (
@@ -97,7 +89,5 @@ while (pimple.correctNonOrthogonal())
                 ),
               - cPhicThresholdCoeff*fcfAvg*mesh.magSf()
             );
-
-//         phic -= cPhicThresholdCoeff*phicFilt;
     }
 }

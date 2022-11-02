@@ -18,7 +18,7 @@ phases          (phase1 phase2);
 
 pMin            1000;
 
-sigma           0.07;
+sigma           0.02;
 
 // sigma
 // {
