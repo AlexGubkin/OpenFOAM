@@ -29,7 +29,7 @@ if
             p_rgh,
             surfaceScalarField("rAUf", fvc::interpolate(rAU())),
             geometricZeroField(),
-            pressureReference,
+            pPressureReference,
             pimple
         );
     }
@@ -44,7 +44,7 @@ if
             p_rgh,
             dimensionedScalar(dimTime/rho.dimensions(), 1),
             geometricZeroField(),
-            pressureReference,
+            pPressureReference,
             pimple
         );
     }

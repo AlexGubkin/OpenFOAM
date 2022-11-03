@@ -50,8 +50,8 @@
 
         p_rghEqn.setReference
         (
-            pressureReference.refCell(),
-            getRefCellValue(p_rgh, pressureReference.refCell())
+            pPressureReference.refCell(),
+            getRefCellValue(p_rgh, pPressureReference.refCell())
         );
 
         p_rghEqn.solve();
@@ -84,8 +84,8 @@
         (
             "p",
             p.dimensions(),
-            pressureReference.refValue()
-          - getRefCellValue(p, pressureReference.refCell())
+            pPressureReference.refValue()
+          - getRefCellValue(p, pPressureReference.refCell())
         );
         p_rgh = p - rho*gh;
     }

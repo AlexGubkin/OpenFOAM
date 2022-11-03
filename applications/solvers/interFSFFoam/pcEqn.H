@@ -54,8 +54,8 @@ while (pimple.correctNonOrthogonal())
 
     pcEqn.setReference
     (
-        pressureReference.refCell(),
-        getRefCellValue(pc, pressureReference.refCell())
+        pcPressureReference.refCell(),
+        getRefCellValue(pc, pcPressureReference.refCell())
     );
 
 //     pcEqn.setReference(pcRefCell, pcRefValue);
@@ -64,6 +64,13 @@ while (pimple.correctNonOrthogonal())
 
     if (pimple.finalNonOrthogonalIter())
     {
+        pc += dimensionedScalar
+        (
+            "pc",
+            pc.dimensions(),
+            pcPressureReference.refValue()
+          - getRefCellValue(pc, pcPressureReference.refCell())
+        );
 
 //         phic = pcEqn.flux();
         phic = (fcf - fcfFilt - fvc::snGrad(pc))*mesh.magSf();
