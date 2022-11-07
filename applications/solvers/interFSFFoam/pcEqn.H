@@ -60,7 +60,7 @@ while (pimple.correctNonOrthogonal())
 
 //     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
-    pc.correctBoundaryConditions();
+//     pc.correctBoundaryConditions();
 
     if (pimple.finalNonOrthogonalIter())
     {
@@ -78,16 +78,14 @@ while (pimple.correctNonOrthogonal())
         const dimensionedScalar fcfAvg
         (
             dimensionSet(dimForce/dimVolume),
-//             average(mag(fcf))/(average(pos(mag(fcf))) + SMALL)
             average(mag(fcf.field()))
-//             cPhicThresholdCoeff*gSum(mag(fcf.field()*mesh.magSf()))
-//            /gSum(SMALL + pos(mag(fcf.field()) - SMALL))
         );
 
         Info<< "fcfAvg = " << fcfAvg.value() << nl;
 
-        phic -=
-            max
+        phic =
+            phic
+          - max
             (
                 min
                 (
