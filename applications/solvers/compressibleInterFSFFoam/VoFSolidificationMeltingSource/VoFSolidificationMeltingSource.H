@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2017-2021 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017-2022 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -122,9 +122,6 @@ class VoFSolidificationMeltingSource
         //- Solid phase fraction
         mutable volScalarField alphaSolid_;
 
-        //- Current time index (used for updating)
-        mutable label curTimeIndex_;
-
 
     // Private Member Functions
 
@@ -133,9 +130,6 @@ class VoFSolidificationMeltingSource
 
         //- Return the name of the solid phase fraction
         word alphaSolidName() const;
-
-        //- Update the model
-        void update() const;
 
         //- Helper function to apply to the energy equation
         template<class RhoFieldType>
@@ -196,8 +190,21 @@ public:
 
         // Mesh motion
 
-            //- Update for mesh changes
-            virtual void updateMesh(const mapPolyMesh&);
+            //- Update topology using the given map
+            virtual void topoChange(const polyTopoChangeMap&);
+
+            //- Update from another mesh using the given map
+            virtual void mapMesh(const polyMeshMap&);
+
+            //- Redistribute or update using the given distribution map
+            virtual void distribute(const polyDistributionMap&);
+
+            //- Update for mesh motion
+            virtual bool movePoints();
+
+
+        //- Correct the model
+        virtual void correct();
 
 
         // IO

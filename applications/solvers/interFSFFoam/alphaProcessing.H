@@ -28,7 +28,7 @@ alphaC = min(1.0, max(alpha1, 0.0));
 
 alphaSh =
     1.0/(1.0 - cShCoeff)
-    *(
+   *(
         min
         (
             max
@@ -38,7 +38,7 @@ alphaSh =
             ),
             1.0 - 0.5*cShCoeff
         )
-        - 0.5*cShCoeff
+      - 0.5*cShCoeff
     );
 // alphaSh.correctBoundaryConditions();
 

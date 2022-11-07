@@ -33,7 +33,7 @@ Description
 
 if (adjustTimeStep)
 {
-    const volScalarField mu(mixture.mu());
+    const volScalarField nu(mixture.nu());
     const volScalarField sigma(sigmaPtr->sigma());
     const scalarField V(mesh.V());
 
@@ -41,12 +41,12 @@ if (adjustTimeStep)
     scalar VAvg =gSum(V*V)/gSum(V);
     scalar rhoMax = gMax(rho);
     scalar rhoMin = gMin(rho);
-    scalar muMax = gMax(mu);
-    scalar muMin = gMin(mu);
+    scalar nuMax = gMax(nu);
+    scalar nuMin = gMin(nu);
     scalar rhoAvg = 0.5*(rhoMin + rhoMax);
-    scalar muAvg = 0.5*(muMin + muMax);
+    scalar nuAvg = 0.5*(nuMin + nuMax);
     scalar sigmaMin = gMin(sigma);
-    scalar tauMu = muAvg*Foam::pow(VAvg, 1.0/3.0)/sigmaMin;
+    scalar tauMu = nuAvg*rhoAvg*Foam::pow(VAvg, 1.0/3.0)/sigmaMin;
     scalar tauRho = Foam::sqrt(rhoAvg*VAvg/sigmaMin);
     scalar C1 = 0.01;
     scalar C2 = 10.0;
@@ -75,10 +75,10 @@ if (adjustTimeStep)
         "VAvg = " << VAvg << endl <<
         "rhoMax = " << rhoMax << endl <<
         "rhoMin = " << rhoMin << endl <<
-        "muMax = " << muMax << endl <<
-        "muMin = " << muMin << endl <<
+        "nuMax = " << nuMax << endl <<
+        "nuMin = " << nuMin << endl <<
         "rhoAvg = " << rhoAvg << endl <<
-        "muAvg = " << muAvg << endl <<
+        "nuAvg = " << nuAvg << endl <<
         "sigmaMin = " << sigmaMin << endl <<
         "tauMu = " << tauMu << endl <<
         "tauRho = " << tauRho << endl <<

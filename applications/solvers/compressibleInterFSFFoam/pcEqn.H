@@ -1,65 +1,87 @@
-label pcRefCell = 0;
-scalar pcRefValue = 0.0;
+fcf.storePrevIter();
+fcfFilt.storePrevIter();
+
+const scalar cPhicFilterCoeff(alphaControls.lookupOrDefault<scalar>("cPhicFilterCoeff", 0.1));
 const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThresholdCoeff", 0.01));
-const scalar cPhicRelaxCoeff(alphaControls.lookupOrDefault<scalar>("cPhicRelaxCoeff", 0.9));
 
-// pc.storeOldTime();
-// pc.oldTime();
+// label pcRefCell = 0;
+// scalar pcRefValue = 0.0;
 
-gradPcf =
-    deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
+// gradPcf =
+//     fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
 
-phic =
+// gradPcf =
+//     fvc::interpolate(fvc::grad(pc));
+
+gradPc =
+    fvc::grad(pc);
+
+fcf =
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf();
+   /fvc::interpolate(w2)*deltaf;
 
-// phic -=
-//     (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
+fcf.relax();
 
-phicFilt =
-    cPhicRelaxCoeff*phicFilt
-  + (1.0 - cPhicRelaxCoeff)
-   *((gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf());
+fc = fvc::reconstruct(fcf*mesh.magSf());
 
-phic -=
-    phicFilt;
+// fcfFilt =
+//     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+//    *(
+//         fcfFilt.oldTime()
+//       + cPhicFilterCoeff*(fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf()))
+//     );
+
+fcfFilt =
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+   *cPhicFilterCoeff*fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf());
+
+fcfFilt.relax();
+
+fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
+
+// fcf -= fcfFilt;
+
+// fcf.relax();
 
 while (pimple.correctNonOrthogonal())
 {
     fvScalarMatrix pcEqn
     (
         fvm::laplacian(pc)
-        ==
-        fvc::div(phic)
+     == fvc::div((fcf - fcfFilt)*mesh.magSf())
     );
 
-    pcEqn.setReference(pcRefCell, pcRefValue);
+    pcEqn.setReference
+    (
+        pcPressureReference.refCell(),
+        getRefCellValue(pc, pcPressureReference.refCell())
+    );
+
+//     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
+//     pc.correctBoundaryConditions();
 
     if (pimple.finalNonOrthogonalIter())
     {
-//         gradPcf =
-//             mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc));
-// 
-//         phic -=
-//             (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
-// 
-//         phicFilt =
-//             cPhicRelaxCoeff*phicFilt + (1.0 - cPhicRelaxCoeff)*(gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf();
-
-        phic =
-            mag(deltaf)/(mag(deltaf) + mixture.deltaN())*fvc::snGrad(pc)*mesh.magSf();
-
-        const dimensionedScalar phicThreshold
+        pc += dimensionedScalar
         (
-            dimForce/dimLength,
-            cPhicThresholdCoeff
-           *gSum(static_cast<surfaceScalarField>(mag(phic)*mesh.magSf()))
-           /(gSum(static_cast<surfaceScalarField>(pos(mag(phic))*mesh.magSf())) + SMALL)
+            "pc",
+            pc.dimensions(),
+            pcPressureReference.refValue()
+          - getRefCellValue(pc, pcPressureReference.refCell())
         );
 
-        Info<< "phicThreshold = " << phicThreshold.value() << nl;
+//         phic = pcEqn.flux();
+        phic = (fcf - fcfFilt - fvc::snGrad(pc))*mesh.magSf();
+
+        const dimensionedScalar fcfAvg
+        (
+            dimensionSet(dimForce/dimVolume),
+            average(mag(fcf.field()))
+        );
+
+        Info<< "fcfAvg = " << fcfAvg.value() << nl;
 
         phic =
             phic
@@ -68,33 +90,9 @@ while (pimple.correctNonOrthogonal())
                 min
                 (
                     phic,
-                    phicThreshold
+                    cPhicThresholdCoeff*fcfAvg*mesh.magSf()
                 ),
-              - phicThreshold
+              - cPhicThresholdCoeff*fcfAvg*mesh.magSf()
             );
-            
-        gradSigmaf =
-            fvc::interpolate(fvc::grad(sigmaPtr->sigma()));
-
-        phict =
-            mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf();
-
-//         tangentGradSigmaf =
-//             mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf();
-
-//         surfaceTensionForce =
-//             (
-//                 phic
-//               - max
-//                 (
-//                     min
-//                     (
-//                         phic,
-//                         phicThreshold
-//                     ),
-//                   - phicThreshold
-//                 )
-//             )/mesh.magSf()
-//           + tangentGradSigmaf;
     }
 }

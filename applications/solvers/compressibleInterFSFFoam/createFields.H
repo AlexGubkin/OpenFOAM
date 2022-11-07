@@ -30,8 +30,8 @@ volVectorField U
 
 #include "createPhi.H"
 
-Info<< "Constructing twoPhaseMixtureThermo\n" << endl;
-twoPhaseMixtureThermo mixture(U, phi);
+Info<< "Constructing compressibleTwoPhaseMixture\n" << endl;
+compressibleTwoPhaseMixture mixture(U, phi);
 
 autoPtr<twoPhaseChangeModel> phaseChangePtr
 (
@@ -48,8 +48,8 @@ dimensionedScalar pMin
     mixture
 );
 
-mesh.setFluxRequired(p_rgh.name());
-mesh.setFluxRequired(alpha1.name());
+mesh.schemes().setFluxRequired(p_rgh.name());
+mesh.schemes().setFluxRequired(alpha1.name());
 
 
 #include "readGravitationalAcceleration.H"
@@ -57,7 +57,7 @@ mesh.setFluxRequired(alpha1.name());
 #include "gh.H"
 
 
-pressureReference pressureReference(mixture.p(), p_rgh, pimple.dict(), false);
+pressureReference pPressureReference(mixture.p(), p_rgh, pimple.dict(), false);
 
 
 // Mass flux
@@ -76,7 +76,18 @@ surfaceScalarField rhoPhi
     fvc::interpolate(rho)*phi
 );
 
-volScalarField dgdt(alpha1*fvc::div(phi));
+volScalarField::Internal dgdt
+(
+    IOobject
+    (
+        "dgdt",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    alpha1*fvc::div(phi)
+);
 
 #include "createAlphaFluxes.H"
 
@@ -87,7 +98,7 @@ compressibleInterPhaseTransportModel turbulence
     U,
     phi,
     rhoPhi,
-    alphaPhi10,
+    alphaPhi1,
     mixture
 );
 

@@ -102,11 +102,17 @@ volScalarField w2
 
 
 // Face unit interface normal initialization
-// Interpolated face-gradient of alpha
+// Gradient of alpha
+volVectorField gradAlphaSm
+(
+    "gradAlphaSm",
+    fvc::grad(alphaSm)
+);
+// Interpolated gradient of alpha
 surfaceVectorField gradAlphaSmf
 (
     "gradAlphaSmf",
-    fvc::interpolate(fvc::grad(alphaSm))
+    fvc::interpolate(gradAlphaSm)
 );
 
 // Interpolated face-gradient of sharpened alpha
@@ -114,6 +120,13 @@ surfaceScalarField deltaf
 (
     "deltaf",
     fvc::snGrad(alphaSh)
+);
+
+// Face unit interface normal
+volVectorField nHatv
+(
+    "nHatv",
+    gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN())
 );
 
 // Face unit interface normal

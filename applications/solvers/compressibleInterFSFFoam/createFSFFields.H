@@ -100,29 +100,33 @@ volScalarField w2
     sqrt(w1*w1 + SMALL)
 );
 
-volScalarField pc
-(
-    IOobject
-    (
-        "pc",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh,
-    dimensionedScalar(dimPressure, 0),
-    zeroGradientFvPatchField<scalar>::typeName
-//     zeroGradientFvPatchScalarField::typeName
-);
-
 
 // Face unit interface normal initialization
-// Interpolated face-gradient of alpha
+// Gradient of alpha
+volVectorField gradAlphaSm
+(
+    "gradAlphaSm",
+    fvc::grad(alphaSm)
+);
+// Interpolated gradient of alpha
 surfaceVectorField gradAlphaSmf
 (
     "gradAlphaSmf",
-    fvc::interpolate(fvc::grad(alphaSm))
+    fvc::interpolate(gradAlphaSm)
+);
+
+// Interpolated face-gradient of sharpened alpha
+surfaceScalarField deltaf
+(
+    "deltaf",
+    fvc::snGrad(alphaSh)
+);
+
+// Face unit interface normal
+volVectorField nHatv
+(
+    "nHatv",
+    gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN())
 );
 
 // Face unit interface normal
@@ -143,75 +147,102 @@ surfaceScalarField nHatf
 // Initialization fields for surface tension force calculation
 //- Surface tension
 const dictionary&
-    thermophysicalPropertiesDict = mesh.lookupObject<IOdictionary>("thermophysicalProperties");
+    phasePropertiesDict = mesh.lookupObject<IOdictionary>("phaseProperties");
 
 autoPtr<surfaceTensionModel> sigmaPtr
 (
-    surfaceTensionModel::New(thermophysicalPropertiesDict, mesh)
+    surfaceTensionModel::New(phasePropertiesDict, mesh)
 );
-sigmaPtr->readDict(thermophysicalPropertiesDict);
+sigmaPtr->readDict(phasePropertiesDict);
 
 
-// Interpolated face-gradient of sharpened alpha
-surfaceVectorField gradAlphaShf
+// Capillary pressure field
+Info<< "Reading field pc\n" << endl;
+volScalarField pc
 (
-    "gradAlphaShf",
-    fvc::interpolate(fvc::grad(alphaSh))
+    IOobject
+    (
+        "pc",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
 );
 
-surfaceScalarField deltaf
+pressureReference pcPressureReference(pc, pimple.dict());
+
+// Interpolated face-gradient of capillary pressure
+// surfaceVectorField gradPcf
+// (
+//     "gradPcf",
+//     fvc::interpolate(fvc::grad(pc))
+// );
+
+volVectorField gradPc
 (
-    "deltaf",
-    fvc::snGrad(alphaSh)
+    "gradPc",
+    fvc::grad(pc)
 );
 
-// Interpolated face-gradient of sigma
-surfaceVectorField gradSigmaf
+
+surfaceScalarField fcf
 (
-    "gradSigmaf",
-    fvc::interpolate(fvc::grad(sigmaPtr->sigma()))
+    "fcf",
+    fvc::interpolate(sigmaPtr->sigma())
+   *fvc::interpolate(w2*kappa)
+   /fvc::interpolate(w2)*deltaf
 );
 
-// Interpolated tangent face-gradient of sigma
-surfaceScalarField tangentGradSigmaf
+surfaceScalarField fcfFilt
 (
-    "tangentGradSigmaf",
-    mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()/mesh.magSf()
+    "fcfFilt",
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+   *fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf())
 );
 
-surfaceVectorField gradPcf
-(
-    "gradPcf",
-    deltaf/(mag(deltaf) + mixture.deltaN())*fvc::interpolate(fvc::grad(pc))
-);
 
 // Surface tension force flux
 surfaceScalarField phic
 (
     "phic",
-    fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf()
+    fcf*mesh.magSf()
 );
 
 // Surface tension force flux
 surfaceScalarField phicFilt
 (
     "phicFilt",
-    (gradPcf - (gradPcf & nHatfv)*nHatfv) & mesh.Sf()
+    fcfFilt*mesh.magSf()
 );
 
-// Surface tension force flux (tangent force flux)
-surfaceScalarField phict
+
+Info<< "Creation field fc\n" << endl;
+volVectorField fc
 (
-    "phict",
-    mag(gradAlphaShf)*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
+    IOobject
+    (
+        "fc",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(fcf*mesh.magSf())
 );
 
-// surfaceScalarField surfaceTensionForce
-// (
-//     "surfaceTensionForce",
-//     capillaryForceFlux/mesh.magSf() + tangentGradSigmaf
-// );
-// 
-// surfaceTensionForce.storeOldTime();
+Info<< "Creation field fcFilt\n" << endl;
+volVectorField fcFilt
+(
+    IOobject
+    (
+        "fcFilt",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(fcfFilt*mesh.magSf())
+);
+

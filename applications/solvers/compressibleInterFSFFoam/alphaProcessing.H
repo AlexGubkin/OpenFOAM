@@ -1,8 +1,6 @@
-// const dictionary& alphaControls = mesh.solverDict(alpha1.name());
-
 const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoothers", 3));
-const scalar cSmoothingCoeff(alphaControls.lookupOrDefault<scalar>("cSmoothingCoeff", 0.5));
-const scalar cSharpeningCoeff(alphaControls.lookupOrDefault<scalar>("cSharpeningCoeff", 0.5));
+const scalar cSmCoeff(alphaControls.lookupOrDefault<scalar>("cSmCoeff", 0.5));
+const scalar cShCoeff(alphaControls.lookupOrDefault<scalar>("cShCoeff", 0.98));
 
 // Smoother loop for SSF
 alphaSm = alpha1;
@@ -11,45 +9,55 @@ for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
 {
     Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
-    alphaSm =
-        cSmoothingCoeff*fvc::average(fvc::interpolate(alphaSm))
-        + (1.0 - cSmoothingCoeff)*alphaSm;
-}
+//     alphaSm =
+//         cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
+//       + (1.0 - cSmCoeff)*alphaSm;
 
+    tmp<volScalarField> talphaSm
+    (
+        cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
+      + (1.0 - cSmCoeff)*alphaSm
+    );
+    alphaSm = talphaSm();
+//     alphaSm.correctBoundaryConditions();
+}
 
 // Sharpener for alpha
 alphaC = min(1.0, max(alpha1, 0.0));
+// alphaC.correctBoundaryConditions();
 
 alphaSh =
-    1.0/(1.0 - cSharpeningCoeff)
-    *(
+    1.0/(1.0 - cShCoeff)
+   *(
         min
         (
             max
             (
                 alpha1,
-                0.5*cSharpeningCoeff
+                0.5*cShCoeff
             ),
-            1.0 - 0.5*cSharpeningCoeff
+            1.0 - 0.5*cShCoeff
         )
-        - 0.5*cSharpeningCoeff
+      - 0.5*cShCoeff
     );
-
-alphaSh.correctBoundaryConditions();
+// alphaSh.correctBoundaryConditions();
 
 w1 = sqrt(alphaC*(1.0 - alphaC));
 w2 = sqrt(w1*w1 + SMALL);
+// w1.correctBoundaryConditions();
+// w2.correctBoundaryConditions();
 
 
 // Interpolated face-gradient of alpha
-gradAlphaSmf = fvc::interpolate(fvc::grad(alphaSm));
-
-gradAlphaShf = fvc::interpolate(fvc::grad(alphaSh));
+gradAlphaSm = fvc::grad(alphaSm);
+gradAlphaSmf = fvc::interpolate(gradAlphaSm);
 
 deltaf = fvc::snGrad(alphaSh);
 
 // Face unit interface normal
-nHatfv = gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN());
+// nHatfv = gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN());
+nHatv = gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN());
+nHatfv = fvc::interpolate(nHatv);
 
 
 // Correction for the boundary condition on the unit normal nHat on

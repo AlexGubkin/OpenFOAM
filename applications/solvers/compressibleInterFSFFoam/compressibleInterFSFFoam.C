@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2021 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2022 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -41,7 +41,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
+#include "interfaceCompression.H"
 #include "CMULES.H"
 #include "EulerDdtScheme.H"
 #include "localEulerDdtScheme.H"
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 
     #include "setRootCaseLists.H"
     #include "createTime.H"
-    #include "createDynamicFvMesh.H"
+    #include "createMesh.H"
     #include "initContinuityErrs.H"
     #include "createDyMControls.H"
     #include "createFields.H"
@@ -92,25 +92,41 @@ int main(int argc, char *argv[])
             #include "CourantNo.H"
             #include "alphaCourantNo.H"
             #include "setDeltaT.H"
+            #include "setCapillaryDeltaT.H"
         }
+
+        fvModels.preUpdateMesh();
+
+        // Store divU from the previous mesh so that it can be mapped
+        // and used in correctPhi to ensure the corrected phi has the
+        // same divergence
+        tmp<volScalarField> divU;
+
+        if (correctPhi && mesh.topoChanged())
+        {
+            // Construct and register divU for mapping
+            divU = new volScalarField
+            (
+                "divU0",
+                fvc::div(fvc::absolute(phi, U))
+            );
+        }
+
+        // Update the mesh for topology change, mesh to mesh mapping
+        mesh.update();
 
         runTime++;
 
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info<< "Time = " << runTime.userTimeName() << nl << endl;
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
             if (pimple.firstPimpleIter() || moveMeshOuterCorrectors)
             {
-                // Store divU from the previous mesh so that it can be mapped
-                // and used in correctPhi to ensure the corrected phi has the
-                // same divergence
-                tmp<volScalarField> divU;
-
-                if (correctPhi)
+                if (correctPhi && !divU.valid())
                 {
-                    // Construct and register divU for mapping
+                    // Construct and register divU for correctPhi
                     divU = new volScalarField
                     (
                         "divU0",
@@ -118,9 +134,8 @@ int main(int argc, char *argv[])
                     );
                 }
 
-                fvModels.preUpdateMesh();
-
-                mesh.update();
+                // Move the mesh
+                mesh.move();
 
                 if (mesh.changing())
                 {
@@ -149,6 +164,7 @@ int main(int argc, char *argv[])
 
             #include "alphaControls.H"
             #include "compressibleAlphaEqnSubCycle.H"
+
             #include "alphaProcessing.H"
             #include "kappaProcessing.H"
             #include "pcEqn.H"

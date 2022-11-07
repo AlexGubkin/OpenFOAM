@@ -1,7 +1,12 @@
 const label nKappaSmoothers(alphaControls.lookupOrDefault<label>("nKappaSmoothers", 2));
 
 // Smoother loop
-kappa0 = -fvc::div(nHatf);
+// kappa0 = -fvc::div(nHatf);
+// forAll(nHatv.boundaryField(), patchi)
+// {
+//     nHatv.boundaryField()[patchi] = nHatfv.boundaryField()[patchi];
+// }
+kappa0 = -fvc::div(nHatf) + (nHatv & fvc::grad(nHatfv) & nHatv);
 kappa = kappa0;
 
 for (int kappaSmoother=0; kappaSmoother<nKappaSmoothers; kappaSmoother++)
@@ -20,4 +25,5 @@ for (int kappaSmoother=0; kappaSmoother<nKappaSmoothers; kappaSmoother++)
        /fvc::average(fvc::interpolate(w2))
     );
     kappa = tKappa();
+//     kappa.correctBoundaryConditions();
 }

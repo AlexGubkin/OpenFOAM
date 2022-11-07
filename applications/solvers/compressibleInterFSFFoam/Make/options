@@ -1,10 +1,10 @@
 EXE_INC = \
-    -I. \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle \
-    -I$(FOAM_APP)/solvers/multiphase/compressibleInterFoam/twoPhaseMixtureThermo \
-    -I$(FOAM_APP)/solvers/multiphase/compressibleInterFoam/compressibleInterPhaseTransportModel/lnInclude \
-    -I$(FOAM_APP)/solvers/multiphase/compressibleInterFoam/twoPhaseChange/lnInclude \
-    -I$(LIB_SRC)/transportModels/lnInclude \
+    -I. \
+    -IcompressibleTwoPhaseMixture \
+    -IcompressibleInterPhaseTransportModel/lnInclude \
+    -ItwoPhaseChange/lnInclude \
+    -I$(LIB_SRC)/physicalProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
@@ -15,13 +15,12 @@ EXE_INC = \
     -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/phaseCompressible/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/lnInclude \
-    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
     -I$(LIB_SRC)/fvModels/lnInclude
 
 EXE_LIBS = \
-    -ltwoPhaseMixtureThermo \
+    -lcompressibleTwoPhaseMixture \
     -ltwoPhaseSurfaceTension \
     -lfluidThermophysicalModels \
     -lspecie \
@@ -35,6 +34,4 @@ EXE_LIBS = \
     -lfiniteVolume \
     -lfvModels \
     -lfvConstraints \
-    -lmeshTools \
-    -ldynamicMesh \
-    -ldynamicFvMesh
+    -lmeshTools
