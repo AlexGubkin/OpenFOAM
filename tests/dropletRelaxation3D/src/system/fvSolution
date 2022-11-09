@@ -19,8 +19,8 @@ solvers
 {
     "alpha.phase1.*"
     {
-        nAlphaCorr      1;
-        nAlphaSubCycles 3;
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
 
         MULESCorr       yes;
         nLimiterIter    3;
@@ -34,7 +34,7 @@ solvers
         cSmCoeff            0.5;
         cShCoeff            0.5;
         nKappaSmoothers     2;
-        cPhicFilterCoeff    0;
+        cPhicFilterCoeff    0.025;
         cPhicThresholdCoeff 0.05;
     }
 
@@ -45,7 +45,7 @@ solvers
 
     pcorr
     {
-        solver          PBiCGStab;
+        solver          PCG;
         preconditioner  DIC;
         tolerance       1e-05;
         relTol          0;
@@ -53,7 +53,7 @@ solvers
 
     pcorrFinal
     {
-        solver          PBiCGStab;
+        solver          PCG;
         preconditioner  DIC;
         tolerance       1e-05;
         relTol          0;
@@ -61,7 +61,7 @@ solvers
 
     p_rgh
     {
-        solver          PBiCGStab;
+        solver          PCG;
         preconditioner  DIC;
         tolerance       1e-12;
         relTol          1e-2;
@@ -69,7 +69,7 @@ solvers
 
     p_rghFinal
     {
-        solver          PBiCGStab;
+        solver          PCG;
         preconditioner  DIC;
         tolerance       1e-12;
         relTol          0;
@@ -77,7 +77,7 @@ solvers
 
     pc
     {
-        solver          PBiCGStab;
+        solver          PCG;
         preconditioner  DIC;
         tolerance       1e-12;
         relTol          1e-2;
@@ -85,7 +85,7 @@ solvers
 
     pcFinal
     {
-        solver          PBiCGStab;
+        solver          PCG;
         preconditioner  DIC;
         tolerance       1e-12;
         relTol          0;
@@ -93,16 +93,20 @@ solvers
 
     "U.*"
     {
-        solver          PBiCGStab;
-        preconditioner  DILU;
+//         solver          PBiCG;
+//         preconditioner  DILU;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
         tolerance       1e-12;
         relTol          0;
     }
 
     "T.*"
     {
-        solver          PBiCGStab;
-        preconditioner  DILU;
+//         solver          PBiCG;
+//         preconditioner  DILU;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
         tolerance       1e-12;
         relTol          0;
     }
@@ -110,9 +114,9 @@ solvers
 
 PIMPLE
 {
-    momentumPredictor           yes;
+    momentumPredictor           no;
     nOuterCorrectors            2;
-    nCorrectors                 2;
+    nCorrectors                 3;
     nNonOrthogonalCorrectors    0;
 
 //     pcRefCell                   0;

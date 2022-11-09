@@ -15,7 +15,7 @@ cp -r\
 
 #Preparation mesh
 foamDictionary  -entry decomposer -set scotch system/decomposeParDict
-foamDictionary  -entry numberOfSubdomains -set 6 system/decomposeParDict
+foamDictionary  -entry numberOfSubdomains -set 20 system/decomposeParDict
 # foamDictionary  -entry simpleCoeffs/n -set "(1 2 3)" system/decomposeParDict
 runApplication  blockMesh
 runApplication  decomposePar

@@ -21,24 +21,27 @@ fcf =
    *fvc::interpolate(w2*kappa)
    /fvc::interpolate(w2)*deltaf;
 
+fc = fvc::reconstruct(fcf*mesh.magSf());
+fcFilt = gradPc - (gradPc & nHatv)*nHatv;
+
 fcf.relax();
 
-fc = fvc::reconstruct(fcf*mesh.magSf());
+// fcFilt.relax();
 
 // fcfFilt =
 //     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
 //    *(
 //         fcfFilt.oldTime()
-//       + cPhicFilterCoeff*(fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf()))
+//       + cPhicFilterCoeff*(fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf()))
 //     );
 
 fcfFilt =
-    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-   *cPhicFilterCoeff*fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf());
+   mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+  *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
 
 fcfFilt.relax();
 
-fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
+// fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
 
 // fcf -= fcfFilt;
 
