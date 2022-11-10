@@ -13,18 +13,18 @@ const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThr
 // gradPcf =
 //     fvc::interpolate(fvc::grad(pc));
 
-gradPc =
-    fvc::grad(pc);
-
 fcf =
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
    /fvc::interpolate(w2)*deltaf;
 
 fc = fvc::reconstruct(fcf*mesh.magSf());
-fcFilt = gradPc - (gradPc & nHatv)*nHatv;
 
 fcf.relax();
+
+// gradPc = fvc::grad(pc);
+//
+// fcFilt = gradPc - (gradPc & nHatv)*nHatv;
 
 // fcFilt.relax();
 
@@ -35,11 +35,11 @@ fcf.relax();
 //       + cPhicFilterCoeff*(fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf()))
 //     );
 
-fcfFilt =
-   mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-  *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
+// fcfFilt =
+//    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+//   *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
 
-fcfFilt.relax();
+// fcfFilt.relax();
 
 // fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
 
@@ -65,6 +65,14 @@ while (pimple.correctNonOrthogonal())
     pcEqn.solve();
 //     pc.correctBoundaryConditions();
 
+    gradPc = fvc::grad(pc);
+
+    fcFilt = gradPc - (gradPc & nHatv)*nHatv;
+
+    fcfFilt =
+        mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+       *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
+
     if (pimple.finalNonOrthogonalIter())
     {
         pc += dimensionedScalar
@@ -76,6 +84,7 @@ while (pimple.correctNonOrthogonal())
         );
 
 //         phic = pcEqn.flux();
+
         phic = (fcf - fcfFilt - fvc::snGrad(pc))*mesh.magSf();
 
         const dimensionedScalar fcfAvg
