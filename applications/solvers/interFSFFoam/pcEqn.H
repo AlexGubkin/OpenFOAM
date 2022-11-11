@@ -22,9 +22,10 @@ fc = fvc::reconstruct(fcf*mesh.magSf());
 
 fcf.relax();
 
-// gradPc = fvc::grad(pc);
-//
-// fcFilt = gradPc - (gradPc & nHatv)*nHatv;
+gradPc = fvc::grad(pc);
+
+fcFilt =
+    cPhicFilterCoeff*(gradPc - (gradPc & nHatv)*nHatv);
 
 // fcFilt.relax();
 
@@ -35,11 +36,11 @@ fcf.relax();
 //       + cPhicFilterCoeff*(fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf()))
 //     );
 
-// fcfFilt =
-//    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-//   *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
+fcfFilt =
+   mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+  *fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
 
-// fcfFilt.relax();
+fcfFilt.relax();
 
 // fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
 
@@ -65,13 +66,13 @@ while (pimple.correctNonOrthogonal())
     pcEqn.solve();
 //     pc.correctBoundaryConditions();
 
-    gradPc = fvc::grad(pc);
-
-    fcFilt = gradPc - (gradPc & nHatv)*nHatv;
-
-    fcfFilt =
-        mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-       *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
+//     gradPc = fvc::grad(pc);
+//
+//     fcFilt = gradPc - (gradPc & nHatv)*nHatv;
+//
+//     fcfFilt =
+//         mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+//        *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
 
     if (pimple.finalNonOrthogonalIter())
     {

@@ -17,29 +17,29 @@ FoamFile
 
 defaultFieldValues
 (
-    volScalarFieldValue alpha.phase1 1
+    volScalarFieldValue alpha.phase1 0
 );
 
 regions
 (
-//     boxToCell
+    boxToCell
+    {
+        box (-15 -15 -15) (15 15 15);
+        fieldValues
+        (
+            volScalarFieldValue alpha.phase1 1
+        );
+    }
+
+//     sphereToCell
 //     {
-//         box (-20 -20 -20) (20 20 20); 
+//         centre (0 0 0);
+//         radius 2.5;
 //         fieldValues
 //         (
 //             volScalarFieldValue alpha.phase1 0
 //         );
 //     }
-
-    sphereToCell
-    {
-        centre (0 0 0);
-        radius 2.5;
-        fieldValues
-        (
-            volScalarFieldValue alpha.phase1 0
-        );
-    }
 );
 
 

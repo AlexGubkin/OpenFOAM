@@ -17,7 +17,7 @@ FoamFile
 
 defaultFieldValues
 (
-    volScalarFieldValue alpha.phase1 1
+    volScalarFieldValue alpha.phase1 0
 );
 
 regions
@@ -27,7 +27,7 @@ regions
         box (-15 -15 -15) (15 15 15);
         fieldValues
         (
-            volScalarFieldValue alpha.phase1 0
+            volScalarFieldValue alpha.phase1 1
         );
     }
 

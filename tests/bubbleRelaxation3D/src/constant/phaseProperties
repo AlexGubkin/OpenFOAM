@@ -23,7 +23,7 @@ pMin            1000;
 sigma
 {
     type    liquidProperties;
-    phase   phase1;
+    phase   phase2;
 }
 
 // sigma
