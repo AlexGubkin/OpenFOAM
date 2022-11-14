@@ -25,6 +25,7 @@ if (pimple.momentumPredictor())
               + fvc::snGrad(pc)
             ) * mesh.magSf()
           + phic
+          + phict
         )
     );
 

@@ -246,3 +246,30 @@ volVectorField fcFilt
     fvc::reconstruct(fcfFilt*mesh.magSf())
 );
 
+
+volVectorField gradSigma
+(
+    "gradSigma",
+    fvc::grad(sigmaPtr->sigma())
+);
+
+Info<< "Creation field fct\n" << endl;
+volVectorField fct
+(
+    IOobject
+    (
+        "fct",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mag(fvc::grad(alpha1))*(gradSigma - (gradSigma & nHatv)*nHatv)
+);
+
+// Surface tension force flux (tangent force flux)
+surfaceScalarField phict
+(
+    "phict",
+    fvc::interpolate(fct) & mesh.Sf()
+);
