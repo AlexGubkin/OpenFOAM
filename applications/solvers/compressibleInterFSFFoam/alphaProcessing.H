@@ -2,6 +2,8 @@ const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoother
 const scalar cSmCoeff(alphaControls.lookupOrDefault<scalar>("cSmCoeff", 0.5));
 const scalar cShCoeff(alphaControls.lookupOrDefault<scalar>("cShCoeff", 0.98));
 
+mixture.correct();
+
 // Smoother loop for SSF
 alphaSm = alpha1;
 
@@ -65,56 +67,56 @@ nHatfv = fvc::interpolate(nHatv);
 
 // The dynamic contact angle is calculated from the component of the
 // velocity on the direction of the interface, parallel to the wall.
-volScalarField::Boundary& a1bf = alpha1.boundaryFieldRef();
-volScalarField::Boundary& a2bf = alpha2.boundaryFieldRef();
-
-const fvBoundaryMesh& boundary = mesh.boundary();
-
-forAll(boundary, patchi)
-{
-    if (isA<alphaContactAngleFvPatchScalarField>(a1bf[patchi]))
-    {
-        alphaContactAngleFvPatchScalarField& a1cap =
-            refCast<alphaContactAngleFvPatchScalarField>
-            (
-                a1bf[patchi]
-            );
-
-        fvsPatchVectorField& nHatp = nHatfv.boundaryFieldRef()[patchi];
-        const scalarField theta
-        (
-            degToRad(a1cap.theta(U.boundaryField()[patchi], nHatp))
-        );
-
-        const vectorField nf
-        (
-            boundary[patchi].nf()
-        );
-
-        // Reset nHatp to correspond to the contact angle
-
-        const scalarField a12(nHatp & nf);
-        const scalarField b1(Foam::cos(theta));
-
-        scalarField b2(nHatp.size());
-        forAll(b2, facei)
-        {
-            b2[facei] = Foam::cos(Foam::acos(a12[facei]) - theta[facei]);
-        }
-
-        const scalarField det(1.0 - a12*a12);
-
-        scalarField a((b1 - a12*b2)/det);
-        scalarField b((b2 - a12*b1)/det);
-
-        nHatp = a*nf + b*nHatp;
-        nHatp /= (mag(nHatp) + mixture.deltaN().value());
-
-        a1cap.gradient() = (nf & nHatp)*mag(gradAlphaSmf.boundaryField()[patchi]);
-        a1cap.evaluate();
-        a2bf[patchi] = 1 - a1cap;
-    }
-}
+// volScalarField::Boundary& a1bf = alpha1.boundaryFieldRef();
+// volScalarField::Boundary& a2bf = alpha2.boundaryFieldRef();
+//
+// const fvBoundaryMesh& boundary = mesh.boundary();
+//
+// forAll(boundary, patchi)
+// {
+//     if (isA<alphaContactAngleFvPatchScalarField>(a1bf[patchi]))
+//     {
+//         alphaContactAngleFvPatchScalarField& a1cap =
+//             refCast<alphaContactAngleFvPatchScalarField>
+//             (
+//                 a1bf[patchi]
+//             );
+//
+//         fvsPatchVectorField& nHatp = nHatfv.boundaryFieldRef()[patchi];
+//         const scalarField theta
+//         (
+//             degToRad(a1cap.theta(U.boundaryField()[patchi], nHatp))
+//         );
+//
+//         const vectorField nf
+//         (
+//             boundary[patchi].nf()
+//         );
+//
+//         // Reset nHatp to correspond to the contact angle
+//
+//         const scalarField a12(nHatp & nf);
+//         const scalarField b1(Foam::cos(theta));
+//
+//         scalarField b2(nHatp.size());
+//         forAll(b2, facei)
+//         {
+//             b2[facei] = Foam::cos(Foam::acos(a12[facei]) - theta[facei]);
+//         }
+//
+//         const scalarField det(1.0 - a12*a12);
+//
+//         scalarField a((b1 - a12*b2)/det);
+//         scalarField b((b2 - a12*b1)/det);
+//
+//         nHatp = a*nf + b*nHatp;
+//         nHatp /= (mag(nHatp) + mixture.deltaN().value());
+//
+//         a1cap.gradient() = (nf & nHatp)*mag(gradAlphaSmf.boundaryField()[patchi]);
+//         a1cap.evaluate();
+//         a2bf[patchi] = 1 - a1cap;
+//     }
+// }
 
 // Face unit interface normal flux
 nHatf = nHatfv & mesh.Sf();

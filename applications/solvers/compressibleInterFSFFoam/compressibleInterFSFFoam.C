@@ -56,7 +56,7 @@ Description
 #include "CorrectPhi.H"
 #include "fvcSmooth.H"
 
-#include "alphaContactAngleFvPatchScalarField.H"
+// #include "alphaContactAngleFvPatchScalarField.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
