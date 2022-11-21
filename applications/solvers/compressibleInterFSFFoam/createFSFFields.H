@@ -30,18 +30,32 @@ volScalarField kappa
     dimensionedScalar(dimless/dimLength, 0)
 );
 
-Info<< "Creation field alphaSm\n" << endl;
-volScalarField alphaSm
+Info<< "Creation field alpha1Sm\n" << endl;
+volScalarField alpha1Sm
 (
     IOobject
     (
-        "alphaSm",
+        "alpha1Sm",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
     alpha1
+);
+
+Info<< "Creation field alpha1Sm\n" << endl;
+volScalarField alpha2Sm
+(
+    IOobject
+    (
+        "alpha2Sm",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    1.0 - alpha1
 );
 
 Info<< "Creation field alphaC\n" << endl;
@@ -106,7 +120,7 @@ volScalarField w2
 volVectorField gradAlphaSm
 (
     "gradAlphaSm",
-    fvc::grad(alphaSm)
+    fvc::grad(alpha1Sm)
 );
 // Interpolated gradient of alpha
 surfaceVectorField gradAlphaSmf
