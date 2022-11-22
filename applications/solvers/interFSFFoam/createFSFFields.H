@@ -187,13 +187,6 @@ volScalarField pc
 
 pressureReference pcPressureReference(pc, pimple.dict());
 
-// Interpolated face-gradient of capillary pressure
-// surfaceVectorField gradPcf
-// (
-//     "gradPcf",
-//     fvc::interpolate(fvc::grad(pc))
-// );
-
 volVectorField gradPc
 (
     "gradPc",

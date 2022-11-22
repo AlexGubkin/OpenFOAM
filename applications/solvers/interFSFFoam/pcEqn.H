@@ -7,12 +7,6 @@ const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThr
 // label pcRefCell = 0;
 // scalar pcRefValue = 0.0;
 
-// gradPcf =
-//     fvc::interpolate(w1)*fvc::interpolate(fvc::grad(pc));
-
-// gradPcf =
-//     fvc::interpolate(fvc::grad(pc));
-
 fcf =
     fvc::interpolate(sigmaPtr->sigma())
    *fvc::interpolate(w2*kappa)
@@ -27,8 +21,6 @@ gradPc = fvc::grad(pc);
 fcFilt =
     cPhicFilterCoeff*(gradPc - (gradPc & nHatv)*nHatv);
 
-// fcFilt.relax();
-
 // fcfFilt =
 //     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
 //    *(
@@ -41,12 +33,6 @@ fcfFilt =
   *fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
 
 fcfFilt.relax();
-
-// fcFilt = fvc::reconstruct(fcfFilt*mesh.magSf());
-
-// fcf -= fcfFilt;
-
-// fcf.relax();
 
 while (pimple.correctNonOrthogonal())
 {
@@ -64,15 +50,7 @@ while (pimple.correctNonOrthogonal())
 
 //     pcEqn.setReference(pcRefCell, pcRefValue);
     pcEqn.solve();
-//     pc.correctBoundaryConditions();
-
-//     gradPc = fvc::grad(pc);
-//
-//     fcFilt = gradPc - (gradPc & nHatv)*nHatv;
-//
-//     fcfFilt =
-//         mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-//        *cPhicFilterCoeff*fvc::interpolate(fcFilt) & (mesh.Sf()/mesh.magSf());
+    pc.correctBoundaryConditions();
 
     if (pimple.finalNonOrthogonalIter())
     {
@@ -83,8 +61,6 @@ while (pimple.correctNonOrthogonal())
             pcPressureReference.refValue()
           - getRefCellValue(pc, pcPressureReference.refCell())
         );
-
-//         phic = pcEqn.flux();
 
         phic = (fcf - fcfFilt - fvc::snGrad(pc))*mesh.magSf();
 

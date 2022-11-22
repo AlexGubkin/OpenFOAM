@@ -13,7 +13,7 @@ if (divU.valid())
         p_rgh,
         surfaceScalarField("rAUf", fvc::interpolate(rAU())),
         divU(),
-        pPressureReference,
+        pressureReference,
         pimple
     );
 }
@@ -26,7 +26,7 @@ else
         p_rgh,
         surfaceScalarField("rAUf", fvc::interpolate(rAU())),
         geometricZeroField(),
-        pPressureReference,
+        pressureReference,
         pimple
     );
 }

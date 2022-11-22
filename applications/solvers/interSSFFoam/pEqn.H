@@ -27,8 +27,8 @@
 
     surfaceScalarField phig
     (
+        phic*rAUf
       - ghf*fvc::snGrad(rho)*rAUf*mesh.magSf()
-      + rAUf*phic
     );
 
     phiHbyA += phig;
@@ -49,8 +49,8 @@
 
         p_rghEqn.setReference
         (
-            pPressureReference.refCell(),
-            getRefCellValue(p_rgh, pPressureReference.refCell())
+            pressureReference.refCell(),
+            getRefCellValue(p_rgh, pressureReference.refCell())
         );
 
         p_rghEqn.solve();
@@ -83,8 +83,8 @@
         (
             "p",
             p.dimensions(),
-            pPressureReference.refValue()
-          - getRefCellValue(p, pPressureReference.refCell())
+            pressureReference.refValue()
+          - getRefCellValue(p, pressureReference.refCell())
         );
         p_rgh = p - rho*gh;
     }

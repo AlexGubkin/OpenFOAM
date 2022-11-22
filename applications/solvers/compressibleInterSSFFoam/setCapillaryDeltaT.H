@@ -31,7 +31,7 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-if (adjustTimeStep)
+if (adjustTimeStep && pimple.correct())
 {
     const volScalarField nu(mixture.nu());
     const volScalarField sigma(sigmaPtr->sigma());

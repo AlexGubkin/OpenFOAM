@@ -73,7 +73,7 @@ volScalarField p
     p_rgh + rho*gh
 );
 
-pressureReference pPressureReference(p, p_rgh, pimple.dict());
+pressureReference pressureReference(p, p_rgh, pimple.dict());
 
 if (p_rgh.needReference())
 {
@@ -81,8 +81,8 @@ if (p_rgh.needReference())
     (
         "p",
         p.dimensions(),
-        pPressureReference.refValue()
-      - getRefCellValue(p, pPressureReference.refCell())
+        pressureReference.refValue()
+      - getRefCellValue(p, pressureReference.refCell())
     );
     p_rgh = p - rho*gh;
 }

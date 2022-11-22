@@ -30,18 +30,32 @@ volScalarField kappa
     dimensionedScalar(dimless/dimLength, 0)
 );
 
-Info<< "Creation field alphaSm\n" << endl;
-volScalarField alphaSm
+Info<< "Creation field alpha1Sm\n" << endl;
+volScalarField alpha1Sm
 (
     IOobject
     (
-        "alphaSm",
+        "alpha1Sm",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
     alpha1
+);
+
+Info<< "Creation field alpha1Sm\n" << endl;
+volScalarField alpha2Sm
+(
+    IOobject
+    (
+        "alpha2Sm",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    1.0 - alpha1
 );
 
 Info<< "Creation field alphaC\n" << endl;
@@ -106,7 +120,7 @@ volScalarField w2
 volVectorField gradAlphaSm
 (
     "gradAlphaSm",
-    fvc::grad(alphaSm)
+    fvc::grad(alpha1Sm)
 );
 // Interpolated gradient of alpha
 surfaceVectorField gradAlphaSmf
@@ -155,28 +169,59 @@ autoPtr<surfaceTensionModel> sigmaPtr
 );
 sigmaPtr->readDict(phasePropertiesDict);
 
+surfaceScalarField fcf
+(
+    "fcf",
+    fvc::interpolate(sigmaPtr->sigma())
+   *fvc::interpolate(w2*kappa)
+   /fvc::interpolate(w2)*deltaf
+);
 
 // Surface tension force flux
 surfaceScalarField phic
 (
     "phic",
-    fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf()
+    fcf*mesh.magSf()
 );
 
-
-// Interpolated face-gradient of sigma
-surfaceVectorField gradSigmaf
+Info<< "Creation field fc\n" << endl;
+volVectorField fc
 (
-    "gradSigmaf",
-    fvc::interpolate(fvc::grad(sigmaPtr->sigma()))
+    IOobject
+    (
+        "fc",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(fcf*mesh.magSf())
 );
 
+
+volVectorField gradSigma
+(
+    "gradSigma",
+    fvc::grad(sigmaPtr->sigma())
+);
+
+Info<< "Creation field fct\n" << endl;
+volVectorField fct
+(
+    IOobject
+    (
+        "fct",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mag(fvc::grad(alpha1))*(gradSigma - (gradSigma & nHatv)*nHatv)
+);
 
 // Surface tension force flux (tangent force flux)
 surfaceScalarField phict
 (
     "phict",
-    deltaf*(gradSigmaf - (gradSigmaf & nHatfv)*nHatfv) & mesh.Sf()
+    fvc::interpolate(fct) & mesh.Sf()
 );

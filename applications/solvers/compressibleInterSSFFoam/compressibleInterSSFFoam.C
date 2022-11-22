@@ -167,6 +167,7 @@ int main(int argc, char *argv[])
             #include "alphaProcessing.H"
             #include "kappaProcessing.H"
             #include "phic.H"
+            #include "phict.H"
 
             turbulence.correctPhasePhi();
 
