@@ -30,18 +30,32 @@ volScalarField kappa
     dimensionedScalar(dimless/dimLength, 0)
 );
 
-Info<< "Creation field alphaSm\n" << endl;
-volScalarField alphaSm
+Info<< "Creation field alpha1Sm\n" << endl;
+volScalarField alpha1Sm
 (
     IOobject
     (
-        "alphaSm",
+        "alpha1Sm",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
     alpha1
+);
+
+Info<< "Creation field alpha1Sm\n" << endl;
+volScalarField alpha2Sm
+(
+    IOobject
+    (
+        "alpha2Sm",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    1.0 - alpha1
 );
 
 Info<< "Creation field alphaC\n" << endl;
@@ -106,7 +120,7 @@ volScalarField w2
 volVectorField gradAlphaSm
 (
     "gradAlphaSm",
-    fvc::grad(alphaSm)
+    fvc::grad(alpha1Sm)
 );
 // Interpolated gradient of alpha
 surfaceVectorField gradAlphaSmf
@@ -156,11 +170,92 @@ autoPtr<surfaceTensionModel> sigmaPtr
 sigmaPtr->readDict(phasePropertiesDict);
 
 
+// Capillary pressure field
+Info<< "Reading field pc\n" << endl;
+volScalarField pc
+(
+    IOobject
+    (
+        "pc",
+        runTime.timeName(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+pressureReference pcPressureReference(pc, pimple.dict());
+
+// Interpolated face-gradient of capillary pressure
+// surfaceVectorField gradPcf
+// (
+//     "gradPcf",
+//     fvc::interpolate(fvc::grad(pc))
+// );
+
+volVectorField gradPc
+(
+    "gradPc",
+    fvc::grad(pc)
+);
+
+
+surfaceScalarField fcf
+(
+    "fcf",
+    fvc::interpolate(sigmaPtr->sigma())
+   *fvc::interpolate(w2*kappa)
+   /fvc::interpolate(w2)*deltaf
+);
+
+surfaceScalarField fcfFilt
+(
+    "fcfFilt",
+    mag(deltaf)/(mag(deltaf) + mixture.deltaN())
+   *fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf())
+);
+
+
 // Surface tension force flux
 surfaceScalarField phic
 (
     "phic",
-    fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf*mesh.magSf()
+    fcf*mesh.magSf()
+);
+
+// Surface tension force flux
+surfaceScalarField phicFilt
+(
+    "phicFilt",
+    fcfFilt*mesh.magSf()
+);
+
+
+Info<< "Creation field fc\n" << endl;
+volVectorField fc
+(
+    IOobject
+    (
+        "fc",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(fcf*mesh.magSf())
+);
+
+Info<< "Creation field fcFilt\n" << endl;
+volVectorField fcFilt
+(
+    IOobject
+    (
+        "fcFilt",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::reconstruct(fcfFilt*mesh.magSf())
 );

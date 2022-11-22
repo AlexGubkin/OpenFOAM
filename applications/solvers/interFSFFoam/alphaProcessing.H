@@ -2,30 +2,36 @@ const label nAlphaSmoothers(alphaControls.lookupOrDefault<label>("nAlphaSmoother
 const scalar cSmCoeff(alphaControls.lookupOrDefault<scalar>("cSmCoeff", 0.5));
 const scalar cShCoeff(alphaControls.lookupOrDefault<scalar>("cShCoeff", 0.98));
 
+// mixture.correct();
+
 // Smoother loop for SSF
-alphaSm = alpha1;
+alpha1Sm = alpha1;
 
 for (int aSmoother=0; aSmoother<nAlphaSmoothers; aSmoother++)
 {
     Info<< "Alpha smoother #" << aSmoother + 1 << nl;
 
-//     alphaSm =
-//         cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
-//       + (1.0 - cSmCoeff)*alphaSm;
+//     alpha1Sm =
+//         cSmCoeff*fvc::average(fvc::interpolate(alpha1Sm))
+//       + (1.0 - cSmCoeff)*alpha1Sm;
 
-    tmp<volScalarField> talphaSm
+    tmp<volScalarField> talpha1Sm
     (
-        cSmCoeff*fvc::average(fvc::interpolate(alphaSm))
-      + (1.0 - cSmCoeff)*alphaSm
+        cSmCoeff*fvc::average(fvc::interpolate(alpha1Sm))
+      + (1.0 - cSmCoeff)*alpha1Sm
     );
-    alphaSm = talphaSm();
-//     alphaSm.correctBoundaryConditions();
+    alpha1Sm = talpha1Sm();
+    alpha1Sm.correctBoundaryConditions();
 }
 
-// Sharpener for alpha
-alphaC = min(1.0, max(alpha1, 0.0));
-// alphaC.correctBoundaryConditions();
+alpha2Sm = 1.0 - alpha1Sm;
+alpha2Sm.correctBoundaryConditions();
 
+// Cutter for alpha1
+alphaC = min(1.0, max(alpha1, 0.0));
+alphaC.correctBoundaryConditions();
+
+// Sharpener for alpha1
 alphaSh =
     1.0/(1.0 - cShCoeff)
    *(
@@ -40,16 +46,16 @@ alphaSh =
         )
       - 0.5*cShCoeff
     );
-// alphaSh.correctBoundaryConditions();
+alphaSh.correctBoundaryConditions();
 
 w1 = sqrt(alphaC*(1.0 - alphaC));
 w2 = sqrt(w1*w1 + SMALL);
-// w1.correctBoundaryConditions();
-// w2.correctBoundaryConditions();
+w1.correctBoundaryConditions();
+w2.correctBoundaryConditions();
 
 
 // Interpolated face-gradient of alpha
-gradAlphaSm = fvc::grad(alphaSm);
+gradAlphaSm = fvc::grad(alpha1Sm);
 gradAlphaSmf = fvc::interpolate(gradAlphaSm);
 
 deltaf = fvc::snGrad(alphaSh);
@@ -65,8 +71,8 @@ nHatfv = fvc::interpolate(nHatv);
 
 // The dynamic contact angle is calculated from the component of the
 // velocity on the direction of the interface, parallel to the wall.
-volScalarField::Boundary& a1bf = alpha1.boundaryFieldRef();
-volScalarField::Boundary& a2bf = alpha2.boundaryFieldRef();
+volScalarField::Boundary& a1bf = alpha1Sm.boundaryFieldRef();
+volScalarField::Boundary& a2bf = alpha2Sm.boundaryFieldRef();
 
 const fvBoundaryMesh& boundary = mesh.boundary();
 
