@@ -87,9 +87,9 @@ int main(int argc, char *argv[])
         if (simple.finalNonOrthogonalIter())
         {
             graddPsi = fvc::grad(dPsi);
-//             volScalarField magGraddPsi(mag(graddPsi));
+            volScalarField magGraddPsi(mag(graddPsi));
 
-            d = sqrt(magSqr(graddPsi) + 2*dPsi) - mag(graddPsi);
+            d = sqrt(magGraddPsi*magGraddPsi + 2*dPsi) - magGraddPsi;
         }
     }
 
@@ -123,50 +123,7 @@ int main(int argc, char *argv[])
     d.write();
     gradd.write();
 
-//     // Non-orthogonal velocity potential corrector loop
-//     label d2PsiRefCell = 0;
-//     scalar d2PsiRefValue = 0.0;
-//
-//     while (simple.correctNonOrthogonal())
-//     {
-//         fvScalarMatrix d2PsiEqn
-//         (
-//             fvm::laplacian(d2Psi)
-//          ==
-//           - neg0(mag(graddPsi)/dimensionedScalar(dimLength, 1.0) - dimensionedScalar(dimless, 0.05))
-//         );
-//
-//         d2PsiEqn.relax();
-//         d2PsiEqn.setReference(d2PsiRefCell, d2PsiRefValue);
-//         d2PsiEqn.solve();
-//
-//         if (simple.finalNonOrthogonalIter())
-//         {
-// //             d2Psi -= dimensionedScalar(sqr(dimLength), gMin(d2Psi));
-//             gradd2Psi = fvc::grad(d2Psi);
-// //             volScalarField magGraddPsi(mag(graddPsi));
-//
-//             d2 = sqrt(magSqr(gradd2Psi) + 2*d2Psi) - mag(gradd2Psi);
-//         }
-//     }
-//
-//     // Write dPsi and graddPsi
-//     d2Psi.write();
-//     gradd2Psi.write();
-//
-//     // Non-orthogonal eikonal corrector loop
-// //     label d2RefCell = 0;
-// //     scalar d2RefValue = 0.0;
-//
-// //     d2 =
-// //         - dPsi/dimensionedScalar(dimLength, 1.0)
-// //         + dimensionedScalar(dimLength, gMax(dPsi))
-// //         + dimensionedScalar(dimLength, small);
-//
-//     d2 = d2Psi/dimensionedScalar(dimLength, 1.0);
 
-//     DynamicList<label>  removedCellsFromMatrix;
-//     DynamicList<scalar> valuesToImpose;
     List<label>  removedCellsFromMatrix;
     List<scalar> valuesToImpose;
 
@@ -200,8 +157,6 @@ int main(int argc, char *argv[])
           - epsilon*d2*fvm::laplacian(d2)
          ==
             dimensionedScalar(dimless, 1.0)
-//             pos(mag(gradd) - dimensionedScalar(dimless, 0.8))
-//           + dimensionedScalar(dimless, 1.0)*neg(mag(gradd) - dimensionedScalar(dimless, 0.8))
         );
 
         d2Eqn.setValues(removedCellsFromMatrix, valuesToImpose);
@@ -219,32 +174,6 @@ int main(int argc, char *argv[])
     // Write d and gradd
     d2.write();
     gradd2.write();
-
-//     int iter = 0;
-//     scalar initialResidual = 0;
-//     do
-//     {
-//         nd = fvc::grad(d);
-//         nd /= (mag(nd) + small);
-// 
-//         surfaceVectorField nf(fvc::interpolate(nd));
-//         nf /= (mag(nf) + small);
-// 
-//         surfaceScalarField dPhi("dPhi", nf & mesh.Sf());
-// 
-//         fvScalarMatrix dEqn
-//         (
-//             fvm::div(dPhi, d)
-//           - fvm::Sp(fvc::div(dPhi), d)
-//           - epsilon*d*fvm::laplacian(d)
-//         ==
-//             dimensionedScalar(dimless, 1.0)
-//         );
-// 
-//         dEqn.relax();
-//         initialResidual = dEqn.solve().initialResidual();
-//  
-//     } while (initialResidual > tolerance && ++iter < maxIter);
 }
 
 
