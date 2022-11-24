@@ -97,6 +97,24 @@ int main(int argc, char *argv[])
     dPsi.write();
     graddPsi.write();
 
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    List<label>  removedCellsFromMatrix;
+    List<scalar> valuesToImpose;
+
+    forAll(d, celli)
+    {
+        if (mag(gradAlpha[celli]) > small)
+        {
+            removedCellsFromMatrix.append(celli);
+        }
+    }
+
+    forAll(removedCellsFromMatrix, celli)
+    {
+        valuesToImpose.append(small);
+    }
+
     // Non-orthogonal eikonal corrector loop
     while (eikonal.correctNonOrthogonal())
     {
@@ -115,6 +133,8 @@ int main(int argc, char *argv[])
             dimensionedScalar(dimless, 1.0)
         );
 
+        dEqn.setValues(removedCellsFromMatrix, valuesToImpose);
+
         dEqn.relax();
         dEqn.solve();
     }
@@ -123,9 +143,10 @@ int main(int argc, char *argv[])
     d.write();
     gradd.write();
 
+    // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    List<label>  removedCellsFromMatrix;
-    List<scalar> valuesToImpose;
+    removedCellsFromMatrix.clear();
+    valuesToImpose.clear();
 
     forAll(d2, celli)
     {
@@ -142,8 +163,6 @@ int main(int argc, char *argv[])
 
     while (eikonal.correctNonOrthogonal())
     {
-//         d2 = d2*pos(mag(gradd) - dimensionedScalar(dimless, 0.8));
-
         gradd2 = fvc::grad(d2);
 
         surfaceVectorField gradd2f(fvc::interpolate(gradd2));

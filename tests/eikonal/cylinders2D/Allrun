@@ -6,19 +6,32 @@ cd ${0%/*} || exit 1    # Run from this directory
 
 application=$(getApplication)
 
+cp -r\
+    0.orig\
+    0
+
 runApplication  blockMesh
 runApplication -a\
     foamDictionary  -entry numberOfSubdomains -set 4 system/decomposeParDict
 runApplication -a\
     foamDictionary  -entry method -set scotch system/decomposeParDict
-runApplication  decomposePar
+runApplication      decomposePar -copyZero
 runParallel         snappyHexMesh -overwrite
+# runParallel         patchSummary
+# runParallel         renumberMesh -noZero -overwrite
 runParallel         extrudeMesh
 runParallel         checkMesh -allTopology -allGeometry
 runParallel -a\
-    foamDictionary constant/polyMesh/boundary -entry entry0/back/type -set empty
+    foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
 runParallel -a\
-    foamDictionary constant/polyMesh/boundary -entry entry0/front/type -set empty
+    foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
+runApplication -a\
+    foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
+runApplication -a\
+    foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
+runApplication      setFields
+runParallel -a      setFields
+
 runParallel         $application
 
 #------------------------------------------------------------------------------

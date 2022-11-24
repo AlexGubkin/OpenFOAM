@@ -27,18 +27,26 @@ volScalarField alpha
         "alpha",
         runTime.timeName(),
         mesh,
+        IOobject::MUST_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh
+);
+
+volVectorField gradAlpha
+(
+    IOobject
+    (
+        "gradAlpha",
+        runTime.timeName(),
+        mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mesh,
-    dimensionedScalar(dimless, 0)
+    fvc::grad(alpha)
 );
 
-surfaceScalarField deltaf
-(
-    "deltaf",
-    fvc::snGrad(alpha)
-);
+gradAlpha.write();
 
 
 Info<< "Creation distance field d\n" << endl;
@@ -56,7 +64,13 @@ volScalarField d
 );
 
 d = dimensionedScalar(dimLength, 1.0);
-// d = (mag(deltaf) > small) ? dimensionedScalar(dimLength, small) : dimensionedScalar(dimLength, 1.0);
+forAll(d, celli)
+{
+    if (mag(gradAlpha[celli]) > small)
+    {
+        d[celli] = small;
+    }
+}
 
 Info<< "Creation field gradd\n" << endl;
 volVectorField gradd
