@@ -102,9 +102,11 @@ int main(int argc, char *argv[])
     List<label>  removedCellsFromMatrix;
     List<scalar> valuesToImpose;
 
+    dimensionedScalar magGradAlphaMax(max(mag(gradAlpha)));
+    
     forAll(d, celli)
     {
-        if (mag(gradAlpha[celli]) > small)
+        if (mag(gradAlpha[celli]) > 0.01*magGradAlphaMax.value())
         {
             removedCellsFromMatrix.append(celli);
         }

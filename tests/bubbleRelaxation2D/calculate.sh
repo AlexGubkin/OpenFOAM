@@ -38,8 +38,8 @@ foamDictionary  -entry adjustTimeStep -set "yes" system/controlDict
 foamDictionary  -entry maxCo -set $(echo "0.2" | bc -l) system/controlDict
 foamDictionary  -entry maxAlphaCo -set $(echo "0.2" | bc -l) system/controlDict
 
-runParallel     compressibleInterFoam
-# runParallel     compressibleInterSSFFoam
+# runParallel     compressibleInterFoam
+runParallel     compressibleInterSSFFoam
 # runParallel     compressibleInterFSFFoam
 
 
