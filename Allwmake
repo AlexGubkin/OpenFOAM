@@ -14,8 +14,8 @@ OWN_LIB_SRC=$PWD/src
 export OWN_LIB_SRC
 echo $OWN_LIB_SRC
 
-# Compile OpenFOAM libraries and applications
+# Compile OpenFOAM libraries
 src/Allwmake $targetType $*
 
-# Compile OpenFOAM libraries and applications
-#applications/Allwmake $targetType $*
+# Compile OpenFOAM applications
+applications/Allwmake $targetType $*

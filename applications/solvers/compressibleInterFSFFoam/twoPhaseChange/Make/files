@@ -6,4 +6,4 @@ cavitation/Kunz/Kunz.C
 cavitation/Merkle/Merkle.C
 cavitation/SchnerrSauer/SchnerrSauer.C
 
-LIB = $(FOAM_USER_LIBBIN)/libcompressibleTwoPhaseChangeModels
+LIB = $(FOAM_USER_LIBBIN)/libcompressibleTwoPhaseChangeModels2

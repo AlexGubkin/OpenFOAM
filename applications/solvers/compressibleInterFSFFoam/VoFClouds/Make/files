@@ -1,3 +1,3 @@
 VoFClouds.C
 
-LIB = $(FOAM_USER_LIBBIN)/libVoFClouds
+LIB = $(FOAM_USER_LIBBIN)/libVoFClouds2

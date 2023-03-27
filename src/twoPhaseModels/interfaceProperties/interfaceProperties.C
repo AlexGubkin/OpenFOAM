@@ -129,7 +129,7 @@ void Foam::interfaceProperties::calculateK()
     //     (gradAlphaf + deltaN_*vector(0, 0, 1)
     //    *sign(gradAlphaf.component(vector::Z)))/(mag(gradAlphaf) + deltaN_)
     // );
-    correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
+//     correctContactAngle(nHatfv.boundaryFieldRef(), gradAlphaf.boundaryField());
 
     // Face unit interface normal flux
     nHatf_ = nHatfv & Sf;

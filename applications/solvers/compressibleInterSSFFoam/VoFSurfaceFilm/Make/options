@@ -3,19 +3,20 @@ EXE_INC = \
     -I$(LIB_SRC)/physicalProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseMixture/lnInclude \
-    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
+    -I$(OWN_LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
     -I$(LIB_SRC)/regionModels/regionModel/lnInclude \
     -I$(LIB_SRC)/regionModels/surfaceFilmModels/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude
 
 LIB_LIBS = \
-    -lcompressibleTwoPhaseMixture \
+    -L$(FOAM_USER_LIBBIN) \
+    -lcompressibleTwoPhaseMixture2 \
     -lfluidThermophysicalModels \
     -lspecie \
     -ltwoPhaseMixture \
-    -ltwoPhaseProperties \
-    -linterfaceProperties \
+    -ltwoPhaseProperties2 \
+    -linterfaceProperties2 \
     -lphysicalProperties \
     -lsurfaceFilmModels \
     -lfiniteVolume \

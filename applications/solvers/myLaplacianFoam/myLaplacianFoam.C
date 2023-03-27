@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -30,18 +30,23 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
+#include "fvModels.H"
+#include "fvConstraints.H"
+// #include "simpleControl.H"
 #include "pimpleControl.H"
-#include "fvOptions.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
 {
-    #include "setRootCase.H"
+    #include "setRootCaseLists.H"
+
     #include "createTime.H"
-    #include "createDynamicFvMesh.H"
-    #include "createControl.H"
+    #include "createMesh.H"
+    #include "createDyMControls.H"
+//     #include "createControl.H"
+
+//     simpleControl simple(mesh);
 
     #include "createFields.H"
 
@@ -49,18 +54,16 @@ int main(int argc, char *argv[])
 
     Info<< "\nCalculating S distribution\n" << endl;
 
-    while
-    (
-        runTime.run()
-//      || ((Foam::mag(m - porosity)).value() > 1e-3)
-    )
+    while (pimple.run(runTime))
     {
-        runTime++;
-
-        Info<< "Time = " << runTime.timeName() << nl << endl;
-
         // Do any mesh changes
         mesh.update();
+
+        runTime++;
+
+        Info<< "Time = " << runTime.userTimeName() << nl << endl;
+
+        fvModels.correct();
 
         while (pimple.correctNonOrthogonal())
         {
@@ -68,15 +71,13 @@ int main(int argc, char *argv[])
             (
                 fvm::ddt(S) - fvm::laplacian(DS, S)
              ==
-                fvOptions(S)
+                fvModels.source(S)
             );
 
-            fvOptions.constrain(SEqn);
+            fvConstraints.constrain(SEqn);
             SEqn.solve();
-            fvOptions.correct(S);
+            fvConstraints.constrain(S);
         }
-
-        #include "write.H"
 
         const scalarField& V = mesh.V();
 
@@ -89,6 +90,8 @@ int main(int argc, char *argv[])
             << "|dm| = " << (Foam::mag(m-porosity)).value() << nl
             << nl << endl;
 
+        #include "write.H"
+
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
@@ -97,6 +100,59 @@ int main(int argc, char *argv[])
     Info<< "End\n" << endl;
 
     return 0;
+
+
+
+//     Info<< "\nCalculating S distribution\n" << endl;
+//
+//     while
+//     (
+//         runTime.run()
+// //      || ((Foam::mag(m - porosity)).value() > 1e-3)
+//     )
+//     {
+//         runTime++;
+//
+//         Info<< "Time = " << runTime.timeName() << nl << endl;
+//
+//         // Do any mesh changes
+//         mesh.update();
+//
+//         while (pimple.correctNonOrthogonal())
+//         {
+//             fvScalarMatrix SEqn
+//             (
+//                 fvm::ddt(S) - fvm::laplacian(DS, S)
+//              ==
+//                 fvModels.source(S)
+//             );
+//
+//             fvModels.constrain(SEqn);
+//             SEqn.solve();
+//             fvModels.constrain(S);
+//         }
+//
+//         #include "write.H"
+//
+//         const scalarField& V = mesh.V();
+//
+//         skeletonMarker = (S > threshold) ? 1 : 0;
+//
+//         porosity =
+//                 1.0 - gSum(V*skeletonMarker)/gSum(V);
+//
+//         Info<< "porosity = " << porosity << nl
+//             << "|dm| = " << (Foam::mag(m-porosity)).value() << nl
+//             << nl << endl;
+//
+//         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+//             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+//             << nl << endl;
+//     }
+//
+//     Info<< "End\n" << endl;
+//
+//     return 0;
 }
 
 
