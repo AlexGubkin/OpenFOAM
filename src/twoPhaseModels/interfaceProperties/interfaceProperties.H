@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2021 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -57,8 +57,8 @@ class interfaceProperties
 {
     // Private Data
 
-        //- Keep a reference to the transportProperties dictionary
-        const dictionary& transportPropertiesDict_;
+        //- Keep a reference to the phaseProperties dictionary
+        const dictionary& phasePropertiesDict_;
 
         //- Surface tension
         autoPtr<surfaceTensionModel> sigmaPtr_;
@@ -70,14 +70,7 @@ class interfaceProperties
         volScalarField& alpha2_;
         const volVectorField& U_;
         surfaceScalarField nHatf_;
-        volScalarField K0_;
         volScalarField K_;
-        volScalarField alphaSmoothed_;
-        volScalarField alphaCut_;
-        volScalarField alphaSharpened_;
-        volScalarField w1_;
-        volScalarField w2_;
-        volScalarField p_c_;
 
 
     // Private Member Functions
@@ -91,17 +84,14 @@ class interfaceProperties
             const surfaceVectorField::Boundary& gradAlphaf
         );
 
-        //- Smoother for alpha marker
-        void alphaSmoother();
-
-        //- Sharpener for alpha marker
-        void alphaSharpener();
-
         //- Re-calculate the interface curvature
         void calculateK();
 
 
 public:
+
+    TypeName("interfaceProperties");
+
 
     // Constructors
 
@@ -118,12 +108,19 @@ public:
         interfaceProperties(const interfaceProperties&) = delete;
 
 
+    //- Destructor
+    virtual ~interfaceProperties()
+    {}
+
+
     // Member Functions
 
         const dimensionedScalar& deltaN() const
         {
             return deltaN_;
         }
+
+        tmp<volVectorField> n() const;
 
         const surfaceScalarField& nHatf() const
         {
@@ -135,12 +132,15 @@ public:
         tmp<surfaceScalarField> surfaceTensionForce() const;
 
         //- Indicator of the proximity of the interface
-        //  Field values are 1 near and 0 away for the interface.
+        //  Field values are 1 near and 0 away from the interface.
         tmp<volScalarField> nearInterface() const;
+
+        //- Interface fraction in a cell
+        tmp<volScalarField::Internal> fraction() const;
 
         void correct();
 
-        //- Read transportProperties dictionary
+        //- Read phaseProperties dictionary
         bool read();
 
 

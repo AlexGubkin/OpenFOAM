@@ -1,3 +1,3 @@
 immiscibleIncompressibleTwoPhaseMixture.C
 
-LIB = $(FOAM_USER_LIBBIN)/libimmiscibleIncompressibleTwoPhaseMixtureFSF
+LIB = $(FOAM_USER_LIBBIN)/libimmiscibleIncompressibleTwoPhaseMixture2
