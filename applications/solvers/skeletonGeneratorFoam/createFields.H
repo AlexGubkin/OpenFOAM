@@ -24,12 +24,7 @@ volScalarField skeletonMarker
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar
-    (
-        "",
-        S.dimensions(),
-        0
-    )
+    dimensionedScalar(S.dimensions(), 0)
 );
 
 Info<< "Reading transportProperties\n" << endl;
@@ -46,18 +41,6 @@ IOdictionary transportProperties
     )
 );
 
-Info<< "Reading diffusivity DS\n" << endl;
-
-dimensionedScalar DS
-(
-    transportProperties.lookup("DS")
-);
-
-dimensionedScalar m
-(
-    transportProperties.lookup("m")
-);
-
 volScalarField threshold
 (
     IOobject
@@ -69,15 +52,20 @@ volScalarField threshold
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar
-    (
-        transportProperties.lookup("threshold")
-    )
+    dimensionedScalar(transportProperties.lookup("threshold"))
 );
 
-scalar
-    porosity(0);
-//     domainVolume(gSum(V));
+Info<< "Reading diffusivity DS\n" << endl;
+
+dimensionedScalar DS
+(
+    transportProperties.lookup("DS")
+);
+
+dimensionedScalar m0
+(
+    transportProperties.lookup("m0")
+);
 
 #include "createFvModels.H"
 #include "createFvConstraints.H"

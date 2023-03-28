@@ -34,6 +34,7 @@ Description
 #include "fvConstraints.H"
 // #include "simpleControl.H"
 #include "pimpleControl.H"
+#include "fvCellSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,8 +55,20 @@ int main(int argc, char *argv[])
 
     Info<< "\nCalculating S distribution\n" << endl;
 
+    fvCellSet set(transportProperties, mesh);
+
     while (pimple.run(runTime))
     {
+        const scalarField& V = mesh.V();
+
+        skeletonMarker = (S < threshold) ? 1 : 0;
+
+        const scalar m = gSum(V*skeletonMarker)/gSum(V);
+
+        Info<< "m = " << m << nl
+            << "|dm| = " << (Foam::mag(m0-m)).value() << nl
+            << nl << endl;
+
         // Do any mesh changes
         mesh.update();
 
@@ -79,17 +92,6 @@ int main(int argc, char *argv[])
             fvConstraints.constrain(S);
         }
 
-        const scalarField& V = mesh.V();
-
-        skeletonMarker = (S > threshold) ? 1 : 0;
-
-        porosity =
-                1.0 - gSum(V*skeletonMarker)/gSum(V);
-
-        Info<< "porosity = " << porosity << nl
-            << "|dm| = " << (Foam::mag(m-porosity)).value() << nl
-            << nl << endl;
-
         #include "write.H"
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
@@ -100,59 +102,6 @@ int main(int argc, char *argv[])
     Info<< "End\n" << endl;
 
     return 0;
-
-
-
-//     Info<< "\nCalculating S distribution\n" << endl;
-//
-//     while
-//     (
-//         runTime.run()
-// //      || ((Foam::mag(m - porosity)).value() > 1e-3)
-//     )
-//     {
-//         runTime++;
-//
-//         Info<< "Time = " << runTime.timeName() << nl << endl;
-//
-//         // Do any mesh changes
-//         mesh.update();
-//
-//         while (pimple.correctNonOrthogonal())
-//         {
-//             fvScalarMatrix SEqn
-//             (
-//                 fvm::ddt(S) - fvm::laplacian(DS, S)
-//              ==
-//                 fvModels.source(S)
-//             );
-//
-//             fvModels.constrain(SEqn);
-//             SEqn.solve();
-//             fvModels.constrain(S);
-//         }
-//
-//         #include "write.H"
-//
-//         const scalarField& V = mesh.V();
-//
-//         skeletonMarker = (S > threshold) ? 1 : 0;
-//
-//         porosity =
-//                 1.0 - gSum(V*skeletonMarker)/gSum(V);
-//
-//         Info<< "porosity = " << porosity << nl
-//             << "|dm| = " << (Foam::mag(m-porosity)).value() << nl
-//             << nl << endl;
-//
-//         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-//             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-//             << nl << endl;
-//     }
-//
-//     Info<< "End\n" << endl;
-//
-//     return 0;
 }
 
 
