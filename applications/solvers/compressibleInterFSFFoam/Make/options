@@ -1,5 +1,5 @@
 EXE_INC = \
-    -I$(LIB_SRC)/twoPhaseModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle \
+    -I$(OWN_LIB_SRC)/twoPhaseModels/twoPhaseProperties/alphaContactAngle/alphaContactAngle \
     -I. \
     -IcompressibleTwoPhaseMixture \
     -IcompressibleInterPhaseTransportModel/lnInclude \
@@ -10,7 +10,7 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
     -I$(LIB_SRC)/twoPhaseModels/twoPhaseMixture/lnInclude \
-    -I$(LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
+    -I$(OWN_LIB_SRC)/twoPhaseModels/interfaceProperties/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/compressible/lnInclude \
     -I$(LIB_SRC)/MomentumTransportModels/phaseCompressible/lnInclude \
@@ -20,17 +20,18 @@ EXE_INC = \
     -I$(LIB_SRC)/fvModels/lnInclude
 
 EXE_LIBS = \
-    -lcompressibleTwoPhaseMixture \
-    -ltwoPhaseSurfaceTension \
+    -L$(FOAM_USER_LIBBIN) \
+    -lcompressibleTwoPhaseMixture2 \
+    -ltwoPhaseSurfaceTension2 \
     -lfluidThermophysicalModels \
     -lspecie \
     -ltwoPhaseMixture \
-    -ltwoPhaseProperties \
-    -linterfaceProperties \
-    -lcompressibleTwoPhaseChangeModels \
+    -ltwoPhaseProperties2 \
+    -linterfaceProperties2 \
+    -lcompressibleTwoPhaseChangeModels2 \
     -lmomentumTransportModels \
     -lcompressibleMomentumTransportModels \
-    -lcompressibleInterPhaseTransportModel \
+    -lcompressibleInterPhaseTransportModel2 \
     -lfiniteVolume \
     -lfvModels \
     -lfvConstraints \

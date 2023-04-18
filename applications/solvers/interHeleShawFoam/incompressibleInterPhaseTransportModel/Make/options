@@ -13,8 +13,8 @@ LIB_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -lphysicalProperties \
     -ltwoPhaseMixture \
-    -ltwoPhaseProperties \
-    -linterfaceProperties \
+    -ltwoPhaseProperties2 \
+    -linterfaceProperties2 \
     -lmomentumTransportModels \
     -lincompressibleMomentumTransportModels \
     -lphaseIncompressibleMomentumTransportModels \
