@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
     while (pimple.run(runTime))
     {
-        fcfFilt.storeOldTime();
+//         fcfFilt.storeOldTime();
 
         #include "readDyMControls.H"
 

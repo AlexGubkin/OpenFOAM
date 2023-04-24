@@ -252,3 +252,37 @@ volVectorField fcFilt
     ),
     fvc::reconstruct(fcfFilt*mesh.magSf())
 );
+
+
+Info<< "Reading Hele-Shaw model parameters\n" << endl;
+IOdictionary HeleShawModel
+(
+    IOobject
+    (
+        "HeleShawModel",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+Info<< "Reading gap thickness b\n" << endl;
+dimensionedScalar b
+(
+    physicalProperties.lookup("b")
+);
+
+dimensionedScalar advectionFactor
+(
+    "advectionFactor",
+    dimless,
+    0.2
+);
+
+dimensionedScalar resistanceFactor
+(
+    "resistanceFactor",
+    dimless/(dimLength*dimLength),
+    -12.0/(b*b)
+);
