@@ -28,9 +28,8 @@
                   + fvc::snGrad(pc)
                 ) * mesh.magSf()
               + phic
+              - phiHS
             )
-          + advectionFactor*fvc::div(rhoPhi, U)
-          + resistanceFactor*mixture.mu()*U
         );
 
         fvConstraints.constrain(U);

@@ -197,9 +197,10 @@ volVectorField gradPc
 surfaceScalarField fcf
 (
     "fcf",
-    fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf
+    0.25*constant::mathematical::pi
+   *fvc::interpolate(sigmaPtr->sigma())
+   *fvc::interpolate(w2*kappa)/fvc::interpolate(w2)
+   *deltaf
 );
 
 surfaceScalarField fcfFilt
@@ -277,9 +278,23 @@ dimensionedScalar advectionFactor
     0.2
 );
 
+dimensionedScalar rb
+(
+    "advectionFactor",
+    dimless/dimLength,
+    1/b.value()
+);
+
 dimensionedScalar resistanceFactor
 (
     "resistanceFactor",
     dimless/(dimLength*dimLength),
-    -12.0/(b.value()*b.value())
+    12.0*rb.value()*rb.value()
+);
+
+// Hele-Shaw flux
+surfaceScalarField phiHS
+(
+    "phiHS",
+    resistanceFactor*fvc::interpolate(mixture.mu()*U) & mesh.Sf()
 );

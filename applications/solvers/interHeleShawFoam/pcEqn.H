@@ -9,8 +9,12 @@ const scalar cPhicThresholdCoeff(alphaControls.lookupOrDefault<scalar>("cPhicThr
 
 fcf =
     fvc::interpolate(sigmaPtr->sigma())
-   *fvc::interpolate(w2*kappa)
-   /fvc::interpolate(w2)*deltaf;
+   *(
+        2.0*rb
+      + 0.25*constant::mathematical::pi
+       *fvc::interpolate(w2*kappa)/fvc::interpolate(w2)
+    )
+   *deltaf;
 
 fc = fvc::reconstruct(fcf*mesh.magSf());
 
