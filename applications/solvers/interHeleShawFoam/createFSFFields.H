@@ -268,10 +268,7 @@ IOdictionary HeleShawModel
 );
 
 Info<< "Reading gap thickness b\n" << endl;
-dimensionedScalar b
-(
-    physicalProperties.lookup("b")
-);
+dimensionedScalar b(HeleShawModel.lookup("b"));
 
 dimensionedScalar advectionFactor
 (
@@ -284,5 +281,5 @@ dimensionedScalar resistanceFactor
 (
     "resistanceFactor",
     dimless/(dimLength*dimLength),
-    -12.0/(b*b)
+    -12.0/(b.value()*b.value())
 );

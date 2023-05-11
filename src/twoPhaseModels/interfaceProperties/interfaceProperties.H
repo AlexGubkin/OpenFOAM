@@ -69,8 +69,8 @@ class interfaceProperties
         volScalarField& alpha1_;
         volScalarField& alpha2_;
         const volVectorField& U_;
-        surfaceScalarField nHatf_;
-        volScalarField K_;
+//         surfaceScalarField nHatf_;
+//         volScalarField K_;
 
 
     // Private Member Functions
@@ -78,14 +78,14 @@ class interfaceProperties
         //- Correction for the boundary condition on the unit normal nHat on
         //  walls to produce the correct contact dynamic angle
         //  calculated from the component of U parallel to the wall
-        void correctContactAngle
-        (
-            surfaceVectorField::Boundary& nHat,
-            const surfaceVectorField::Boundary& gradAlphaf
-        );
+//         void correctContactAngle
+//         (
+//             surfaceVectorField::Boundary& nHat,
+//             const surfaceVectorField::Boundary& gradAlphaf
+//         );
 
         //- Re-calculate the interface curvature
-        void calculateK();
+//         void calculateK();
 
 
 public:
@@ -122,14 +122,14 @@ public:
 
         tmp<volVectorField> n() const;
 
-        const surfaceScalarField& nHatf() const
-        {
-            return nHatf_;
-        }
+//         const surfaceScalarField& nHatf() const
+//         {
+//             return nHatf_;
+//         }
 
-        tmp<volScalarField> sigmaK() const;
+//         tmp<volScalarField> sigmaK() const;
 
-        tmp<surfaceScalarField> surfaceTensionForce() const;
+//         tmp<surfaceScalarField> surfaceTensionForce() const;
 
         //- Indicator of the proximity of the interface
         //  Field values are 1 near and 0 away from the interface.
