@@ -5,7 +5,7 @@
 #Variables section
 caseName=case1
 
-scaleSize=$(echo "0.000001" | bc -l)
+scaleSize=$(echo "0.001" | bc -l)
 
 cd ${caseName}
 
@@ -14,13 +14,25 @@ cp -r\
     0
 
 #Preparation mesh
-foamDictionary  -entry decomposer -set scotch system/decomposeParDict
-foamDictionary  -entry numberOfSubdomains -set 6 system/decomposeParDict
+runApplication -a\
+    foamDictionary  -entry decomposer -set scotch system/decomposeParDict
+runApplication -a\
+    foamDictionary  -entry numberOfSubdomains -set 30 system/decomposeParDict
+
 # foamDictionary  -entry simpleCoeffs/n -set "(1 2 3)" system/decomposeParDict
 runApplication  blockMesh
-runApplication  decomposePar
+runApplication  decomposePar -copyZero
 runParallel     renumberMesh -overwrite
 runParallel     checkMesh -allGeometry -allTopology
+
+runParallel -a\
+    foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
+runParallel -a\
+    foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
+runApplication -a\
+    foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
+runApplication -a\
+    foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
 
 #Calculation
 runApplication  setFields

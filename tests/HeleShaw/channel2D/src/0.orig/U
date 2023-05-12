@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  10
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -23,18 +23,18 @@ boundaryField
     //- Set patchGroups for constraint patches
     #includeEtc "caseDicts/setConstraintTypes"
 
-    empty1
+    back
     {
         type            empty;
     }
-    empty2
+    front
     {
         type            empty;
     }
-    open
+    left
     {
-//         type            zeroGradient;
-        type            noSlip;
+        type            fixedValue;
+        value           uniform (0.01 0 0);
 //         type            pressureInletOutletVelocity;
 //         phi             phi;
 //         tangentialVelocity (0 0 0);
@@ -44,6 +44,21 @@ boundaryField
 //         rho             rho;
 //         value           uniform (0 0 0);
     }
+    bottom
+    {
+        type            noSlip;
+    }
+    right
+    {
+        type            fixedValue;
+        value           uniform (0.01 0 0);
+//         type            zeroGradient;
+    }
+    top
+    {
+        type            noSlip;
+    }
 }
+
 
 // ************************************************************************* //

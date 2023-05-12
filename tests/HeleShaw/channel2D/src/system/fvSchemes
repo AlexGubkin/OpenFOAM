@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -16,7 +16,7 @@ FoamFile
 
 ddtSchemes
 {
-    default         steadyState;
+    default         Euler;
 }
 
 gradSchemes
@@ -26,15 +26,25 @@ gradSchemes
 
 divSchemes
 {
-    default         none;
-    div(dPhi,d)     Gauss vanLeer;
-    div(d2Phi,d2)   Gauss vanLeer;
+//     div(rhoPhi,U)   Gauss linearUpwind grad(U);
+    div(rhoPhi,U)   Gauss vanLeerV;
+    div(phi,alpha)  Gauss interfaceCompression vanLeer 1;
+//     div(phi,alpha)  Gauss PLICU interfaceCompression vanLeer 1;
+//     div(phi,alpha)  Gauss MPLIC;
+//     div(phi,alpha)  Gauss MPLICU;
+    div(rhoPhi,T)   Gauss upwind;
+    div(rhoPhi,K)   Gauss upwind;
+    div(phi,p)      Gauss upwind;
+
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+    div(((thermo:rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
 }
 
 laplacianSchemes
 {
-    default         Gauss linear limited corrected 0.5;
-//     laplacian(dPsi) Gauss linear corrected;
+    default         Gauss linear corrected;
+//     default         Gauss linear limited 0.5;
+//     default         Gauss linear orthogonal;
 }
 
 interpolationSchemes
@@ -44,7 +54,16 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default         limited corrected 0.5;
+    default         corrected;
+//     default         limited 0.5;
+//     default         orthogonal;
+}
+
+fluxRequired
+{
+    default         no;
+//     pc;
+    p_rgh;
 }
 
 

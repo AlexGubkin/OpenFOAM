@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  10
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -23,20 +23,71 @@ boundaryField
     //- Set patchGroups for constraint patches
     #includeEtc "caseDicts/setConstraintTypes"
 
-    empty1
+    back
     {
         type            empty;
     }
-    empty2
+    front
     {
         type            empty;
     }
-    open
+    left
     {
         type            zeroGradient;
-//         type            inletOutlet;
-//         value           uniform 1;
-//         inletValue      uniform 1;
+    }
+    bottom
+    {
+//         type           dynamicAlphaContactAngle;
+//         uTheta         0.1;
+//         theta0         60;
+//         thetaA         15;
+//         thetaR         61;
+//         limit          gradient;
+//         value          uniform 0;
+
+        type            constantAlphaContactAngle;
+        theta0          160.0;
+        limit           gradient;
+        value           uniform 0;
+
+//         type            temperatureDependentAlphaContactAngle;
+//         T               T;
+//         theta0          table
+//         (
+//             (300.0 90.0)
+//             (370.0 10.0)
+//         );
+//         limit           gradient;
+//         value           uniform 0;
+    }
+    right
+    {
+        type            zeroGradient;
+    }
+    top
+    {
+//         type           dynamicAlphaContactAngle;
+//         uTheta         0.1;
+//         theta0         60;
+//         thetaA         15;
+//         thetaR         61;
+//         limit          gradient;
+//         value          uniform 0;
+
+        type            constantAlphaContactAngle;
+        theta0          160.0;
+        limit           gradient;
+        value           uniform 0;
+
+//         type            temperatureDependentAlphaContactAngle;
+//         T               T;
+//         theta0          table
+//         (
+//             (300.0 90.0)
+//             (370.0 10.0)
+//         );
+//         limit           gradient;
+//         value           uniform 0;
     }
 }
 
