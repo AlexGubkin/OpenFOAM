@@ -43,7 +43,8 @@ boundaryField
     }
     right
     {
-        type            zeroGradient;
+        type            totalPressure;
+        p0              uniform 1e5;
     }
     top
     {

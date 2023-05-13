@@ -17,7 +17,7 @@ cp -r\
 runApplication -a\
     foamDictionary  -entry decomposer -set scotch system/decomposeParDict
 runApplication -a\
-    foamDictionary  -entry numberOfSubdomains -set 30 system/decomposeParDict
+    foamDictionary  -entry numberOfSubdomains -set 60 system/decomposeParDict
 
 # foamDictionary  -entry simpleCoeffs/n -set "(1 2 3)" system/decomposeParDict
 runApplication  blockMesh
@@ -37,8 +37,8 @@ runApplication -a\
 #Calculation
 runApplication  setFields
 runParallel -a  setFields
-runApplication  transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
-runParallel -a  transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
+# runApplication  transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
+# runParallel -a  transformPoints "scale=(${scaleSize} ${scaleSize} ${scaleSize})"
 
 foamDictionary  -entry endTime -set $(echo "10.0" | bc -l) system/controlDict
 foamDictionary  -entry deltaT -set $(echo "0.00000001" | bc -l) system/controlDict
