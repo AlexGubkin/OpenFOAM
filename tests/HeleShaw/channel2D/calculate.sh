@@ -44,7 +44,7 @@ foamDictionary  -entry endTime -set $(echo "10.0" | bc -l) system/controlDict
 foamDictionary  -entry deltaT -set $(echo "0.00000001" | bc -l) system/controlDict
 foamDictionary  -entry writeControl -set "adjustableRunTime" system/controlDict
 # foamDictionary  -entry writeControl -set "timeStep" system/controlDict
-foamDictionary  -entry writeInterval -set $(echo "0.001" | bc -l) system/controlDict
+foamDictionary  -entry writeInterval -set $(echo "0.01" | bc -l) system/controlDict
 # foamDictionary  -entry writeInterval -set 1 system/controlDict
 foamDictionary  -entry adjustTimeStep -set "yes" system/controlDict
 foamDictionary  -entry maxCo -set $(echo "0.2" | bc -l) system/controlDict

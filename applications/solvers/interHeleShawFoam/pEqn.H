@@ -28,7 +28,6 @@
     surfaceScalarField phig
     (
         phic*rAUf
-      - phiHS*rAUf
       + fvc::snGrad(pc)*rAUf*mesh.magSf()
       - ghf*fvc::snGrad(rho)*rAUf*mesh.magSf()
     );
@@ -66,13 +65,6 @@
             U = HbyA + rAU()*fvc::reconstruct((phig + p_rghEqn.flux())/rAUf);
             U.correctBoundaryConditions();
             fvConstraints.constrain(U);
-
-            phiHS =
-                fvc::interpolate
-                (
-                    advectionFactor*fvc::div(rhoPhi, U)
-                  + resistanceFactor*mixture.mu()*U
-                ) & mesh.Sf();
         }
     }
 

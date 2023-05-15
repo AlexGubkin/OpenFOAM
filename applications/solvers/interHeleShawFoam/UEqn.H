@@ -2,9 +2,11 @@
 
     fvVectorMatrix UEqn
     (
-        fvm::ddt(rho, U) + fvm::div(rhoPhi, U)
+        fvm::ddt(rho, U)
+      + advectionFactor*fvm::div(rhoPhi, U)
       + MRF.DDt(rho, U)
       + turbulence.divDevTau(rho, U)
+      + fvm::Sp(resistanceFactor*mixture.mu(), U)
      ==
        phaseChange.SU(rho, rhoPhi, U)
      + fvModels.source(rho, U)
@@ -28,7 +30,6 @@
                   + fvc::snGrad(pc)
                 ) * mesh.magSf()
               + phic
-              - phiHS
             )
         );
 

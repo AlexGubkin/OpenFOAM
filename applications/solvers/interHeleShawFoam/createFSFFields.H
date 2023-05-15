@@ -273,28 +273,19 @@ dimensionedScalar b(HeleShawModel.lookup("b"));
 
 dimensionedScalar advectionFactor
 (
-    "advectionFactor",
     dimless,
-    0.2
+    1.2
 );
 
 dimensionedScalar rb
 (
-    "advectionFactor",
     dimless/dimLength,
     1/b.value()
 );
 
 dimensionedScalar resistanceFactor
 (
-    "resistanceFactor",
     dimless/(dimLength*dimLength),
     12.0*rb.value()*rb.value()
 );
 
-// Hele-Shaw flux
-surfaceScalarField phiHS
-(
-    "phiHS",
-    resistanceFactor*fvc::interpolate(mixture.mu()*U) & mesh.Sf()
-);
