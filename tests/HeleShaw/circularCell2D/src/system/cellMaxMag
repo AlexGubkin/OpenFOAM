@@ -2,19 +2,16 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  10
+    \\  /    A nd           | Version:  9
      \\/     M anipulation  |
+-------------------------------------------------------------------------------
+Description
+    Writes out the maximum cell value magnitude for one or more fields.
+
 \*---------------------------------------------------------------------------*/
-FoamFile
-{
-    format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      HeleShawModel;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-b               b               [ 0 1 0 0 0 0 0 ]  100e-6;
+#includeEtc "caseDicts/postProcessing/minMax/cellMaxMag.cfg"
 
+fields  (<fieldNames>);
 
 // ************************************************************************* //

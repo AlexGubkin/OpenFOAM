@@ -10,11 +10,28 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      HeleShawModel;
+    object      physicalProperties.phase1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-b               b               [ 0 1 0 0 0 0 0 ]  100e-6;
+viscosityModel  constant;
+
+nu              2e-06;
+
+rho             800;
+
+// thermoType
+// {
+//     type            heRhoThermo;
+//     mixture         pureMixture;
+//     properties      liquid;
+//     energy          sensibleInternalEnergy;
+// }
+// 
+// mixture
+// {
+//     H2O;
+// }
 
 
 // ************************************************************************* //

@@ -17,12 +17,15 @@ cp -r\
 runApplication -a\
     foamDictionary  -entry decomposer -set scotch system/decomposeParDict
 runApplication -a\
-    foamDictionary  -entry numberOfSubdomains -set 60 system/decomposeParDict
+    foamDictionary  -entry numberOfSubdomains -set 30 system/decomposeParDict
 
 # foamDictionary  -entry simpleCoeffs/n -set "(1 2 3)" system/decomposeParDict
 runApplication  blockMesh
 runApplication  decomposePar -copyZero
-runParallel     renumberMesh -overwrite
+runParallel     snappyHexMesh -overwrite
+# runParallel     renumberMesh -overwrite
+runParallel     extrudeMesh
+runParallel     createPatch -overwrite
 runParallel     checkMesh -allGeometry -allTopology
 
 runParallel -a\
@@ -33,6 +36,8 @@ runApplication -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
 runApplication -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
+
+runApplication reconstructParMesh -constant -withZero
 
 #Calculation
 runApplication  setFields

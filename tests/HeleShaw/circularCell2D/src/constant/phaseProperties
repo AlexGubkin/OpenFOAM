@@ -10,11 +10,31 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      HeleShawModel;
+    object      phaseProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-b               b               [ 0 1 0 0 0 0 0 ]  100e-6;
+phases          (phase1 phase2);
+
+pMin            1000;
+
+sigma           0.02;
+
+// sigma
+// {
+//     type    liquidProperties;
+//     phase   phase1;
+// }
+
+// sigma
+// {
+//     type    temperatureDependent;
+//     sigma   table
+//     (
+//         (273.15 0.02410053)
+//         (370.00 0.01562685)
+//     );
+// }
 
 
 // ************************************************************************* //

@@ -8,13 +8,38 @@
 FoamFile
 {
     format      ascii;
-    class       dictionary;
-    location    "constant";
-    object      HeleShawModel;
+    class       volScalarField;
+    location    "0";
+    object      pc;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-b               b               [ 0 1 0 0 0 0 0 ]  100e-6;
+dimensions      [1 -1 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    back
+    {
+        type            empty;
+    }
+    front
+    {
+        type            empty;
+    }
+    open
+    {
+        type            zeroGradient;
+    }
+    inlet
+    {
+        type            zeroGradient;
+    }
+}
 
 
 // ************************************************************************* //

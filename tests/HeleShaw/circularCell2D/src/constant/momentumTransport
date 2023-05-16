@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  10
+    \\  /    A nd           | Version:  9
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,11 +10,22 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      HeleShawModel;
+    object      momentumTransport;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-b               b               [ 0 1 0 0 0 0 0 ]  100e-6;
+simulationType laminar;
+
+RAS
+{
+    // Tested with kEpsilon, realizableKE, kOmega, kOmega2006, kOmegaSST, v2f,
+    // ShihQuadraticKE, LienCubicKE.
+    model           kEpsilon;
+
+    turbulence      on;
+
+    printCoeffs     on;
+}
 
 
 // ************************************************************************* //

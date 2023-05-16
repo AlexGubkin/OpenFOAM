@@ -9,12 +9,12 @@ FoamFile
 {
     format      ascii;
     class       dictionary;
-    location    "constant";
-    object      HeleShawModel;
+    object      createPatchDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-b               b               [ 0 1 0 0 0 0 0 ]  100e-6;
-
+patches
+(
+);
 
 // ************************************************************************* //
