@@ -33,11 +33,8 @@ boundaryField
     }
     open
     {
-//         type            fixedValue;
-//         value           uniform 300;
-        type            inletOutlet;
-        inletValue      $internalField;
-        value           $internalField;
+        type            fixedValue;
+        value           uniform 300;
     }
 }
 

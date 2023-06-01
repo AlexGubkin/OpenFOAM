@@ -27,17 +27,49 @@ geometry
     open
     {
         type            searchableCylinder;
-        point1          (0 0 -1e6);
-        point2          (0 0 1e6);
+        point1          (0 0 -1);
+        point2          (0 0 1);
         radius          0.1;
     }
 
     inlet
     {
         type            searchableCylinder;
-        point1          (0 0 -1e6);
-        point2          (0 0 1e6);
+        point1          (0 0 -1);
+        point2          (0 0 1);
         radius          0.0025;
+    }
+
+    cylinder1
+    {
+        type            searchableCylinder;
+        point1          (0.005 0 -1);
+        point2          (0.005 0 1);
+        radius          0.0005;
+    }
+
+    cylinder2
+    {
+        type            searchableCylinder;
+        point1          (0 0.005 -1);
+        point2          (0 0.005 1);
+        radius          0.0005;
+    }
+
+    cylinder3
+    {
+        type            searchableCylinder;
+        point1          (-0.005 0 -1);
+        point2          (-0.005 0 1);
+        radius          0.0005;
+    }
+
+    cylinder4
+    {
+        type            searchableCylinder;
+        point1          (0 -0.005 -1);
+        point2          (0 -0.005 1);
+        radius          0.0005;
     }
 };
 
@@ -65,6 +97,11 @@ castellatedMeshControls
         {
             level (1 1);
             patchInfo{type patch;}
+        }
+        "cylinder.*"
+        {
+            level (0 0);
+            patchInfo{type wall;}
         }
     }
 
@@ -154,6 +191,14 @@ addLayersControls
             nSurfaceLayers 10;
             expansionRatio 1;
             thickness 5;
+            minThickness 0.05;
+        }
+
+        "cylinder.*"
+        {
+            nSurfaceLayers 2;
+            expansionRatio 1;
+            thickness 0.5;
             minThickness 0.05;
         }
     }

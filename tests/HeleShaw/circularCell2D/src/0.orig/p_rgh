@@ -41,6 +41,11 @@ boundaryField
         type            totalPressure;
         p0              uniform 101000;
     }
+    "cylinder.*"
+    {
+        type            fixedFluxPressure;
+        value           uniform 1e5;
+    }
 }
 
 

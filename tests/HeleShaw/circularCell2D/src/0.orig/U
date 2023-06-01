@@ -57,6 +57,10 @@ boundaryField
         rho             rho;
         value           uniform (0 0 0);
     }
+    "cylinder.*"
+    {
+        type            noSlip;
+    }
 }
 
 

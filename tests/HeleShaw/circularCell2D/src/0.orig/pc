@@ -39,6 +39,10 @@ boundaryField
     {
         type            zeroGradient;
     }
+    "cylinder.*"
+    {
+        type            zeroGradient;
+    }
 }
 
 

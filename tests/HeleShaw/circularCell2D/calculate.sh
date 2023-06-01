@@ -17,7 +17,7 @@ cp -r\
 runApplication -a\
     foamDictionary  -entry decomposer -set scotch system/decomposeParDict
 runApplication -a\
-    foamDictionary  -entry numberOfSubdomains -set 40 system/decomposeParDict
+    foamDictionary  -entry numberOfSubdomains -set 20 system/decomposeParDict
 # runApplication -a\
 #     foamDictionary  -entry simpleCoeffs/n -set "(7 7 1)" system/decomposeParDict
 
