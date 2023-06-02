@@ -75,6 +75,14 @@ solvers
         relTol          0;
     }
 
+    p
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          1e-2;
+    }
+
     pc
     {
         solver          PCG;
@@ -109,6 +117,22 @@ solvers
         smoother        symGaussSeidel;
         tolerance       1e-8;
         relTol          0;
+    }
+}
+
+SIMPLE
+{
+    momentumPredictor           yes;
+    nUCorrectors                2;
+    nNonOrthogonalCorrectors    2;
+    consistent                  yes;
+    pRefCell                    0;
+    pRefValue                   0;
+
+    residualControl
+    {
+        p                       1e-6;
+        U                       1e-6;
     }
 }
 
@@ -162,6 +186,7 @@ relaxationFactors
 {
     fields
     {
+        p                       0.3;
 //         p_rgh                   0.3;
 //         p_rghFinal              1;
 //         phic                    0.7;

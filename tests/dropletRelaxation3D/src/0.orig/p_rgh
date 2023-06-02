@@ -26,8 +26,6 @@ boundaryField
     open
     {
         type            fixedFluxPressure;
-//         type            totalPressure;
-//         p0              $internalField;
     }
 }
 

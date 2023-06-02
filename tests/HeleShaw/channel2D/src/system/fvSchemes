@@ -26,6 +26,7 @@ gradSchemes
 
 divSchemes
 {
+    div(phi,U)      bounded Gauss linearUpwindV grad(U);
 //     div(rhoPhi,U)   Gauss linearUpwind grad(U);
     div(rhoPhi,U)   Gauss vanLeerV;
     div(phi,alpha)  Gauss interfaceCompression vanLeer 1;
@@ -36,6 +37,7 @@ divSchemes
     div(rhoPhi,K)   Gauss upwind;
     div(phi,p)      Gauss upwind;
 
+    div((nuEff*dev2(T(grad(U)))))   Gauss linear;
     div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
     div(((thermo:rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
 }
@@ -63,6 +65,7 @@ fluxRequired
 {
     default         no;
 //     pc;
+    p;
     p_rgh;
 }
 

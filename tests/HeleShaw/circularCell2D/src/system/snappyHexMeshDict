@@ -43,33 +43,65 @@ geometry
     cylinder1
     {
         type            searchableCylinder;
-        point1          (0.005 0 -1);
-        point2          (0.005 0 1);
-        radius          0.0005;
+        point1          (0.01 0 -1);
+        point2          (0.01 0 1);
+        radius          0.001;
     }
 
     cylinder2
     {
         type            searchableCylinder;
-        point1          (0 0.005 -1);
-        point2          (0 0.005 1);
-        radius          0.0005;
+        point1          (0.007071067811865476 0.007071067811865476 -1);
+        point2          (0.007071067811865476 0.007071067811865476 1);
+        radius          0.001;
     }
 
     cylinder3
     {
         type            searchableCylinder;
-        point1          (-0.005 0 -1);
-        point2          (-0.005 0 1);
-        radius          0.0005;
+        point1          (0 0.01 -1);
+        point2          (0 0.01 1);
+        radius          0.001;
     }
 
     cylinder4
     {
         type            searchableCylinder;
-        point1          (0 -0.005 -1);
-        point2          (0 -0.005 1);
-        radius          0.0005;
+        point1          (-0.007071067811865476 0.007071067811865476 -1);
+        point2          (-0.007071067811865476 0.007071067811865476 1);
+        radius          0.001;
+    }
+
+    cylinder5
+    {
+        type            searchableCylinder;
+        point1          (-0.01 0 -1);
+        point2          (-0.01 0 1);
+        radius          0.001;
+    }
+
+    cylinder6
+    {
+        type            searchableCylinder;
+        point1          (-0.007071067811865476 -0.007071067811865476 -1);
+        point2          (-0.007071067811865476 -0.007071067811865476 1);
+        radius          0.001;
+    }
+
+    cylinder7
+    {
+        type            searchableCylinder;
+        point1          (0 -0.01 -1);
+        point2          (0 -0.01 1);
+        radius          0.001;
+    }
+
+    cylinder8
+    {
+        type            searchableCylinder;
+        point1          (0.007071067811865476 -0.007071067811865476 -1);
+        point2          (0.007071067811865476 -0.007071067811865476 1);
+        radius          0.001;
     }
 };
 
@@ -80,7 +112,7 @@ castellatedMeshControls
     maxGlobalCells 4000000;
     minRefinementCells 0;
     maxLoadUnbalance 0.10;
-    nCellsBetweenLevels 20;
+    nCellsBetweenLevels 50;
 
     features
     (
@@ -188,15 +220,15 @@ addLayersControls
 
         inlet
         {
-            nSurfaceLayers 10;
+            nSurfaceLayers 4;
             expansionRatio 1;
-            thickness 5;
+            thickness 2;
             minThickness 0.05;
         }
 
         "cylinder.*"
         {
-            nSurfaceLayers 2;
+            nSurfaceLayers 1;
             expansionRatio 1;
             thickness 0.5;
             minThickness 0.05;
@@ -234,16 +266,16 @@ addLayersControls
 
     // Maximum number of snapping relaxation iterations. Should stop
     // before upon reaching a correct mesh.
-    nRelaxIter 5;
+    nRelaxIter 1;
 
     // Number of smoothing iterations of surface normals
-    nSmoothSurfaceNormals 10;
+    nSmoothSurfaceNormals 1;
 
     // Number of smoothing iterations of interior mesh movement direction
-    nSmoothNormals 10;
+    nSmoothNormals 1;
 
     // Smooth layer thickness over surface patches
-    nSmoothThickness 10;
+    nSmoothThickness 1;
 
     // Stop layer growth on highly warped cells
     maxFaceThicknessRatio 0.9;
@@ -267,7 +299,7 @@ addLayersControls
     // Max number of iterations after which relaxed meshQuality controls
     // get used. Up to nRelaxIter it uses the settings in meshQualityControls,
     // after nRelaxIter it uses the values in meshQualityControls::relaxed.
-    nRelaxedIter 20;
+    nRelaxedIter 1;
 }
 
 // Generic mesh quality settings. At any undoable phase these determine

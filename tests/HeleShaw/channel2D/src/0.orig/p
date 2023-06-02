@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  9
+    \\  /    A nd           | Version:  10
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -14,27 +14,38 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -1 -2 0 0 0 0];
+dimensions      [0 2 -2 0 0 0 0];
 
-internalField   uniform 1e5;
+internalField   uniform 0;
 
 boundaryField
 {
-    //- Set patchGroups for constraint patches
-    #includeEtc "caseDicts/setConstraintTypes"
-
-    empty1
+    back
     {
         type            empty;
     }
-    empty2
+    front
     {
         type            empty;
     }
-    open
+    left
     {
-        type            calculated;
-        value           $internalField;
+        type            zeroGradient;
+//         type            totalPressure;
+//         p0              uniform 100100;
+    }
+    bottom
+    {
+        type            zeroGradient;
+    }
+    right
+    {
+        type            totalPressure;
+        p0              uniform 0;
+    }
+    top
+    {
+        type            zeroGradient;
     }
 }
 
