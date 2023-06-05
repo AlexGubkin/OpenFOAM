@@ -17,14 +17,13 @@ cp -r\
 runApplication -a\
     foamDictionary  -entry decomposer -set scotch system/decomposeParDict
 runApplication -a\
-    foamDictionary  -entry numberOfSubdomains -set 60 system/decomposeParDict
+    foamDictionary  -entry numberOfSubdomains -set 20 system/decomposeParDict
 
 # foamDictionary  -entry simpleCoeffs/n -set "(1 2 3)" system/decomposeParDict
 runApplication  blockMesh
 runApplication  decomposePar -copyZero
-runParallel     renumberMesh -overwrite
+runParallel     renumberMesh -noFields -overwrite
 runParallel     checkMesh -allGeometry -allTopology
-
 runParallel -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
 runParallel -a\
@@ -33,6 +32,7 @@ runApplication -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
 runApplication -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
+runParallel     patchSummary
 
 # #Calculation
 # runApplication  setFields
@@ -52,8 +52,13 @@ runApplication -a\
 #
 # runParallel     interHeleShawFoam
 
-foamDictionary -entry ddtSchemes/default -set steadyState system/fvSchemes
+foamDictionary  -entry ddtSchemes/default -set steadyState system/fvSchemes
+foamDictionary  -entry endTime -set $(echo "1000" | bc -l) system/controlDict
+foamDictionary  -entry deltaT -set $(echo "1" | bc -l) system/controlDict
+foamDictionary  -entry writeControl -set "timeStep" system/controlDict
+foamDictionary  -entry writeInterval -set 100 system/controlDict
 
 runParallel     HeleShawSimpleFoam
+# runParallel     simpleFoam
 
 exit 0
