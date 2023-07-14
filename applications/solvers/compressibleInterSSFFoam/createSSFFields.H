@@ -5,7 +5,7 @@ volScalarField kappa0
 (
     IOobject
     (
-        "interfaceProperties:kappa0",
+        "kappa0",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -20,7 +20,7 @@ volScalarField kappa
 (
     IOobject
     (
-        "interfaceProperties:kappa",
+        "kappa",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
