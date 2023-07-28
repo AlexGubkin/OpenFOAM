@@ -144,11 +144,11 @@ PIMPLE
     nNonOrthogonalCorrectors    0;
 
 //     pcRefCell                   0;
-    pcRefPoint                  (1e-6 0 0);
+    pcRefPoint                  (0.001 0.001 0);
     pcRefValue                  0;
 
 //     pRefCell                    0;
-    pRefPoint                   (1e-6 0 0);
+    pRefPoint                   (0.001 0.001 0);
     pRefValue                   1e5;
 
     outerCorrectorResidualControl

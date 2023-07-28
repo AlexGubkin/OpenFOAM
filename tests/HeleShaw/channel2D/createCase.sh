@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Variables section
-caseName=case1
+caseName=b10um
 
 function makeCase(){
     mkdir -p ${caseName}

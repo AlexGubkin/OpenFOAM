@@ -34,7 +34,7 @@ boundaryField
     left
     {
         type            fixedValue;
-        value           uniform (0.01 0 0);
+        value           uniform (0.005 0 0);
 
 //         type            pressureInletOutletVelocity;
 //         phi             phi;
@@ -47,7 +47,7 @@ boundaryField
     }
     bottom
     {
-        type            noSlip;
+        type            slip;
     }
     right
     {
@@ -63,7 +63,7 @@ boundaryField
     }
     top
     {
-        type            noSlip;
+        type            slip;
     }
 }
 

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm -rf case*
+rm -rf case* b*um
