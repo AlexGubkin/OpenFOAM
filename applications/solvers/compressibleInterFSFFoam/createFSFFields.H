@@ -117,17 +117,53 @@ volScalarField w2
 
 // Face unit interface normal initialization
 // Gradient of alpha
+volVectorField gradAlpha
+(
+    "gradAlpha",
+    fvc::grad(alpha1)
+);
+// Interpolated gradient of alpha
+surfaceVectorField gradAlphaf
+(
+    "gradAlphaf",
+    fvc::interpolate(gradAlpha)
+);
+
+// Face unit interface normal
+volVectorField nHatv
+(
+    "nHatv",
+    gradAlpha/(mag(gradAlpha) + mixture.deltaN())
+);
+
+// Face unit interface normal
+surfaceVectorField nHatfv
+(
+    "nHatfv",
+    gradAlphaf/(mag(gradAlphaf) + mixture.deltaN())
+);
+
+// Face unit interface normal flux
+surfaceScalarField nHatf
+(
+    "nHatf",
+    nHatfv & mesh.Sf()
+);
+
+
+// Face unit interface normal initialization
+// Gradient of alpha
 volVectorField gradAlphaSm
 (
     "gradAlphaSm",
     fvc::grad(alpha1Sm)
 );
 // Interpolated gradient of alpha
-surfaceVectorField gradAlphaSmf
-(
-    "gradAlphaSmf",
-    fvc::interpolate(gradAlphaSm)
-);
+// surfaceVectorField gradAlphaSmf
+// (
+//     "gradAlphaSmf",
+//     fvc::interpolate(gradAlphaSm)
+// );
 
 // Interpolated face-gradient of sharpened alpha
 surfaceScalarField deltaf
@@ -137,25 +173,18 @@ surfaceScalarField deltaf
 );
 
 // Face unit interface normal
-volVectorField nHatv
+volVectorField nHatSmv
 (
-    "nHatv",
+    "nHatSmv",
     gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN())
 );
 
-// Face unit interface normal
-surfaceVectorField nHatfv
-(
-    "nHatfv",
-    gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN())
-);
-
-// Face unit interface normal flux
-surfaceScalarField nHatf
-(
-    "nHatf",
-    nHatfv & mesh.Sf()
-);
+// // Face unit interface normal
+// surfaceVectorField nHatSmfv
+// (
+//     "nHatSmfv",
+//     gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN())
+// );
 
 
 // Initialization fields for surface tension force calculation
@@ -206,7 +235,7 @@ surfaceScalarField fcfFilt
 (
     "fcfFilt",
     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-   *fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf())
+   *fvc::interpolate(gradPc - (gradPc & nHatSmv)*nHatSmv) & (mesh.Sf()/mesh.magSf())
 );
 
 
@@ -271,7 +300,7 @@ volVectorField fct
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    mag(fvc::grad(alpha1))*(gradSigma - (gradSigma & nHatv)*nHatv)
+    mag(fvc::grad(alpha1))*(gradSigma - (gradSigma & nHatSmv)*nHatSmv)
 );
 
 // Surface tension force flux (tangent force flux)
