@@ -8,7 +8,7 @@ volScalarField kappa0
         "kappa0",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
@@ -23,7 +23,7 @@ volScalarField kappa
         "kappa",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
@@ -38,7 +38,7 @@ volScalarField alpha1Sm
         "alpha1Sm",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     alpha1
@@ -52,7 +52,7 @@ volScalarField alpha2Sm
         "alpha2Sm",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     1.0 - alpha1
@@ -66,7 +66,7 @@ volScalarField alphaC
         "alphaC",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     alpha1
@@ -80,7 +80,7 @@ volScalarField alphaSh
         "alphaSh",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     alpha1
@@ -94,7 +94,7 @@ volScalarField w1
         "w1",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     sqrt(alphaC*(scalar(1.0) - alphaC))
@@ -108,7 +108,7 @@ volScalarField w2
         "w2",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     sqrt(w1*w1 + SMALL)
@@ -208,7 +208,7 @@ volScalarField pc
         "pc",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh
