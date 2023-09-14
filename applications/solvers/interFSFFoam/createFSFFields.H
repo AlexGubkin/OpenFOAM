@@ -8,7 +8,7 @@ volScalarField kappa0
         "kappa0",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
@@ -23,7 +23,7 @@ volScalarField kappa
         "kappa",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
@@ -38,7 +38,7 @@ volScalarField alpha1Sm
         "alpha1Sm",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     alpha1
@@ -52,7 +52,7 @@ volScalarField alpha2Sm
         "alpha2Sm",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     1.0 - alpha1
@@ -66,7 +66,7 @@ volScalarField alphaC
         "alphaC",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     alpha1
@@ -80,7 +80,7 @@ volScalarField alphaSh
         "alphaSh",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     alpha1
@@ -94,7 +94,7 @@ volScalarField w1
         "w1",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     sqrt(alphaC*(scalar(1.0) - alphaC))
@@ -108,10 +108,46 @@ volScalarField w2
         "w2",
         runTime.timeName(),
         mesh,
-        IOobject::NO_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     sqrt(w1*w1 + SMALL)
+);
+
+
+// Face unit interface normal initialization
+// Gradient of alpha
+volVectorField gradAlpha
+(
+    "gradAlpha",
+    fvc::grad(alpha1)
+);
+// Interpolated gradient of alpha
+surfaceVectorField gradAlphaf
+(
+    "gradAlphaf",
+    fvc::interpolate(gradAlpha)
+);
+
+// Face unit interface normal
+volVectorField nHatv
+(
+    "nHatv",
+    gradAlpha/(mag(gradAlpha) + mixture.deltaN())
+);
+
+// Face unit interface normal
+surfaceVectorField nHatfv
+(
+    "nHatfv",
+    gradAlphaf/(mag(gradAlphaf) + mixture.deltaN())
+);
+
+// Face unit interface normal flux
+surfaceScalarField nHatf
+(
+    "nHatf",
+    nHatfv & mesh.Sf()
 );
 
 
@@ -123,11 +159,11 @@ volVectorField gradAlphaSm
     fvc::grad(alpha1Sm)
 );
 // Interpolated gradient of alpha
-surfaceVectorField gradAlphaSmf
-(
-    "gradAlphaSmf",
-    fvc::interpolate(gradAlphaSm)
-);
+// surfaceVectorField gradAlphaSmf
+// (
+//     "gradAlphaSmf",
+//     fvc::interpolate(gradAlphaSm)
+// );
 
 // Interpolated face-gradient of sharpened alpha
 surfaceScalarField deltaf
@@ -137,25 +173,18 @@ surfaceScalarField deltaf
 );
 
 // Face unit interface normal
-volVectorField nHatv
+volVectorField nHatSmv
 (
-    "nHatv",
+    "nHatSmv",
     gradAlphaSm/(mag(gradAlphaSm) + mixture.deltaN())
 );
 
-// Face unit interface normal
-surfaceVectorField nHatfv
-(
-    "nHatfv",
-    gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN())
-);
-
-// Face unit interface normal flux
-surfaceScalarField nHatf
-(
-    "nHatf",
-    nHatfv & mesh.Sf()
-);
+// // Face unit interface normal
+// surfaceVectorField nHatSmfv
+// (
+//     "nHatSmfv",
+//     gradAlphaSmf/(mag(gradAlphaSmf) + mixture.deltaN())
+// );
 
 
 // Initialization fields for surface tension force calculation
@@ -179,7 +208,7 @@ volScalarField pc
         "pc",
         runTime.timeName(),
         mesh,
-        IOobject::MUST_READ,
+        IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh
@@ -206,7 +235,7 @@ surfaceScalarField fcfFilt
 (
     "fcfFilt",
     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
-   *fvc::interpolate(gradPc - (gradPc & nHatv)*nHatv) & (mesh.Sf()/mesh.magSf())
+   *fvc::interpolate(gradPc - (gradPc & nHatSmv)*nHatSmv) & (mesh.Sf()/mesh.magSf())
 );
 
 

@@ -19,7 +19,7 @@ fcf.relax();
 gradPc = fvc::grad(pc);
 
 fcFilt =
-    cPhicFilterCoeff*(gradPc - (gradPc & nHatv)*nHatv);
+    cPhicFilterCoeff*(gradPc - (gradPc & nHatSmv)*nHatSmv);
 
 // fcfFilt =
 //     mag(deltaf)/(mag(deltaf) + mixture.deltaN())
