@@ -56,7 +56,7 @@ SIMPLE
 
 eikonal
 {
-    nNonOrthogonalCorrectors 200;
+    nNonOrthogonalCorrectors 1000;
 
     eikonalCoeffs
     {
@@ -71,9 +71,9 @@ relaxationFactors
     }
     equations
     {
-        d       0.25;
-        d2      0.25;
-        d2Psi   0.25;
+        d       0.5;
+        d2      0.5;
+        d2Psi   0.1;
     }
 }
 

@@ -35,7 +35,7 @@ boundaryField
     {
         type            zeroGradient;
 //         type            totalPressure;
-//         p0              uniform 100100;
+//         p0              uniform 1;
     }
     bottom
     {

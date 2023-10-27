@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Variables section
-caseName=b10um
+caseName=simpleFoam
 
 function makeCase(){
     mkdir -p ${caseName}

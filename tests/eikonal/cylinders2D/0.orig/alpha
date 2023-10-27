@@ -25,48 +25,48 @@ boundaryField
 
     back
     {
-        type            empty;
+        type    empty;
     }
     front
     {
-        type            empty;
+        type    empty;
     }
     left
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     bottom
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     right
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     top
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
 
     cylinder1
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     cylinder2
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     cylinder3
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     cylinder4
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
     cylinder5
     {
-        type            zeroGradient;
+        type    zeroGradient;
     }
 }
 

@@ -29,8 +29,8 @@ runApplication -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
 runApplication -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/front/type -set empty
-runApplication      setFields
-runParallel -a      setFields
+# runApplication      setFields
+# runParallel -a      setFields
 
 runParallel         $application
 
