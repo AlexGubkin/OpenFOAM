@@ -27,6 +27,7 @@ gradSchemes
 divSchemes
 {
     default         none;
+    div(sPhi,s)     Gauss vanLeer;
     div(dPhi,d)     Gauss vanLeer;
     div(d2Phi,d2)   Gauss vanLeer;
 }
@@ -34,7 +35,6 @@ divSchemes
 laplacianSchemes
 {
     default         Gauss linear limited corrected 0.5;
-//     laplacian(dPsi) Gauss linear corrected;
 }
 
 interpolationSchemes

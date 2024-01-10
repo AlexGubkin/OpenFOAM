@@ -44,5 +44,19 @@ timePrecision   6;
 
 runTimeModifiable true;
 
+libs (
+    "libOpenFOAM.so"
+);
 
+functions
+{
+    distanceField1
+    {
+        type    distanceField;
+        libs    ("libdistanceFieldFunctionObject.so");
+
+        field   s;
+        patches (bottom top);
+    }
+}
 // ************************************************************************* //
