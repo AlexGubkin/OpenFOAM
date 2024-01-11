@@ -11,6 +11,7 @@ cp -r\
     0
 
 runApplication  blockMesh
+runApplication  topoSet
 # runApplication  $application -noFunctionObjects
 # runApplication  foamPostProcess
 

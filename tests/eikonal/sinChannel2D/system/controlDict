@@ -55,6 +55,9 @@ functions
         type    distanceField;
         libs    ("libdistanceFieldFunctionObject.so");
 
+        selectionMode cellSet;
+        cellSet       c0;
+
         field   s;
         patches (bottom top);
     }
