@@ -50,6 +50,29 @@ libs (
 
 functions
 {
+//     #includeFunc    residuals
+
+    volAveragedU1
+    {
+        type            volFieldValue;
+
+        libs            ("libfieldFunctionObjects.so");
+
+        writeControl    writeTime;
+
+        log             true;
+        writeFields     true;
+
+        regionType      cellZone;
+        name            set0;
+
+        operation       volAverage;
+        fields
+        (
+            d
+        );
+    }
+
     distanceField1
     {
         type    distanceField;

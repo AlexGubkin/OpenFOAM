@@ -26,16 +26,16 @@ actions
             box (-1 -1 -1) (1 1 1);
         }
     }
-//     {
-//         name    set1;
-//         type    cellZoneSet;
-//         action  new;
-//         source  setToCellZone;
-//         sourceInfo
-//         {
-//             set     c0;
-//         }
-//     }
+    {
+        name    set0;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        sourceInfo
+        {
+            set     c0;
+        }
+    }
 );
 
 // ************************************************************************* //
