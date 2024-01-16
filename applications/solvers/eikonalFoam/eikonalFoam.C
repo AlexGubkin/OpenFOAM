@@ -49,6 +49,12 @@ Description
 
 int main(int argc, char *argv[])
 {
+    argList::addBoolOption
+    (
+        "withFunctionObjects",
+        "execute functionObjects"
+    );
+
     #include "setRootCaseLists.H"
     #include "createTime.H"
     #include "createMesh.H"
@@ -195,6 +201,14 @@ int main(int argc, char *argv[])
     // Write d and gradd
     d2.write();
     gradd2.write();
+
+    runTime.functionObjects().end();
+
+    Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+        << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+        << nl << endl;
+
+    Info<< "End\n" << endl;
 }
 
 
