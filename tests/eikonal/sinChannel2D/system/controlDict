@@ -52,7 +52,7 @@ functions
 {
 //     #includeFunc    residuals
 
-    volAveragedU1
+    volAveragedd
     {
         type            volFieldValue;
 
@@ -78,11 +78,21 @@ functions
         type    distanceField;
         libs    ("libdistanceFieldFunctionObject.so");
 
-        selectionMode cellSet;
-        cellSet       c0;
+        writeControl    writeTime;
+
+        log             true;
+        writeFields     true;
+
+        regionType      cellZone;
+        name            set0;
 
         field   s;
         patches (bottom top);
+
+        fields
+        (
+            s
+        );
     }
 }
 // ************************************************************************* //
