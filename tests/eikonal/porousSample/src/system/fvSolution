@@ -1,0 +1,212 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+//     Phi
+//     {
+//         solver                  GAMG;
+//         tolerance               1e-10;
+//         relTol                  0;
+// 
+//         smoother                DICGaussSeidel;
+// 
+//         cacheAgglomeration      true;
+//         nCellsInCoarsestLevel   10;
+//         agglomerator            faceAreaPair;
+//         mergeLevels             1;
+// 
+//         /*solver                  PCG;
+//         preconditioner          DIC;
+//         tolerance               1e-10;
+//         relTol                  1e-1;*/
+//     }
+
+    p
+    {
+        solver                  GAMG;
+        tolerance               1e-10;
+        relTol                  0.01;
+
+        smoother                DICGaussSeidel;
+
+        cacheAgglomeration      true;
+        nCellsInCoarsestLevel   10;
+        agglomerator            faceAreaPair;
+        mergeLevels             1;
+
+//         solver                  PCG;
+//         preconditioner          DIC;
+//         tolerance               1e-8;
+//         relTol                  1e-3;
+    }
+
+//     "(U|k|epsilon|omega)"
+//     {
+//         /*solver                  smoothSolver;
+//         smoother                symGaussSeidel;
+//         tolerance               1e-8;
+//         relTol                  1e-1;*/
+// 
+//         solver                  PBiCG;
+//         preconditioner          DILU;
+//         tolerance               1e-8;
+//         relTol                  0;
+//     }
+
+//     p
+//     {
+// //         solver          GAMG;
+// //         smoother        GaussSeidel;
+// //         tolerance       1e-06;
+// //         relTol          0.01;
+//         solver                  PCG;
+//         preconditioner          DIC;
+//         tolerance               1e-8;
+//         relTol                  0.1;
+//     }
+
+    U
+    {
+//         solver          PBiCG;
+//         preconditioner  DILU;
+//         tolerance       1e-8;
+//         relTol          0.01;
+        solver                  smoothSolver;
+        smoother                symGaussSeidel;
+        tolerance               1e-12;
+        relTol                  0;
+    }
+
+    "alpha.liquid1.*"
+    {
+//         nAlphaCorr      2;
+//         nAlphaSubCycles 2;
+
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
+
+        MULESCorr       yes;
+        nLimiterIter    5;
+
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    "pcorr.*"
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-4;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+//     U
+//     {
+//         solver          smoothSolver;
+//         smoother        symGaussSeidel;
+//         tolerance       1e-6;
+//         relTol          0;
+//     }
+}
+
+SIMPLE
+{
+    momentumPredictor           yes;
+    nNonOrthogonalCorrectors    2;
+    consistent                  yes;
+    pRefCell                    0;
+    pRefValue                   0;
+
+    residualControl
+    {
+        p                       1e-6;
+        U                       1e-6;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor           no;
+    nOuterCorrectors            1;
+    nCorrectors                 2;
+    nNonOrthogonalCorrectors    1;
+    consistent                  yes;
+
+    outerCorrectorResidualControl
+    {
+        p_rgh
+        {
+            tolerance           1e-4;
+            relTol              0;
+        }
+
+        U
+        {
+            tolerance           1e-4;
+            relTol              0;
+        }
+    }
+
+    turbOnFinalIterOnly on;
+}
+
+relaxationFactors
+{
+    fields
+    {
+        p                       0.5;
+    }
+
+    equations
+    {
+        U                       0.7;
+    }
+}
+
+potentialFlow
+{
+    nNonOrthogonalCorrectors    25;
+
+    PhiRefCell                  0;
+    PhiRefPoint                 0;
+    PhiRefValue                 0;
+    Phi                         0;
+}
+
+cache
+{
+    grad(U);
+}
+
+// ************************************************************************* //

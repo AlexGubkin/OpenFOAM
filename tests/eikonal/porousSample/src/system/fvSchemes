@@ -1,0 +1,88 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  9
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default                         steadyState;
+}
+
+gradSchemes
+{
+    default                         Gauss linear;
+//     grad(p)                         cellLimited Gauss linear 1;
+//     grad(U)                         cellLimited Gauss linear 1;
+}
+
+divSchemes
+{
+    default                         none;
+
+    div(phi,U)                      bounded Gauss linearUpwindV grad(U);
+//     div(phi,U)                      bounded Gauss upwind;
+    div(rhoPhi,U)                   Gauss linearUpwindV grad(U);
+    div(phi,alpha)                  Gauss interfaceCompression vanLeer 1;
+//     div(phi,U)                      bounded Gauss vanLeerV;
+//     div(phi,k)                      bounded Gauss vanLeer;
+//     div(phi,epsilon)                bounded Gauss vanLeer;
+//     div(phi,R)                      bounded Gauss vanLeer;
+//     div(R)                          bounded Gauss vanLeer;
+//     div(phi,nuTilda)                bounded Gauss vanLeer;
+    div((nuEff*dev2(T(grad(U)))))   Gauss linear;
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
+//     div((nuEff*dev(T(grad(U)))))    Gauss linear;
+//     div((nuEff*grad(U)))            Gauss linear;
+}
+
+laplacianSchemes
+{
+    default                         Gauss linear corrected;
+//     default                         Gauss linear limited corrected 1;
+//     laplacian(1,Phi)                Gauss linear limited corrected 0.33;
+//     laplacian(nuEff,U)              Gauss linear limited corrected 0.33;
+//     laplacian(rAUf,p)               Gauss linear limited corrected 0.33;
+//     laplacian(DkEff,k)              Gauss linear limited corrected 0.33;
+//     laplacian(DepsilonEff,epsilon)  Gauss linear limited corrected 0.33;
+//     laplacian(DREff,R)              Gauss linear limited corrected 0.33;
+//     laplacian(DnuTildaEff,nuTilda)  Gauss linear limited corrected 0.33;
+//     laplacian((1|A(U)),p)           Gauss linear limited corrected 0.33;
+}
+
+interpolationSchemes
+{
+    default                         linear;
+    /*interpolate(U)                  linear;*/
+}
+
+snGradSchemes
+{
+    default                         corrected;
+//     default                         limited corrected 1;
+}
+
+fluxRequired
+{
+    default                         no;
+    pcorr;
+    p;
+    p_rgh;
+}
+
+/*wallDist
+{
+    method meshWave;
+}*/
+
+// ************************************************************************* //

@@ -1,0 +1,163 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#include "ROI"
+
+overset         #calc "0.006 * min($dx, $dy)";
+
+box0x0          #calc "- 0.5 * ($dx + $overset) + $ox";
+box0y0          #calc "- 0.5 * ($dy + $overset) + $oy";
+box0z0          #calc "- 0.5 * $dz + $oz";
+box0x6          #calc "0.5 * ($dx + $overset) + $ox";
+box0y6          #calc "0.5 * ($dy + $overset) + $oy";
+box0z6          #calc "0.5 * $dz + $oz";
+
+// Which of the steps to run
+castellatedMesh true;
+snap            false;
+addLayers       false;
+
+geometry
+{
+    refineBox
+    {
+        type    searchableBox;
+        min     ($box0x0 $box0y0 $box0z0);
+        max     ($box0x6 $box0y6 $box0z6);
+    }
+};
+
+
+castellatedMeshControls
+{
+    maxLocalCells 5000000;
+    maxGlobalCells 200000000;
+    minRefinementCells 0;
+    maxLoadUnbalance 0.10;
+    nCellsBetweenLevels 5;
+
+    features
+    (
+    );
+
+    refinementSurfaces
+    {
+    }
+
+    resolveFeatureAngle 30;
+
+    refinementRegions
+    {
+        refineBox
+        {
+            mode    inside;
+            levels  ((1E15 4));
+        }
+    }
+
+    #include "locationInMesh"
+
+    allowFreeStandingZoneFaces true;
+}
+
+
+snapControls
+{
+    nSmoothPatch 5;
+    tolerance 1.0;
+    nSolveIter 50;
+    nRelaxIter 5;
+
+    nFeatureSnapIter 10;
+    implicitFeatureSnap true;
+    explicitFeatureSnap false;
+    multiRegionFeatureSnap false;
+}
+
+
+addLayersControls
+{
+    relativeSizes false;
+
+    layers
+    {
+    }
+
+    expansionRatio 1.1;
+    //finalLayerThickness 1e-2;
+    thickness 0.5;
+    minThickness 0.05;
+    nGrow 0;
+
+    featureAngle 160;
+    nRelaxIter 5;
+    nSmoothSurfaceNormals 2;
+    nSmoothNormals 4;
+    nSmoothThickness 8;
+    maxFaceThicknessRatio 0.9;
+    maxThicknessToMedialRatio 0.9;
+    minMedianAxisAngle 90;
+    nBufferCellsNoExtrude 0;
+    nLayerIter 50;
+    nRelaxedIter 20;
+}
+
+meshQualityControls
+{
+    maxNonOrtho                 120;
+    maxBoundarySkewness         20;
+    maxInternalSkewness         6;
+    maxConcave                  100;
+    minVol                      -1e-30;
+    minTetQuality               1e-30;
+    minArea                     0;
+    minTwist                    0.05;
+    minDeterminant              0.01;
+    minFaceWeight               0.05;
+    minVolRatio                 0.01;
+    minTriangleTwist            -1;
+    minVolCollapseRatio         0.5;
+
+    nSmoothScale                4;
+    errorReduction              0.75;
+    relaxed
+    {
+        maxNonOrtho             75;
+    }
+}
+
+
+// Advanced
+
+// Flags for optional output
+// 0 : only write final meshes
+// 1 : write intermediate meshes
+// 2 : write volScalarField with cellLevel for postprocessing
+// 4 : write current intersections as .obj files
+debug 0;
+
+writeFlags
+(
+//     scalarLevels
+//     layerSets
+//     layerFields
+);
+
+mergeTolerance 1e-6;
+
+
+// ************************************************************************* //

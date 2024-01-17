@@ -26,7 +26,7 @@ oz              0;
 
 nz              1;
 nx              500;
-ny              #calc "int($nx * $dy / $dx)";
+ny              #calc "int($nx * $dy / $dx) + 1";
 
 box0nx      $nx;
 box0ny      $ny;

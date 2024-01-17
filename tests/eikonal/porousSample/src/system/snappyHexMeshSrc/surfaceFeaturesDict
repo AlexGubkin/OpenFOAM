@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      surfaceFeaturesDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+surface1
+{
+    surfaces
+    (
+        "rockSkeletonWalls.stl"
+    );
+
+    // Identify a feature when angle between faces < includedAngle
+    includedAngle   95;
+
+    // Do not mark region edges
+    geometricTestOnly       yes;
+
+    // Write options
+
+    // Write features to obj format for postprocessing
+    writeObj                no;
+    verboseObj              no;
+}
+
+// surface2
+// {
+//     surfaces
+//     (
+//         "outerBufferZoneWalls.stl"
+//     );
+//
+//     // Identify a feature when angle between faces < includedAngle
+//     includedAngle   170;
+//
+//     // Do not mark region edges
+//     geometricTestOnly       yes;
+//
+//     // Write options
+//
+//     // Write features to obj format for postprocessing
+//     writeObj                no;
+//     verboseObj              no;
+// }
+
+// flowDomain.stl
+// {
+//     extractionMethod    extractFromSurface;
+// 
+//     extractFromSurfaceCoeffs
+//     {
+//         includedAngle   170;
+//     }
+// 
+//     writeObj            no;
+//     writeVTK            no;
+// }
+
+
+// ************************************************************************* //

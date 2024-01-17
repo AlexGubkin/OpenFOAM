@@ -1,0 +1,425 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+#include "ROI"
+
+//box0 - center
+box0x0          #calc "- 0.5 * $dx + $ox";
+box0y0          #calc "- 0.5 * $dy + $oy";
+box0z0          #calc "- 0.5 * $dz + $oz";
+
+box0x1          #calc "0.5 * $dx + $ox";
+box0y1          #calc "- 0.5 * $dy + $oy";
+box0z1          #calc "- 0.5 * $dz + $oz";
+
+box0x2          #calc "0.5 * $dx + $ox";
+box0y2          #calc "0.5 * $dy + $oy";
+box0z2          #calc "- 0.5 * $dz + $oz";
+
+box0x3          #calc "- 0.5 * $dx + $ox";
+box0y3          #calc "0.5 * $dy + $oy";
+box0z3          #calc "- 0.5 * $dz + $oz";
+
+box0x4          #calc "- 0.5 * $dx + $ox";
+box0y4          #calc "- 0.5 * $dy + $oy";
+box0z4          #calc "0.5 * $dz + $oz";
+
+box0x5          #calc "0.5 * $dx + $ox";
+box0y5          #calc "- 0.5 * $dy + $oy";
+box0z5          #calc "0.5 * $dz + $oz";
+
+box0x6          #calc "0.5 * $dx + $ox";
+box0y6          #calc "0.5 * $dy + $oy";
+box0z6          #calc "0.5 * $dz + $oz";
+
+box0x7          #calc "- 0.5 * $dx + $ox";
+box0y7          #calc "0.5 * $dy + $oy";
+box0z7          #calc "0.5 * $dz + $oz";
+
+//box1 on x (-0.5*x - bufferSize)
+box1x0          #calc "- 0.5 * $dx + $ox - $bufferSize";
+box1y0          #calc "- 0.5 * $dy + $oy";
+box1z0          #calc "- 0.5 * $dz + $oz";
+
+box1x1          #calc "- 0.5 * $dx + $ox";
+box1y1          #calc "- 0.5 * $dy + $oy";
+box1z1          #calc "- 0.5 * $dz + $oz";
+
+box1x2          #calc "- 0.5 * $dx + $ox";
+box1y2          #calc "0.5 * $dy + $oy";
+box1z2          #calc "- 0.5 * $dz + $oz";
+
+box1x3          #calc "- 0.5 * $dx + $ox - $bufferSize";
+box1y3          #calc "0.5 * $dy + $oy";
+box1z3          #calc "- 0.5 * $dz + $oz";
+
+box1x4          #calc "- 0.5 * $dx + $ox - $bufferSize";
+box1y4          #calc "- 0.5 * $dy + $oy";
+box1z4          #calc "0.5 * $dz + $oz";
+
+box1x5          #calc "- 0.5 * $dx + $ox";
+box1y5          #calc "- 0.5 * $dy + $oy";
+box1z5          #calc "0.5 * $dz + $oz";
+
+box1x6          #calc "- 0.5 * $dx + $ox";
+box1y6          #calc "0.5 * $dy + $oy";
+box1z6          #calc "0.5 * $dz + $oz";
+
+box1x7          #calc "- 0.5 * $dx + $ox - $bufferSize";
+box1y7          #calc "0.5 * $dy + $oy";
+box1z7          #calc "0.5 * $dz + $oz";
+
+//box2 on x (0.5*x + bufferSize)
+box2x0          #calc "0.5 * $dx + $ox";
+box2y0          #calc "- 0.5 * $dy + $oy";
+box2z0          #calc "- 0.5 * $dz + $oz";
+
+box2x1          #calc "0.5 * $dx + $ox + $bufferSize";
+box2y1          #calc "- 0.5 * $dy + $oy";
+box2z1          #calc "- 0.5 * $dz + $oz";
+
+box2x2          #calc "0.5 * $dx + $ox + $bufferSize";
+box2y2          #calc "0.5 * $dy + $oy";
+box2z2          #calc "- 0.5 * $dz + $oz";
+
+box2x3          #calc "0.5 * $dx + $ox";
+box2y3          #calc "0.5 * $dy + $oy";
+box2z3          #calc "- 0.5 * $dz + $oz";
+
+box2x4          #calc "0.5 * $dx + $ox";
+box2y4          #calc "- 0.5 * $dy + $oy";
+box2z4          #calc "0.5 * $dz + $oz";
+
+box2x5          #calc "0.5 * $dx + $ox + $bufferSize";
+box2y5          #calc "- 0.5 * $dy + $oy";
+box2z5          #calc "0.5 * $dz + $oz";
+
+box2x6          #calc "0.5 * $dx + $ox + $bufferSize";
+box2y6          #calc "0.5 * $dy + $oy";
+box2z6          #calc "0.5 * $dz + $oz";
+
+box2x7          #calc "0.5 * $dx + $ox";
+box2y7          #calc "0.5 * $dy + $oy";
+box2z7          #calc "0.5 * $dz + $oz";
+
+//box3 on y (-0.5*y - bufferSize)
+box3x0          #calc "- 0.5 * $dx + $ox";
+box3y0          #calc "- 0.5 * $dy + $oy - $bufferSize";
+box3z0          #calc "- 0.5 * $dz + $oz";
+
+box3x1          #calc "0.5 * $dx + $ox";
+box3y1          #calc "- 0.5 * $dy + $oy - $bufferSize";
+box3z1          #calc "- 0.5 * $dz + $oz";
+
+box3x2          #calc "0.5 * $dx + $ox";
+box3y2          #calc "- 0.5 * $dy + $oy";
+box3z2          #calc "- 0.5 * $dz + $oz";
+
+box3x3          #calc "- 0.5 * $dx + $ox";
+box3y3          #calc "- 0.5 * $dy + $oy";
+box3z3          #calc "- 0.5 * $dz + $oz";
+
+box3x4          #calc "- 0.5 * $dx + $ox";
+box3y4          #calc "- 0.5 * $dy + $oy - $bufferSize";
+box3z4          #calc "0.5 * $dz + $oz";
+
+box3x5          #calc "0.5 * $dx + $ox";
+box3y5          #calc "- 0.5 * $dy + $oy - $bufferSize";
+box3z5          #calc "0.5 * $dz + $oz";
+
+box3x6          #calc "0.5 * $dx + $ox";
+box3y6          #calc "- 0.5 * $dy + $oy";
+box3z6          #calc "0.5 * $dz + $oz";
+
+box3x7          #calc "- 0.5 * $dx + $ox";
+box3y7          #calc "- 0.5 * $dy + $oy";
+box3z7          #calc "0.5 * $dz + $oz";
+
+//box4 on y (0.5*y + bufferSize)
+box4x0          #calc "- 0.5 * $dx + $ox";
+box4y0          #calc "0.5 * $dy + $oy";
+box4z0          #calc "- 0.5 * $dz + $oz";
+
+box4x1          #calc "0.5 * $dx + $ox";
+box4y1          #calc "0.5 * $dy + $oy";
+box4z1          #calc "- 0.5 * $dz + $oz";
+
+box4x2          #calc "0.5 * $dx + $ox";
+box4y2          #calc "0.5 * $dy + $oy + $bufferSize";
+box4z2          #calc "- 0.5 * $dz + $oz";
+
+box4x3          #calc "- 0.5 * $dx + $ox";
+box4y3          #calc "0.5 * $dy + $oy + $bufferSize";
+box4z3          #calc "- 0.5 * $dz + $oz";
+
+box4x4          #calc "- 0.5 * $dx + $ox";
+box4y4          #calc "0.5 * $dy + $oy";
+box4z4          #calc "0.5 * $dz + $oz";
+
+box4x5          #calc "0.5 * $dx + $ox";
+box4y5          #calc "0.5 * $dy + $oy";
+box4z5          #calc "0.5 * $dz + $oz";
+
+box4x6          #calc "0.5 * $dx + $ox";
+box4y6          #calc "0.5 * $dy + $oy + $bufferSize";
+box4z6          #calc "0.5 * $dz + $oz";
+
+box4x7          #calc "- 0.5 * $dx + $ox";
+box4y7          #calc "0.5 * $dy + $oy + $bufferSize";
+box4z7          #calc "0.5 * $dz + $oz";
+
+vertices
+(
+    //box0
+    ($box0x0 $box0y0 $box0z0)
+    ($box0x1 $box0y1 $box0z1)
+    ($box0x2 $box0y2 $box0z2)
+    ($box0x3 $box0y3 $box0z3)
+    ($box0x4 $box0y4 $box0z4)
+    ($box0x5 $box0y5 $box0z5)
+    ($box0x6 $box0y6 $box0z6)
+    ($box0x7 $box0y7 $box0z7)
+    //box1
+    ($box1x0 $box1y0 $box1z0)
+    ($box1x1 $box1y1 $box1z1)
+    ($box1x2 $box1y2 $box1z2)
+    ($box1x3 $box1y3 $box1z3)
+    ($box1x4 $box1y4 $box1z4)
+    ($box1x5 $box1y5 $box1z5)
+    ($box1x6 $box1y6 $box1z6)
+    ($box1x7 $box1y7 $box1z7)
+    //box2
+    ($box2x0 $box2y0 $box2z0)
+    ($box2x1 $box2y1 $box2z1)
+    ($box2x2 $box2y2 $box2z2)
+    ($box2x3 $box2y3 $box2z3)
+    ($box2x4 $box2y4 $box2z4)
+    ($box2x5 $box2y5 $box2z5)
+    ($box2x6 $box2y6 $box2z6)
+    ($box2x7 $box2y7 $box2z7)
+    //box3
+    ($box3x0 $box3y0 $box3z0)
+    ($box3x1 $box3y1 $box3z1)
+    ($box3x2 $box3y2 $box3z2)
+    ($box3x3 $box3y3 $box3z3)
+    ($box3x4 $box3y4 $box3z4)
+    ($box3x5 $box3y5 $box3z5)
+    ($box3x6 $box3y6 $box3z6)
+    ($box3x7 $box3y7 $box3z7)
+    //box4
+    ($box4x0 $box4y0 $box4z0)
+    ($box4x1 $box4y1 $box4z1)
+    ($box4x2 $box4y2 $box4z2)
+    ($box4x3 $box4y3 $box4z3)
+    ($box4x4 $box4y4 $box4z4)
+    ($box4x5 $box4y5 $box4z5)
+    ($box4x6 $box4y6 $box4z6)
+    ($box4x7 $box4y7 $box4z7)
+);
+
+blocks
+(
+    //box0 - central box
+    hex (0 1 2 3 4 5 6 7)
+    porousCell
+    ($nx $ny $nz)
+    simpleGrading (1 1 1)
+    //box1 x (-0.5*x - bufferSize)
+    hex (8 9 10 11 12 13 14 15)
+    xBuffer1
+    ($nBuffer $ny $nz)
+    simpleGrading (1 1 1)
+    //box2 x (0.5*x + bufferSize)
+    hex (16 17 18 19 20 21 22 23)
+    xBuffer2
+    ($nBuffer $ny $nz)
+    simpleGrading (1 1 1)
+    //box3 y (-0.5*y - bufferSize)
+    hex (24 25 26 27 28 29 30 31)
+    yBuffer1
+    ($nx $nBuffer $nz)
+    simpleGrading (1 1 1)
+    //box4 y (0.5*y + bufferSize)
+    hex (32 33 34 35 36 37 38 39)
+    yBuffer2
+    ($nx $nBuffer $nz)
+    simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+defaultPatch
+{
+    name defaultFaces;
+    type wall;
+}
+
+boundary
+(
+    zPlane
+    {
+        type patch;
+        faces
+        (
+            (0 1 2 3)
+            (8 9 10 11)
+            (16 17 18 19)
+            (24 25 26 27)
+            (32 33 34 35)
+        );
+    }
+
+    dzPlane
+    {
+        type patch;
+        faces
+        (
+            (4 7 6 5)
+            (12 15 14 13)
+            (20 23 22 21)
+            (28 31 30 29)
+            (36 39 38 37)
+        );
+    }
+
+    xPlane
+    {
+        type patch;
+        faces
+        (
+            (8 11 15 12)
+        );
+    }
+
+    dxPlane
+    {
+        type patch;
+        faces
+        (
+            (17 21 22 18)
+        );
+    }
+
+    yPlane
+    {
+        type patch;
+        faces
+        (
+            (24 28 29 25)
+        );
+    }
+
+    dyPlane
+    {
+        type patch;
+        faces
+        (
+            (35 34 38 39)
+        );
+    }
+
+    interfaceFrom0To1
+    {
+        type patch;
+        faces
+        (
+            (0 3 7 4)
+        );
+    }
+
+    interfaceFrom1To0
+    {
+        type patch;
+        faces
+        (
+            (9 14 13 10)
+        );
+    }
+
+    interfaceFrom0To2
+    {
+        type patch;
+        faces
+        (
+            (1 5 6 2)
+        );
+    }
+
+    interfaceFrom2To0
+    {
+        type patch;
+        faces
+        (
+            (16 19 23 20)
+        );
+    }
+
+    interfaceFrom0To3
+    {
+        type patch;
+        faces
+        (
+            (0 4 5 1)
+        );
+    }
+
+    interfaceFrom3To0
+    {
+        type patch;
+        faces
+        (
+            (27 31 30 26)
+        );
+    }
+
+    interfaceFrom0To4
+    {
+        type patch;
+        faces
+        (
+            (2 3 7 6)
+        );
+    }
+
+    interfaceFrom4To0
+    {
+        type patch;
+        faces
+        (
+            (32 36 37 33)
+        );
+    }
+
+//     defaultFaces
+//     {
+//         type wall;
+//         faces ();
+//     }
+);
+
+mergePatchPairs
+(
+    (interfaceFrom0To1 interfaceFrom1To0)
+    (interfaceFrom0To2 interfaceFrom2To0)
+    (interfaceFrom0To3 interfaceFrom3To0)
+    (interfaceFrom0To4 interfaceFrom4To0)
+);
+
+// ************************************************************************* //

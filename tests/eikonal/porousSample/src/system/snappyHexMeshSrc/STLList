@@ -1,0 +1,53 @@
+// Can work in three modes:
+// - follow : makes sure each processor has all the triangles inside the
+// externally provided bounding box (usually the mesh bounding box).
+// Guarantees minimum amount of communication since mesh-local queries
+// should be answerable without any comms.
+// - independent : surface is decomposed according to the triangle centres
+// so the decomposition might be radically different from the mesh
+// decomposition. Guarantees best memory balance but at the expense of
+// more communication.
+// - frozen : no change
+
+// flowDomain.stl
+// {
+//     type triSurfaceMesh;
+//     name flowDomain;
+// 
+//     regions
+//     {
+//         rockSkeletonWalls
+//         {
+//             name rockSkeletonWalls;
+//         }
+// 
+//         outerBufferZoneWalls
+//         {
+//             name outerBufferZoneWalls;
+//         }
+// 
+//         inlet
+//         {
+//             name inlet;
+//         }
+// 
+//         outlet
+//         {
+//             name outlet;
+//         }
+//     }
+// }
+
+rockSkeletonWalls.stl
+{
+    type triSurfaceMesh;
+    name rockSkeletonWalls;
+
+//     type distributedTriSurfaceMesh;
+//     name rockSkeletonWalls;
+//     distributionType follow;
+}
+
+// outerBufferZoneWalls.stl    {type triSurfaceMesh;name outerBufferZoneWalls;}
+// inlet.stl                   {type triSurfaceMesh;name inlet;}
+// outlet.stl                  {type triSurfaceMesh;name outlet;}

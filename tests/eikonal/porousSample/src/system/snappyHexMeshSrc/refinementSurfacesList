@@ -1,0 +1,41 @@
+// flowDomain
+// {
+//     level (0 0);
+// 
+//     regions
+//     {
+//         rockSkeletonWalls
+//         {
+//             level (3 3);
+//             patchInfo{type wall;}
+//         }
+// 
+//         outerBufferZoneWalls
+//         {
+//             level (3 3);
+//             patchInfo{type wall;}
+//         }
+// 
+//         inlet
+//         {
+//             level (0 0);
+//             patchInfo{type patch;}
+//         }
+// 
+//         outlet
+//         {
+//             level (0 0);
+//             patchInfo{type patch;}
+//         }
+//     }
+// }
+
+rockSkeletonWalls
+{
+    #include "levels"
+    patchInfo{type wall;}
+}
+
+// outerBufferZoneWalls    {level (0 0); patchInfo{type wall;}}
+// inlet                   {level (0 0); patchInfo{type patch;}}
+// outlet                  {level (0 0); patchInfo{type patch;}}

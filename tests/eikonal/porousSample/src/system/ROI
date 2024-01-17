@@ -1,0 +1,12 @@
+dx 10;
+dy 10;
+dz 0.050;
+ox 0;
+oy 0;
+oz 0;
+nx 150;
+ny 150;
+nz 1;
+
+bufferSize #calc "0.1 * $dx";
+nBuffer #calc "int(0.1 * $nx)";

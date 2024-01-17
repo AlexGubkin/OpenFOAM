@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  10
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       volScalarField;
+    object      p_rgh;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [1 -1 -2 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    rockSkeletonWalls
+    {
+        type            fixedFluxPressure;
+    }
+
+    zPlane
+    {
+        type            empty;
+    }
+
+    dzPlane
+    {
+        type            empty;
+    }
+
+    xPlane
+    {
+        type            totalPressure;
+        p0              uniform 50;
+    }
+
+    dxPlane
+    {
+        type            totalPressure;
+        p0              uniform 0;
+    }
+
+    yPlane
+    {
+        type            totalPressure;
+        p0              uniform 50;
+    }
+
+    dyPlane
+    {
+        type            totalPressure;
+        p0              uniform 0;
+    }
+
+    defaultFaces
+    {
+        type            fixedFluxPressure;
+    }
+}
+
+
+// ************************************************************************* //
