@@ -22,6 +22,7 @@ ddtSchemes
 gradSchemes
 {
     default                         Gauss linear;
+    grad(s)                         cellLimited Gauss linear 1;
 //     grad(p)                         cellLimited Gauss linear 1;
 //     grad(U)                         cellLimited Gauss linear 1;
 }
@@ -31,6 +32,7 @@ divSchemes
     default                         none;
 
     div(phi,U)                      bounded Gauss linearUpwindV grad(U);
+    div(sPhi,s)                     Gauss upwind;
 //     div(phi,U)                      bounded Gauss upwind;
     div(rhoPhi,U)                   Gauss linearUpwindV grad(U);
     div(phi,alpha)                  Gauss interfaceCompression vanLeer 1;

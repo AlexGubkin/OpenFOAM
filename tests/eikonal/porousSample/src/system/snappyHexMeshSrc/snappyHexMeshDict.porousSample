@@ -142,9 +142,9 @@ addLayersControls
         rockSkeletonWalls
         {
             nSurfaceLayers 2;
-            expansionRatio 1;
+            expansionRatio 1.1;
             thickness 0.002;
-            minThickness 0.0001;
+            minThickness 0.00001;
         }
     }
 

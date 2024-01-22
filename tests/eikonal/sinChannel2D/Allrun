@@ -12,7 +12,9 @@ cp -r\
 
 runApplication  blockMesh
 runApplication  topoSet
-runApplication  postProcess -func distanceField
+runApplication  decomposePar
+runParallel     postProcess -func distanceField
+# runApplication  postProcess -func distanceField
 
 # runApplication  $application
 # runApplication  $application -withFunctionObjects

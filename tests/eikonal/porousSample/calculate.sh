@@ -53,7 +53,7 @@ runApplication -a\
 #Preparation STL-files for snappyHexMesh
 mkdir -p ${caseDir}/constant/triSurface/
 tar -xzf ${srcDir}/skeletonSample3D.tar.gz -C ${caseDir}
-ln -sf ${caseDir}/openPoresSkeleton3D.stl ${caseDir}/constant/triSurface/rockSkeletonWalls.stl
+ln -sf ${caseDir}/skeletonSample3D.stl ${caseDir}/constant/triSurface/rockSkeletonWalls.stl
 
 #             runApplication -o\
 #                 surfaceFeatures\
@@ -110,8 +110,8 @@ runParallel -o\
 #                     -case ${caseDir}
 
 runParallel -o\
-    HeleShawSimpleFoam\
-        -case ${caseDir}
+    postProcess\
+        -func distanceField
 
 echo -e "\nCalculation done!\n"
 

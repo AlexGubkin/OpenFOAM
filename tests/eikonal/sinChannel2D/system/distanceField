@@ -17,11 +17,14 @@ writeControl    writeTime;
 log             true;
 writeFields     true;
 
+selectionMode   cellSet;
+cellSet         c0;
+
 regionType      cellZone;
 name            set0;
 
-field   s;
-patches (bottom top);
+field           s;
+patches         (bottom top);
 
 fields
 (

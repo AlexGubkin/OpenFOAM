@@ -10,8 +10,22 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#includeEtc "distanceField.cfg"
+#includeEtc "caseDicts/postProcessing/fields/distanceField.cfg"
 
-fields  (<fieldNames>);
+writeControl    writeTime;
+
+log             true;
+writeFields     true;
+
+regionType      cellZone;
+name            porousCell;
+
+field           s;
+patches         (rockSkeletonWalls);
+
+fields
+(
+    s
+);
 
 // ************************************************************************* //

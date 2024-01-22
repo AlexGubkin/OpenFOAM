@@ -70,6 +70,28 @@ functions
     }
 
     #includeFunc    residuals
+
+    distanceField1
+    {
+        type            distanceField;
+        libs            ("libdistanceFieldFunctionObject.so");
+
+        writeControl    writeTime;
+
+        log             true;
+        writeFields     true;
+
+        regionType      cellZone;
+        name            set0;
+
+        field           s;
+        patches         (rockSkeletonWalls);
+
+        fields
+        (
+            s
+        );
+    }
 }
 
 // ************************************************************************* //

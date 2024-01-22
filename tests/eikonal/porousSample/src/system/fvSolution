@@ -16,6 +16,25 @@ FoamFile
 
 solvers
 {
+    s
+    {
+        nPredictorCorr  10;
+        nCorr           400;
+        epsilon         1e-3;
+
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0.0;
+    }
+
+    sPsi
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.0;
+    }
 //     Phi
 //     {
 //         solver                  GAMG;
@@ -190,6 +209,7 @@ relaxationFactors
 
     equations
     {
+        s                       0.2;
         U                       0.7;
     }
 }

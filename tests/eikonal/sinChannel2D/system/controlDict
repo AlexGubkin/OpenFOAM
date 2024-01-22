@@ -62,6 +62,9 @@ functions
         log             true;
         writeFields     true;
 
+        selectionMode   cellSet;
+        cellSet         c0;
+
         regionType      cellZone;
         name            set0;
 
