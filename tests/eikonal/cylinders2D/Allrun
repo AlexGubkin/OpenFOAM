@@ -10,7 +10,7 @@ cp -r\
     0.orig\
     0
 
-runApplication  blockMesh
+runApplication      blockMesh
 runApplication -a\
     foamDictionary  -entry numberOfSubdomains -set 4 system/decomposeParDict
 runApplication -a\
@@ -20,6 +20,7 @@ runParallel         snappyHexMesh -overwrite
 # runParallel         patchSummary
 # runParallel         renumberMesh -noZero -overwrite
 runParallel         extrudeMesh
+runParallel         topoSet
 runParallel         checkMesh -allTopology -allGeometry
 runParallel -a\
     foamDictionary  constant/polyMesh/boundary -entry entry0/back/type -set empty
@@ -32,6 +33,7 @@ runApplication -a\
 # runApplication      setFields
 # runParallel -a      setFields
 
-runParallel         $application
+# runParallel         $application
+runParallel         postProcess -func distanceField
 
 #------------------------------------------------------------------------------

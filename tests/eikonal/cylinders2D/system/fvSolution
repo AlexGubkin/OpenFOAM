@@ -16,6 +16,26 @@ FoamFile
 
 solvers
 {
+    s
+    {
+        nPredictorCorr  10;
+        nCorr           200;
+        epsilon         1e-3;
+
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0.0;
+    }
+
+    sPsi
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.0;
+    }
+
     d
     {
         solver          PBiCGStab;
@@ -56,11 +76,11 @@ SIMPLE
 
 eikonal
 {
-    nNonOrthogonalCorrectors 1000;
+    nNonOrthogonalCorrectors 100;
 
     eikonalCoeffs
     {
-        epsilon         1e-4;
+        epsilon         1e-3;
     }
 }
 
@@ -71,6 +91,7 @@ relaxationFactors
     }
     equations
     {
+        s       0.5;
         d       0.5;
         d2      0.5;
         d2Psi   0.1;
