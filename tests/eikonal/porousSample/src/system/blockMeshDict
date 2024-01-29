@@ -407,11 +407,11 @@ boundary
         );
     }
 
-//     defaultFaces
-//     {
-//         type wall;
-//         faces ();
-//     }
+    defaultFaces
+    {
+        type patch;
+        faces ();
+    }
 );
 
 mergePatchPairs

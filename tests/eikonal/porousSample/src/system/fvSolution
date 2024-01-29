@@ -19,7 +19,7 @@ solvers
     s
     {
         nPredictorCorr  10;
-        nCorr           400;
+        nCorr           100;
         epsilon         1e-3;
 
         solver          PBiCGStab;

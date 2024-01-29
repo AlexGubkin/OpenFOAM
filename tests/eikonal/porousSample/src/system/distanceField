@@ -17,11 +17,14 @@ writeControl    writeTime;
 log             true;
 writeFields     true;
 
+selectionMode   all;
+// cellSet         c0;
+
 regionType      cellZone;
 name            porousCell;
 
 field           s;
-patches         (rockSkeletonWalls);
+patches         (rockSkeletonWalls defaultFaces);
 
 fields
 (

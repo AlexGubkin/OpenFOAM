@@ -110,8 +110,11 @@ runParallel -o\
 #                     -case ${caseDir}
 
 runParallel -o\
-    postProcess\
-        -func distanceField
+    postProcess
+
+# runParallel -a\
+#     postProcess\
+#         -func distanceField
 
 echo -e "\nCalculation done!\n"
 

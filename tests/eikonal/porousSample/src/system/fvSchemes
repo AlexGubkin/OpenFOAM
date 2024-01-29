@@ -22,7 +22,7 @@ ddtSchemes
 gradSchemes
 {
     default                         Gauss linear;
-    grad(s)                         cellLimited Gauss linear 1;
+//     grad(s)                         cellLimited Gauss linear 1;
 //     grad(p)                         cellLimited Gauss linear 1;
 //     grad(U)                         cellLimited Gauss linear 1;
 }
@@ -32,7 +32,7 @@ divSchemes
     default                         none;
 
     div(phi,U)                      bounded Gauss linearUpwindV grad(U);
-    div(sPhi,s)                     Gauss upwind;
+    div(sPhi,s)                     Gauss vanLeer;
 //     div(phi,U)                      bounded Gauss upwind;
     div(rhoPhi,U)                   Gauss linearUpwindV grad(U);
     div(phi,alpha)                  Gauss interfaceCompression vanLeer 1;
@@ -50,8 +50,8 @@ divSchemes
 
 laplacianSchemes
 {
-    default                         Gauss linear corrected;
-//     default                         Gauss linear limited corrected 1;
+//     default                         Gauss linear corrected;
+    default                         Gauss linear limited corrected 1;
 //     laplacian(1,Phi)                Gauss linear limited corrected 0.33;
 //     laplacian(nuEff,U)              Gauss linear limited corrected 0.33;
 //     laplacian(rAUf,p)               Gauss linear limited corrected 0.33;
@@ -70,8 +70,8 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default                         corrected;
-//     default                         limited corrected 1;
+//     default                         corrected;
+    default                         limited corrected 1;
 }
 
 fluxRequired

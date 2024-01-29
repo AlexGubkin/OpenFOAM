@@ -81,8 +81,11 @@ functions
         log             true;
         writeFields     true;
 
+        selectionMode   all;
+        // cellSet         c0;
+
         regionType      cellZone;
-        name            set0;
+        name            porousCell;
 
         field           s;
         patches         (rockSkeletonWalls);

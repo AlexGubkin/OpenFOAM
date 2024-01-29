@@ -76,7 +76,9 @@ boundaryField
 
     defaultFaces
     {
-        type            noSlip;
+//         type            noSlip;
+        type            fixedValue;
+        value           uniform (0 0 0);
     }
 }
 
