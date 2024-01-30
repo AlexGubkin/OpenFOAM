@@ -80,6 +80,10 @@ runParallel -o\
     snappyHexMesh -overwrite\
         -case ${caseDir}\
         -dict ${caseDir}/system/snappyHexMeshSrc/snappyHexMeshDict.porousSample
+# runParallel -o\
+#     topoSet\
+#         -case ${caseDir}\
+#         -dict ${caseDir}/system/topoSetDict
 runParallel -o\
     transformPoints\
         -case ${caseDir}\
